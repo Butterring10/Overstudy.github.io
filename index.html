@@ -798,9 +798,9 @@ if(!rWalk(r,RM.x,RM.y)){let bd=1e9,bx=RM.x,by=RM.y;for(let a=0;a<RW*RD;a++){cons
 rDraw(r);requestAnimationFrame(rLoop)}
 function rWall(R,plane,o,k){const L=plane==="y"?RW:RD,P=(a,z)=>plane==="y"?[a,0,z]:[0,a,z];
 for(let i=0;i<L;i++){let col=shd(o.c1,k);if(o.pat==="stripe"&&i%2)col=shd(o.c2,k);rPoly(R,[P(i,0),P(i+1,0),P(i+1,RWH),P(i,RWH)],col,0)}
-if(o.pat==="dots")for(let i=0;i<L;i++)for(let j=0;j<4;j++)rDot(R,...(plane==="y"?[i+.5+(j%2)*.5,0]:[0,i+.5+(j%2)*.5]),.5+j*.75,.1,shd(o.c2,k));
+if(o.pat==="dots")for(let i=0;i<L;i++)for(let j=0;j<4;j++)rDot(R,...(plane==="y"?[i+.5+(j%2)*.5,0]:[0,i+.5+(j%2)*.5]),.5+j*.75,6,shd(o.c2,k));
 if(o.pat==="brick"){for(let j=1;j<8;j++)rLine(R,P(0,j*.4),P(L,j*.4),shd(o.c2,k),1.3);for(let j=0;j<8;j++)for(let i=0;i<L;i++)rLine(R,P(i+(j%2?.5:0)+.01,j*.4),P(i+(j%2?.5:0)+.01,j*.4+.4),shd(o.c2,k),1.3)}
-if(o.pat==="stars")for(let off=0;off<L;off+=8)for(const[a,z]of[[.7,2.6],[1.8,1.6],[2.9,2.8],[3.7,1.2],[4.6,2.4],[5.5,1.5],[6.4,2.8],[7.2,1.9],[2.2,.9],[5,.8]])if(a+off<L)rDot(R,...(plane==="y"?[a+off,0]:[0,a+off]),z,.12,o.c2);
+if(o.pat==="stars")for(let off=0;off<L;off+=8)for(const[a,z]of[[.7,2.6],[1.8,1.6],[2.9,2.8],[3.7,1.2],[4.6,2.4],[5.5,1.5],[6.4,2.8],[7.2,1.9],[2.2,.9],[5,.8]])if(a+off<L)rDot(R,...(plane==="y"?[a+off,0]:[0,a+off]),z,3.4,o.c2);
 rPoly(R,[P(0,0),P(L,0),P(L,RWH),P(0,RWH)],null,1.8)}
 function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;c.clearRect(0,0,cv.width,cv.height);RSH=1;
 rWall(R,"x",W,.86);rWall(R,"y",W,1);
