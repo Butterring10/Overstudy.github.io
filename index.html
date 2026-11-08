@@ -372,17 +372,21 @@ const item=id=>ITEMS.find(i=>i.id===id);
 function avatar(m){const q=m.equip||{};const av={e:(CHARS.find(x=>x.id===m.char)||{e:"❔"}).e},bg=q.bg&&item(q.bg),h=q.hat&&item(q.hat),tl=q.tool&&item(q.tool);
 return `<div class="av" style="background:${bg?bg.e:"var(--bd)"}">${charHTML(m.char,q.hat,0,q.tool)}</div>`}
 const myTool=()=>{const t=S.me&&S.me.equip&&S.me.equip.tool;return t?item(t):null};
-async function init(){try{db=await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){db=null}render()}
+async function init(){try{db=await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){db=null}render();loadTheme()}
 function nav(v,x={}){Object.assign(S,{view:v,err:""},x);render()}
-function render(){
+function render(){document.body.style.background="";document.documentElement.style.background="";
 if(!db){$.innerHTML=`<div class="card"><h1>학습 게임</h1><p class="mu">저장소에 연결하지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p></div>`;return}
 ({home:home,teacher:teacher,tlogin:tlogin,alogin:alogin,class:classPage})[S.view]()}
-function home(){$.innerHTML=`<h1>🎓 오버 스터디!</h1><p class="mu">학급 코드로 입장해 친구들과 함께 배워요.</p>
+const DEFT="🎓 오버 스터디!",THD={title:"",tc:"",bg:""},hexOk=v=>/^#[0-9a-fA-F]{6}$/.test(v||"");
+function thm(){return Object.assign({},THD,S.theme||{})}
+function applyTheme(){const t=thm(),on=S.view==="home"&&hexOk(t.bg);document.body.style.background=on?t.bg:"";document.documentElement.style.background=on?t.bg:""}
+async function loadTheme(){if(!db)return;try{const d=await db.doc("classes/_site").get();if(d.exists){S.theme=dc(d.data()).theme||{};if(S.view==="home")render()}}catch(e){}}
+function home(){const t=thm();$.innerHTML=`<h1${hexOk(t.tc)?` style="color:${t.tc}"`:""}>${esc(t.title||DEFT)}</h1><p class="mu">학급 코드로 입장해 친구들과 함께 배워요.</p>
 <div class="card"><h2>학생 로그인</h2><label class="mu">학급 코드</label><input id="lc" autocapitalize="off">
 <label class="mu">아이디</label><input id="li" autocapitalize="off"><label class="mu">비밀번호</label><input id="lp" type="password">
 <div class="err">${esc(S.err)}</div><button id="go" style="width:100%">입장하기</button></div>
 <button class="g" style="width:100%" onclick="nav('tlogin')">교사 · 관리자 로그인</button>`;
-go.onclick=login}
+go.onclick=login;applyTheme()}
 async function login(){const c=lc.value.trim().toLowerCase(),i=li.value.trim().toLowerCase(),p=lp.value.trim();
 try{const [cs,ss]=await Promise.all([db.doc("classes/"+c).get(),db.doc("students/"+c+"_"+i).get()]);
 if(!cs.exists||!ss.exists||ss.data().pw!==p)return nav("home",{err:"학급 코드, 아이디 또는 비밀번호를 확인해 주세요."});
@@ -406,12 +410,27 @@ function alogin(){$.innerHTML=`<h1>관리자</h1><div class="card"><label class=
 <div class="err">${esc(S.err)}</div><button id="go" style="width:100%">확인</button></div><button class="g" onclick="nav('tlogin')">← 돌아가기</button>`;
 go.onclick=()=>ac.value===ADMIN_CODE?(S.auth={role:"admin"},S.tsel=null,S.ttab="cls",loadT()):nav("alogin",{err:"관리자 코드가 올바르지 않아요."})}
 async function loadT(){try{const q=await db.collection("classes").get(),all=q.docs.map(d=>dc(d.data())),A=S.auth||{};
-S.tch=all.filter(x=>x.kind==="teacher").sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));const cl=all.filter(x=>x.kind!=="teacher");
+S.tch=all.filter(x=>x.kind==="teacher").sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));const cl=all.filter(x=>x.kind!=="teacher"&&x.kind!=="site");
 S.tcls=A.role==="admin"?cl:cl.filter(c=>c.owner===A.tid);if(S.tsel&&!S.tcls.some(c=>c.code===S.tsel))S.tsel=null;S.tstu=[];
 if(S.tsel){const s=await db.collection("students").where("cls","==",S.tsel).get();S.tstu=s.docs.map(d=>dc(d.data())).filter(x=>x.sid!=='teacher').sort((a,b)=>a.sid.localeCompare(b.sid))}}catch(e){S.err="불러오지 못했어요."}
 nav("teacher")}
 const tName=id=>{const t=(S.tch||[]).find(x=>x.tid===id);return id?(t?t.name||t.tid:"(삭제된 교사)"):"미배정"};
 const tTitle=id=>{const t=(S.tch||[]).find(x=>x.tid===id);return((t&&t.name)||"")+"선생님"};
+const THP=[["기본","","" ],["하늘","#1d4ed8","#e0f2fe"],["민트","#0f766e","#dcfce7"],["노을","#c2410c","#ffedd5"],["라벤더","#6d28d9","#ede9fe"],["밤하늘","#fde68a","#1e293b"],["분홍","#be185d","#fce7f3"]];
+function themeCard(){const t=thm(),tc=hexOk(t.tc)?t.tc:"#1c2430",bg=hexOk(t.bg)?t.bg:"#f4f7fb";
+return `<div class="card"><h2>🎨 메인 화면 꾸미기</h2><p class="mu">로그인 전 첫 화면의 제목과 배경을 바꿔요. 모든 학생과 교사에게 똑같이 보여요.</p>
+<label class="mu">제목 글자</label><input id="thT" value="${esc(t.title)}" placeholder="${DEFT}" maxlength="30" oninput="thmPrev()">
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin:6px 0"><label class="mu" style="display:flex;align-items:center;gap:8px">제목 색 <input id="thC" type="color" value="${tc}" oninput="thmPrev(1)" style="width:52px;height:38px;padding:2px;margin:0"></label>
+<label class="mu" style="display:flex;align-items:center;gap:8px">배경 색 <input id="thB" type="color" value="${bg}" oninput="thmPrev(2)" style="width:52px;height:38px;padding:2px;margin:0"></label></div>
+<div class="mu" style="margin-top:8px">추천 색</div><div class="chips" style="margin-bottom:10px">${THP.map(([n,c,b])=>`<button class="g" style="padding:5px 12px" onclick="thmSet('${c}','${b}')">${n}</button>`).join("")}</div>
+<div id="thPv" style="border:1px solid var(--bd);border-radius:12px;padding:22px 14px;text-align:center"><div id="thPt" style="font-size:24px;font-weight:700">제목 미리보기</div><div class="mu" style="margin-top:4px">학급 코드로 입장해 친구들과 함께 배워요.</div></div>
+<div id="thm" class="err" style="min-height:22px"></div><div style="display:flex;gap:8px"><button onclick="saveTheme()">저장</button><button class="g" onclick="thmSet('','');document.getElementById('thT').value='';saveTheme()">기본으로 되돌리기</button></div></div>`}
+let thmDirty={};
+function thmPrev(k){if(k)thmDirty[k]=1;const g=i=>document.getElementById(i);if(!g("thPv"))return;g("thPt").textContent=g("thT").value.trim()||DEFT;g("thPt").style.color=thmPick(1,"thC",thm().tc);g("thPv").style.background=thmPick(2,"thB",thm().bg)}
+function thmPick(k,id,old){const on=thmDirty.x?thmDirty[k]:(thmDirty[k]||hexOk(old));return on?document.getElementById(id).value:""}
+function thmSet(c,b){const g=i=>document.getElementById(i);thmDirty={1:!!c,2:!!b,x:1};g("thC").value=c||"#1c2430";g("thB").value=b||"#f4f7fb";g("thPt").style.color=c;g("thPv").style.background=b}
+async function saveTheme(){const g=i=>document.getElementById(i),tc=thmPick(1,"thC",thm().tc),bg=thmPick(2,"thB",thm().bg),title=g("thT").value.trim().slice(0,30),th={title,tc,bg};
+try{await db.doc("classes/_site").set({kind:"site",code:"_site",theme:th});S.theme=th;thmDirty={};qMsg("thm","저장했어요. 첫 화면에서 확인해 보세요.")}catch(e){qMsg("thm","저장하지 못했어요.",1)}}
 function adminCard(){const arm=S.arm,bt=(k,l,f)=>`<button class="${arm===k?"":"g"}" style="${arm===k?"background:#e5484d;":""}" onclick="${f}">${arm===k?"정말 삭제?":l}</button>`;
 const st={pending:"승인 대기",ok:"승인됨",rejected:"거절됨"};
 return `<div class="card"><h2>교사 계정 관리</h2>${S.tch.length?S.tch.map(t=>`<div class="row" style="margin-bottom:6px;gap:6px"><span>${esc(t.name||t.tid)} <span class="mu">${esc(t.tid)} · ${st[t.status]||t.status}</span></span><span class="row" style="gap:4px">${t.status!=="ok"?`<button onclick="tSet('${t.tid}','ok')">승인</button>`:""}${t.status==="pending"?`<button class="g" onclick="tSet('${t.tid}','rejected')">거절</button>`:""}${bt("t_"+t.tid,"삭제","tDelT('"+t.tid+"')")}</span></div>`).join(""):'<p class="mu">가입 신청한 교사가 없어요.</p>'}</div>`}
@@ -427,10 +446,10 @@ try{const q=await db.collection("students").where("cls","==",c).get();for(const 
 async function setOwner(c,o){try{await db.doc("classes/"+c).update({owner:o||""})}catch(e){S.err="저장하지 못했어요."}loadT()}
 function teacher(){const sel=S.tcls.find(c=>c.code===S.tsel);
 const AD=(S.auth||{}).role==="admin",okT=(S.tch||[]).filter(t=>t.status==="ok");
-const T=S.ttab||"cls",TB=[["cls","학급"],["new","새 학급 만들기"]].concat(AD?[["tch","교사 관리"]]:[["info","정보 변경"]]);
+const T=S.ttab||"cls",TB=[["cls","학급"],["new","새 학급 만들기"]].concat(AD?[["tch","교사 관리"],["thm","화면 꾸미기"]]:[["info","정보 변경"]]);
 $.innerHTML=`<div class="row"><h1>${AD?"관리자":esc((S.auth||{}).name||"")+"선생님"}</h1><button class="g" onclick="S.auth=null;nav('home')">나가기</button></div>
 <div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:10px">${TB.map(t=>`<button class="${T===t[0]?"":"g"}" onclick="S.ttab='${t[0]}';S.arm=null;S.err='';teacher()">${t[1]}</button>`).join("")}</div>
-${S.err&&!(T==="cls"&&sel)?`<div class="err">${esc(S.err)}</div>`:""}${T==="tch"&&AD?adminCard():""}${T==="info"&&!AD?`<div class="card"><h2>내 정보</h2><p class="mu" style="margin:0">아이디 <b>${esc((S.auth||{}).tid||"")}</b> · 닉네임 <b>${esc((S.auth||{}).name||"없음")}</b></p></div>`+pwCard():""}
+${S.err&&!(T==="cls"&&sel)?`<div class="err">${esc(S.err)}</div>`:""}${T==="tch"&&AD?adminCard():""}${T==="thm"&&AD?themeCard():""}${T==="info"&&!AD?`<div class="card"><h2>내 정보</h2><p class="mu" style="margin:0">아이디 <b>${esc((S.auth||{}).tid||"")}</b> · 닉네임 <b>${esc((S.auth||{}).name||"없음")}</b></p></div>`+pwCard():""}
 ${T==="new"?`<div class="card"><h2>새 학급 만들기</h2><input id="cn" placeholder="예: 3학년 2반">${AD?`<label class="mu">담당 교사</label><select id="co"><option value="">미배정 (관리자)</option>${okT.map(t=>`<option value="${esc(t.tid)}">${esc(t.name||t.tid)} (${esc(t.tid)})</option>`).join("")}</select>`:""}<button onclick="mkClass()">학급 만들기</button></div>
 `:""}
 ${T==="cls"?`<div class="card"><h2>${AD?"전체 학급":"내 학급"}</h2>${S.tcls.length?S.tcls.map(c=>`<div style="margin-bottom:10px"><div class="row" style="gap:6px"><span>${esc(c.name)} <span class="mu">코드 ${esc(c.code)}${AD?" · "+esc(tName(c.owner)):""}</span></span><span class="row" style="gap:4px"><button class="${c.code===S.tsel?"":"g"}" onclick="selC('${c.code}')">선택</button>${AD?`<button class="g" style="${S.arm==="c_"+c.code?"background:#e5484d;color:#fff":""}" onclick="delC('${c.code}')">${S.arm==="c_"+c.code?"정말 삭제?":"삭제"}</button>`:""}</span></div>${AD?`<select onchange="setOwner('${c.code}',this.value)" style="margin-top:4px"><option value="">미배정 (관리자)</option>${okT.map(t=>`<option value="${esc(t.tid)}"${t.tid===c.owner?" selected":""}>${esc(t.name||t.tid)} (${esc(t.tid)})</option>`).join("")}</select>`:""}</div>`).join(""):'<p class="mu">아직 학급이 없어요.</p>'}${AD?'<p class="mu" style="margin:4px 0 0">학급을 삭제하면 학생 계정과 기록도 함께 지워져요.</p>':""}</div>
