@@ -248,7 +248,7 @@ function drawChar(c,x,y,a,mv,wob,sz,tm,fz){const ca=Math.cos(a),sa=Math.sin(a),b
  g.save();g.translate(0,13);g.scale(1/sq,sq);g.translate(0,-13);
  pb(-14,5,3.6,4.6,C1,1.5);
  if(c.mk=='tail'){g.save();g.translate(15,3);g.rotate(.5);pb(0,0,8,15.5,'#bfe0f7',1.7);g.strokeStyle='#8cbfe6';g.lineWidth=1.1;g.lineCap='round';g.beginPath();for(const k of[-9,-4,1,6,11]){g.moveTo(-7,k);g.lineTo(-4,k+1.4);g.moveTo(7,k+1.5);g.lineTo(4,k+2.9)}g.stroke();g.restore()}
- for(const s of[-1,1]){g.save();
+ for(const s of[-1,1]){if(c.ear=='none')continue;g.save();
   if(c.ear=='long'){g.translate(s*6,-13);g.rotate(s*.18);pb(0,-6,3.8,9.5);g.fillStyle=c.ei;g.beginPath();g.ellipse(0,-5.5,1.8,6,0,0,TAU);g.fill()}
   else if(c.ear=='point'){g.translate(s*9,-11);g.rotate(s*.35);g.beginPath();g.moveTo(-5.5,3);g.quadraticCurveTo(-3,-6,0,-9);g.quadraticCurveTo(3,-6,5.5,3);g.closePath();g.fillStyle=C1;g.fill();g.strokeStyle=LN;g.lineWidth=1.7;g.lineJoin='round';g.stroke();g.fillStyle=c.ei;g.beginPath();g.ellipse(0,-.5,2,3,0,0,TAU);g.fill()}
   else if(c.ear=='bear'){const es=c.es||1;g.translate(s*11.5,-8);g.scale(es,es);pb(0,0,5.2,5.2,null,1.7/es);g.fillStyle=c.ei;g.beginPath();g.ellipse(0,.4,2.6,2.6,0,0,TAU);g.fill()}
@@ -337,7 +337,7 @@ const HATPOS={round:[0,-9.6,1,0],long:[0,-10.6,.86,-.06],bear:[0,-10.2,.96,0],po
 const CHART={};
 const TGRIP={t1:[0,-1],t2:[-.7,11],t3:[0,7],t4:[0,8],t5:[0,8],t6:[0,9.5],t7:[3.5,0],t8:[0,6],t9:[0,0],t10:[0,6],t11:[0,-4],t12:[-3,4],t13:[0,6],t14:[0,14],t15:[0,8]};
 const HATDY={h6:1.6,h8:3.2,h11:1.6,h14:4.4,h15:5.6,h18:4.6,h21:.8,h16:2.4,h7:.4,h10:.8};
-function charArt(c,hid,ko,tid){tid=tid&&TOOLS[tid]?tid:"";const key=c.n+"|"+(hid||"")+(tid?"|"+tid:"")+(ko?"|ko":"");if(CHART[key])return CHART[key];const cv=document.createElement('canvas');cv.width=cv.height=272;const pv=g;g=cv.getContext('2d');g.scale(4,4);drawChar(c,26,40,.35,0,0,1,0,ko?2:0);g=pv;
+function charArt(c,hid,ko,tid){tid=tid&&TOOLS[tid]?tid:"";const key=c.n+"|"+(hid||"")+(tid?"|"+tid:"")+(ko?"|ko":"");if(CHART[key])return CHART[key];const cv=document.createElement('canvas');cv.width=cv.height=272;const pv=g;g=cv.getContext('2d');g.scale(4,4);drawChar((hid==='h14'||hid==='h15')?{...c,ear:'none'}:c,26,40,.35,0,0,1,0,ko?2:0);g=pv;
 const b=artCrop(cv);let top=b.y0,x0=b.x0,x1=b.x1;if(hid&&HATS[hid]){const x=cv.getContext("2d"),hp2=HATPOS[c.ear]||HATPOS.round;x.save();x.setTransform(4,0,0,4,0,0);x.translate(26+hp2[0],40+hp2[1]);x.translate(0,HATDY[hid]||0);x.rotate(hp2[3]);x.scale(hp2[2],hp2[2]);HATS[hid](x);x.restore();const u=artCrop(cv);top=Math.min(top,u.y0);x0=Math.min(x0,u.x0);x1=Math.max(x1,u.x1)}
 if(tid){const x=cv.getContext("2d"),k0=artCrop(cv);x.save();x.setTransform(4,0,0,4,0,0);x.translate(26,45);x.rotate(.35);x.translate(11.4,3.4);x.rotate(.45);x.scale(.72,.72);const gp=TGRIP[tid]||[0,3];x.translate(-gp[0],-gp[1]);TOOLS[tid](x);x.restore();if(tid!=="t11"&&tid!=="t16"){x.save();x.setTransform(4,0,0,4,0,0);x.translate(26,45);x.rotate(.35);x.beginPath();x.ellipse(11.4,3.4,3.6,3.6,0,0,TAU);x.fillStyle=c.c1;x.fill();x.strokeStyle="#4a2c2a";x.lineWidth=1.4;x.stroke();x.restore()}const u=artCrop(cv),cx=(b.x0+b.x1)/2,hf=Math.max(cx-Math.min(x0,u.x0),Math.max(x1,u.x1)-cx);x0=Math.floor(cx-hf);x1=Math.ceil(cx+hf)}
 const bw=x1-x0+1,bh=b.y1-top+1,c2=document.createElement('canvas');c2.width=bw;c2.height=bh;c2.getContext('2d').drawImage(cv,x0,top,bw,bh,0,0,bw,bh);return CHART[key]={src:c2.toDataURL('image/png'),r:bh/(b.y1-b.y0+1)}}
