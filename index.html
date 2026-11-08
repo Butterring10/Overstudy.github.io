@@ -432,7 +432,7 @@ function thmPick(k,id){const old=thmCurT()[k===1?"tc":"bg"],on=thmDirty.x?thmDir
 function thmSet(c,b){const g=i=>document.getElementById(i);thmDirty={1:!!c,2:!!b,x:1};g("thC").value=c||"#1c2430";g("thB").value=b||"#f4f7fb";g("thPt").style.color=c;g("thPv").style.background=b}
 function thmReset(){thmSet("","");const e=document.getElementById("thT");if(e)e.value="";saveTheme()}
 async function saveTheme(){const g=i=>document.getElementById(i),tc=thmPick(1,"thC"),bg=thmPick(2,"thB"),title=g("thT")?g("thT").value.trim().slice(0,30):"",th={title,tc,bg};
-try{if(thmScope==="site"){await db.doc("classes/_site").set({kind:"site",code:"_site",theme:th});S.theme=th}else{const c=S.tcls.find(x=>x.code===S.tsel);if(!c)return;await db.doc("classes/"+c.code).update({theme:th});c.theme=th}
+try{if(thmScope==="site"){await db.doc("classes/_site").set({kind:"site",code:"_site",theme:th});S.theme=th}else{const c=S.tcls.find(x=>x.code===S.tsel);if(!c)return;await db.doc("classes/"+c.code).update({theme:th});c.theme=th;const bgc=hexOk(bg)?bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc;const h=document.querySelector("h1");if(h)h.style.color=hexOk(tc)?tc:""}
 thmDirty={};qMsg("thm",thmScope==="site"?"저장했어요. 첫 화면에서 확인해 보세요.":"저장했어요. 학생이 다시 로그인하면 바뀐 화면이 보여요.")}catch(e){qMsg("thm","저장하지 못했어요.",1)}}
 function adminCard(){const arm=S.arm,bt=(k,l,f)=>`<button class="${arm===k?"":"g"}" style="${arm===k?"background:#e5484d;":""}" onclick="${f}">${arm===k?"정말 삭제?":l}</button>`;
 const st={pending:"승인 대기",ok:"승인됨",rejected:"거절됨"};
@@ -450,7 +450,7 @@ async function setOwner(c,o){try{await db.doc("classes/"+c).update({owner:o||""}
 function teacher(){const sel=S.tcls.find(c=>c.code===S.tsel);
 const AD=(S.auth||{}).role==="admin",okT=(S.tch||[]).filter(t=>t.status==="ok");
 const T=S.ttab||"cls",TB=[["cls","학급"],["new","새 학급 만들기"]].concat(AD?[["tch","교사 관리"],["thm","화면 꾸미기"]]:[["info","정보 변경"]]);
-$.innerHTML=`<div class="row"><h1>${AD?"관리자":esc((S.auth||{}).name||"")+"선생님"}</h1><button class="g" onclick="S.auth=null;nav('home')">나가기</button></div>
+const ct=(sel&&sel.theme)||{};$.innerHTML=`<div class="row"><h1${hexOk(ct.tc)?` style="color:${ct.tc}"`:""}>${AD?"관리자":esc((S.auth||{}).name||"")+"선생님"}</h1><button class="g" onclick="S.auth=null;nav('home')">나가기</button></div>
 <div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:10px">${TB.map(t=>`<button class="${T===t[0]?"":"g"}" onclick="S.ttab='${t[0]}';S.arm=null;S.err='';teacher()">${t[1]}</button>`).join("")}</div>
 ${S.err&&!(T==="cls"&&sel)?`<div class="err">${esc(S.err)}</div>`:""}${T==="tch"&&AD?adminCard():""}${T==="thm"&&AD?themeCard("site"):""}${T==="info"&&!AD?`<div class="card"><h2>내 정보</h2><p class="mu" style="margin:0">아이디 <b>${esc((S.auth||{}).tid||"")}</b> · 닉네임 <b>${esc((S.auth||{}).name||"없음")}</b></p></div>`+pwCard():""}
 ${T==="new"?`<div class="card"><h2>새 학급 만들기</h2><input id="cn" placeholder="예: 3학년 2반">${AD?`<label class="mu">담당 교사</label><select id="co"><option value="">미배정 (관리자)</option>${okT.map(t=>`<option value="${esc(t.tid)}">${esc(t.name||t.tid)} (${esc(t.tid)})</option>`).join("")}</select>`:""}<button onclick="mkClass()">학급 만들기</button></div>
@@ -467,7 +467,7 @@ ${S.tstu.map(s=>`<tr><td>${esc(s.name)}</td><td><input id="si_${esc(s.sid)}" val
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><small>아이디 글자</small><input id="bi" placeholder="예: grade3-" oninput="bulkPrev()" style="margin:0"></div><div><small>비밀번호 글자</small><input id="bp" placeholder="예: pw#!" oninput="bulkPrev()" style="margin:0"></div>
 <div><small>시작 숫자</small><input id="bs" type="number" min="0" value="1" oninput="bulkPrev()" style="margin:0"></div><div><small>숫자 자릿수 (0으로 채움)</small><input id="bd" type="number" min="1" max="4" value="2" oninput="bulkPrev()" style="margin:0"></div></div>
 <p id="bpv" class="mu" style="min-height:20px"></p><div id="bem" class="err" style="min-height:22px"></div><button onclick="bulkEdit()">체크한 학생에게 적용</button>
-<p class="mu">※ 아이디는 영문 소문자·숫자·한글·- _ . 로 2~20자예요. 아이디를 바꾸면 그 학생은 새 아이디로 다시 로그인해야 해요.</p></div>`:""}`:""}`}
+<p class="mu">※ 아이디는 영문 소문자·숫자·한글·- _ . 로 2~20자예요. 아이디를 바꾸면 그 학생은 새 아이디로 다시 로그인해야 해요.</p></div>`:""}`:""}`;{const bgc=hexOk(ct.bg)?ct.bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc}}
 const bPat=(b,n,dg)=>{const k=String(n).padStart(dg,"0");return b.includes("#")?b.replace("#",k):b+k};
 function bulkPrev(){const el=document.getElementById("bpv");if(!el)return;const g=i=>document.getElementById(i).value,n0=Math.floor(Number(g("bs")))||0,dg=Math.min(4,Math.max(1,Math.floor(Number(g("bd")))||2)),bi=g("bi").trim().toLowerCase(),bp=g("bp").trim();
 el.textContent=(bi||bp)?"미리보기: "+[0,1,2].map(i=>(bi?bPat(bi,n0+i,dg):"(그대로)")+" / "+(bp?bPat(bp,n0+i,dg):"(그대로)")).join("  ·  ")+" …":""}
