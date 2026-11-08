@@ -374,10 +374,10 @@ return `<div class="av" style="background:${bg?bg.e:"var(--bd)"}">${charHTML(m.c
 const myTool=()=>{const t=S.me&&S.me.equip&&S.me.equip.tool;return t?item(t):null};
 async function init(){try{db=await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){db=null}render();loadTheme()}
 function nav(v,x={}){Object.assign(S,{view:v,err:""},x);render()}
-function render(){document.body.style.background="";document.documentElement.style.background="";
+function render(){applyCard("");document.body.style.background="";document.documentElement.style.background="";
 if(!db){$.innerHTML=`<div class="card"><h1>학습 게임</h1><p class="mu">저장소에 연결하지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p></div>`;return}
 ({home:home,teacher:teacher,tlogin:tlogin,alogin:alogin,class:classPage})[S.view]()}
-const DEFT="🎓 오버 스터디!",THD={title:"",tc:"",bg:""},hexOk=v=>/^#[0-9a-fA-F]{6}$/.test(v||"");
+const DEFT="🎓 오버 스터디!",THD={title:"",tc:"",bg:"",cd:""},hexOk=v=>/^#[0-9a-fA-F]{6}$/.test(v||"");
 function thm(){return Object.assign({},THD,S.theme||{})}
 function applyTheme(){const t=thm(),on=S.view==="home"&&hexOk(t.bg);document.body.style.background=on?t.bg:"";document.documentElement.style.background=on?t.bg:""}
 async function loadTheme(){if(!db)return;try{const d=await db.doc("classes/_site").get();if(d.exists){S.theme=dc(d.data()).theme||{};if(S.view==="home")render()}}catch(e){}}
@@ -416,23 +416,25 @@ if(S.tsel){const s=await db.collection("students").where("cls","==",S.tsel).get(
 nav("teacher")}
 const tName=id=>{const t=(S.tch||[]).find(x=>x.tid===id);return id?(t?t.name||t.tid:"(삭제된 교사)"):"미배정"};
 const tTitle=id=>{const t=(S.tch||[]).find(x=>x.tid===id);return((t&&t.name)||"")+"선생님"};
-const THP=[["기본","","" ],["하늘","#1d4ed8","#e0f2fe"],["민트","#0f766e","#dcfce7"],["노을","#c2410c","#ffedd5"],["라벤더","#6d28d9","#ede9fe"],["밤하늘","#fde68a","#1e293b"],["분홍","#be185d","#fce7f3"]];
+const THP=[["기본","","",""],["하늘","#1d4ed8","#e0f2fe","#f8fcff"],["민트","#0f766e","#dcfce7","#f6fdf8"],["노을","#c2410c","#ffedd5","#fffaf3"],["라벤더","#6d28d9","#ede9fe","#faf8ff"],["밤하늘","#fde68a","#1e293b","#334155"],["분홍","#be185d","#fce7f3","#fff7fb"]];
+function cardTx(h){const n=parseInt(h.slice(1),16),l=(.299*(n>>16&255)+.587*(n>>8&255)+.114*(n&255))/255;return l<.5?["#f1f5f9","#cbd5e1"]:["#1c2430","#6b7686"]}
+function applyCard(cd){let e=document.getElementById("cdTheme");if(!hexOk(cd)){if(e)e.remove();return}if(!e){e=document.createElement("style");e.id="cdTheme";document.head.appendChild(e)}const[t,m]=cardTx(cd);e.textContent=`.card{background:${cd}!important;color:${t}}.card .mu,.card small{color:${m}}`}
 let thmScope="site",thmDirty={};
 function thmCurT(){if(thmScope==="site")return thm();const c=S.tcls.find(x=>x.code===S.tsel);return Object.assign({},THD,(c&&c.theme)||{})}
 function themeCard(sc){thmScope=sc;thmDirty={};const t=thmCurT(),tc=hexOk(t.tc)?t.tc:"#1c2430",bg=hexOk(t.bg)?t.bg:"#f4f7fb",site=sc==="site",c=S.tcls.find(x=>x.code===S.tsel);
 return `<div class="card"><h2>🎨 ${site?"메인 화면 꾸미기":esc(c?c.name:"")+" 화면 꾸미기"}</h2><p class="mu">${site?"로그인 전 첫 화면의 제목과 배경을 바꿔요. 모든 학생과 교사에게 똑같이 보여요.":"이 학급 학생들이 로그인한 뒤 보는 메인 화면의 제목 색과 배경 색을 바꿔요. 다른 학급에는 영향이 없어요."}</p>
 ${site?`<label class="mu">제목 글자</label><input id="thT" value="${esc(t.title)}" placeholder="${DEFT}" maxlength="30" oninput="thmPrev()">`:""}
 <div style="display:flex;gap:18px;flex-wrap:wrap;margin:6px 0"><label class="mu" style="display:flex;align-items:center;gap:8px">제목 색 <input id="thC" type="color" value="${tc}" oninput="thmPrev(1)" style="width:52px;height:38px;padding:2px;margin:0"></label>
-<label class="mu" style="display:flex;align-items:center;gap:8px">배경 색 <input id="thB" type="color" value="${bg}" oninput="thmPrev(2)" style="width:52px;height:38px;padding:2px;margin:0"></label></div>
-<div class="mu" style="margin-top:8px">추천 색</div><div class="chips" style="margin-bottom:10px">${THP.map(([n,c2,b])=>`<button class="g" style="padding:5px 12px" onclick="thmSet('${c2}','${b}')">${n}</button>`).join("")}</div>
-<div id="thPv" style="border:1px solid var(--bd);border-radius:12px;padding:22px 14px;text-align:center;${hexOk(t.bg)?"background:"+t.bg:""}"><div id="thPt" style="font-size:24px;font-weight:700;${hexOk(t.tc)?"color:"+t.tc:""}">${site?esc(t.title||DEFT):esc(c?c.name:"")}</div><div class="mu" style="margin-top:4px">미리보기</div></div>
+<label class="mu" style="display:flex;align-items:center;gap:8px">배경 색 <input id="thB" type="color" value="${bg}" oninput="thmPrev(2)" style="width:52px;height:38px;padding:2px;margin:0"></label>${site?"":`<label class="mu" style="display:flex;align-items:center;gap:8px">영역(카드) 색 <input id="thD" type="color" value="${hexOk(t.cd)?t.cd:"#ffffff"}" oninput="thmPrev(3)" style="width:52px;height:38px;padding:2px;margin:0"></label>`}</div>
+<div class="mu" style="margin-top:8px">추천 색</div><div class="chips" style="margin-bottom:10px">${THP.map(([n,c2,b,d])=>`<button class="g" style="padding:5px 12px" onclick="thmSet('${c2}','${b}','${d}')">${n}</button>`).join("")}</div>
+<div id="thPv" style="border:1px solid var(--bd);border-radius:12px;padding:22px 14px;text-align:center;${hexOk(t.bg)?"background:"+t.bg:""}"><div id="thPt" style="font-size:24px;font-weight:700;${hexOk(t.tc)?"color:"+t.tc:""}">${site?esc(t.title||DEFT):esc(c?c.name:"")}</div><div class="mu" style="margin-top:4px">미리보기</div>${site?"":`<div id="thPk" style="margin:10px auto 0;max-width:240px;border:1px solid var(--bd);border-radius:10px;padding:10px;font-size:14px;${hexOk(t.cd)?`background:${t.cd};color:${cardTx(t.cd)[0]}`:"background:var(--card)"}">학급 정보 · 직접 참여 · 토벌 문제 설정</div>`}</div>
 <div id="thm" class="err" style="min-height:22px"></div><div style="display:flex;gap:8px"><button onclick="saveTheme()">저장</button><button class="g" onclick="thmReset()">기본으로 되돌리기</button></div></div>`}
-function thmPrev(k){if(k)thmDirty[k]=1;const g=i=>document.getElementById(i);if(!g("thPv"))return;if(g("thT"))g("thPt").textContent=g("thT").value.trim()||DEFT;g("thPt").style.color=thmPick(1,"thC");g("thPv").style.background=thmPick(2,"thB")}
-function thmPick(k,id){const old=thmCurT()[k===1?"tc":"bg"],on=thmDirty.x?thmDirty[k]:(thmDirty[k]||hexOk(old));return on?document.getElementById(id).value:""}
-function thmSet(c,b){const g=i=>document.getElementById(i);thmDirty={1:!!c,2:!!b,x:1};g("thC").value=c||"#1c2430";g("thB").value=b||"#f4f7fb";g("thPt").style.color=c;g("thPv").style.background=b}
+function thmPrev(k){if(k)thmDirty[k]=1;const g=i=>document.getElementById(i);if(!g("thPv"))return;if(g("thT"))g("thPt").textContent=g("thT").value.trim()||DEFT;g("thPt").style.color=thmPick(1,"thC");g("thPv").style.background=thmPick(2,"thB");const pk2=g("thPk");if(pk2){const d=thmPick(3,"thD");pk2.style.background=d||"var(--card)";pk2.style.color=d?cardTx(d)[0]:""}}
+function thmPick(k,id){const el=document.getElementById(id);if(!el)return"";const old=thmCurT()[k===1?"tc":k===2?"bg":"cd"],on=thmDirty.x?thmDirty[k]:(thmDirty[k]||hexOk(old));return on?el.value:""}
+function thmSet(c,b,d){const g=i=>document.getElementById(i);thmDirty={1:!!c,2:!!b,3:!!d,x:1};g("thC").value=c||"#1c2430";g("thB").value=b||"#f4f7fb";if(g("thD"))g("thD").value=d||"#ffffff";g("thPt").style.color=c;g("thPv").style.background=b;const k=g("thPk");if(k){k.style.background=d||"var(--card)";k.style.color=d?cardTx(d)[0]:""}}
 function thmReset(){thmSet("","");const e=document.getElementById("thT");if(e)e.value="";saveTheme()}
-async function saveTheme(){const g=i=>document.getElementById(i),tc=thmPick(1,"thC"),bg=thmPick(2,"thB"),title=g("thT")?g("thT").value.trim().slice(0,30):"",th={title,tc,bg};
-try{if(thmScope==="site"){await db.doc("classes/_site").set({kind:"site",code:"_site",theme:th});S.theme=th}else{const c=S.tcls.find(x=>x.code===S.tsel);if(!c)return;await db.doc("classes/"+c.code).update({theme:th});c.theme=th;const bgc=hexOk(bg)?bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc;const h=document.querySelector("h1");if(h)h.style.color=hexOk(tc)?tc:""}
+async function saveTheme(){const g=i=>document.getElementById(i),tc=thmPick(1,"thC"),bg=thmPick(2,"thB"),cd=thmPick(3,"thD"),title=g("thT")?g("thT").value.trim().slice(0,30):"",th={title,tc,bg,cd};
+try{if(thmScope==="site"){await db.doc("classes/_site").set({kind:"site",code:"_site",theme:th});S.theme=th}else{const c=S.tcls.find(x=>x.code===S.tsel);if(!c)return;await db.doc("classes/"+c.code).update({theme:th});c.theme=th;applyCard(cd);const bgc=hexOk(bg)?bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc;const h=document.querySelector("h1");if(h)h.style.color=hexOk(tc)?tc:""}
 thmDirty={};qMsg("thm",thmScope==="site"?"저장했어요. 첫 화면에서 확인해 보세요.":"저장했어요. 학생이 다시 로그인하면 바뀐 화면이 보여요.")}catch(e){qMsg("thm","저장하지 못했어요.",1)}}
 function adminCard(){const arm=S.arm,bt=(k,l,f)=>`<button class="${arm===k?"":"g"}" style="${arm===k?"background:#e5484d;":""}" onclick="${f}">${arm===k?"정말 삭제?":l}</button>`;
 const st={pending:"승인 대기",ok:"승인됨",rejected:"거절됨"};
@@ -467,7 +469,7 @@ ${S.tstu.map(s=>`<tr><td>${esc(s.name)}</td><td><input id="si_${esc(s.sid)}" val
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><small>아이디 글자</small><input id="bi" placeholder="예: grade3-" oninput="bulkPrev()" style="margin:0"></div><div><small>비밀번호 글자</small><input id="bp" placeholder="예: pw#!" oninput="bulkPrev()" style="margin:0"></div>
 <div><small>시작 숫자</small><input id="bs" type="number" min="0" value="1" oninput="bulkPrev()" style="margin:0"></div><div><small>숫자 자릿수 (0으로 채움)</small><input id="bd" type="number" min="1" max="4" value="2" oninput="bulkPrev()" style="margin:0"></div></div>
 <p id="bpv" class="mu" style="min-height:20px"></p><div id="bem" class="err" style="min-height:22px"></div><button onclick="bulkEdit()">체크한 학생에게 적용</button>
-<p class="mu">※ 아이디는 영문 소문자·숫자·한글·- _ . 로 2~20자예요. 아이디를 바꾸면 그 학생은 새 아이디로 다시 로그인해야 해요.</p></div>`:""}`:""}`;{const bgc=hexOk(ct.bg)?ct.bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc}}
+<p class="mu">※ 아이디는 영문 소문자·숫자·한글·- _ . 로 2~20자예요. 아이디를 바꾸면 그 학생은 새 아이디로 다시 로그인해야 해요.</p></div>`:""}`:""}`;{const bgc=hexOk(ct.bg)?ct.bg:"";document.body.style.background=bgc;document.documentElement.style.background=bgc}applyCard(ct.cd)}
 const bPat=(b,n,dg)=>{const k=String(n).padStart(dg,"0");return b.includes("#")?b.replace("#",k):b+k};
 function bulkPrev(){const el=document.getElementById("bpv");if(!el)return;const g=i=>document.getElementById(i).value,n0=Math.floor(Number(g("bs")))||0,dg=Math.min(4,Math.max(1,Math.floor(Number(g("bd")))||2)),bi=g("bi").trim().toLowerCase(),bp=g("bp").trim();
 el.textContent=(bi||bp)?"미리보기: "+[0,1,2].map(i=>(bi?bPat(bi,n0+i,dg):"(그대로)")+" / "+(bp?bPat(bp,n0+i,dg):"(그대로)")).join("  ·  ")+" …":""}
