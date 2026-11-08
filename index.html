@@ -165,7 +165,60 @@ if(v===null)v=await fbReq(name,"GET")||{};
 let docs=Object.keys(v).filter(k=>v[k]&&v[k].j!=null).map(k=>({id:k,data:()=>fbDec(v[k])}));
 if(flt)docs=docs.filter(d=>{const x=d.data();return x&&x[flt[0]]===flt[2]});return{docs}},
 where(a,b,c){return fbCol(name,[a,b,c])}}}
-window.claude={use:async n=>n==="db"?{doc:fbDoc,collection:n=>fbCol(n)}:null};
+/* 같이 요리하기 · 경쟁 모드용 실시간 방 (Firebase REST 스트리밍) */
+const TABID=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-3);
+const FB_SV={".sv":"timestamp"},FBROOMS=new Set();
+const fbUrl=p=>FBURL+"/"+p.split("/").map(encodeURIComponent).join("/")+".json";
+async function fbW(path,method,body,ka){const r=await fetch(fbUrl(path),{method,headers:body!==undefined?{"Content-Type":"application/json"}:undefined,body:body!==undefined?JSON.stringify(body):undefined,keepalive:!!ka});if(!r.ok)throw new Error("fb "+r.status)}
+function fbRoomJoin(rawName){
+const base="rooms/"+String(rawName).replace(/[.$#\[\]\/]/g,"_");
+return new Promise((resolve,reject)=>{
+let T={p:{},e:{}},ready=false,closed=false,done=false,skew=null,pruned=false,cnt=0,sig="",hb=null,chk=null,es=null;
+const handlers={},peerFns=new Set(),Q={};
+const parse=s=>{try{return s?JSON.parse(s):{}}catch(e){return{}}};
+const alive=v=>!v||v.t==null||skew==null||Date.now()+skew-v.t<7000;
+const peers=()=>Object.keys(T.p).filter(id=>id===TABID||alive(T.p[id])).map(id=>{const v=T.p[id]||{};return{peer:id,isMe:id===TABID,sameTab:id===TABID,presence:parse(v.d),j:+v.j||0}}).sort((a,b)=>(a.j-b.j)||(a.peer<b.peer?-1:1)).map(x=>({peer:x.peer,isMe:x.isMe,sameTab:x.sameTab,presence:x.presence}));
+const fire=()=>{peerFns.forEach(f=>{try{f()}catch(e){}})};
+const mkSig=()=>Object.keys(T.p).filter(id=>id===TABID||alive(T.p[id])).sort().join(",");
+function setAt(segs,val){if(!segs.length){T={p:(val&&val.p)||{},e:(val&&val.e)||{}};return}
+const k=segs[0];if(k!=="p"&&k!=="e")return;if(segs.length===1){T[k]=val||{};return}
+let n=T[k];for(let i=1;i<segs.length-1;i++){const s=segs[i];if(n[s]===null||typeof n[s]!=="object")n[s]={};n=n[s]}
+const last=segs[segs.length-1];if(val===null||val===undefined)delete n[last];else n[last]=val}
+function dispatch(peer,topic,str){const m={peer,isMe:peer===TABID,data:parse(str)};(handlers[topic]||[]).slice().forEach(f=>{try{f(m)}catch(e){console.error(e)}})}
+function apply(path,data,init){const segs=path.split("/").filter(Boolean);setAt(segs,data);
+if(!init&&segs[0]==="e"){if(segs.length>=3){const v=T.e[segs[1]]&&T.e[segs[1]][segs[2]];if(v&&data!==null)dispatch(segs[1],segs[2],v.d)}else if(segs.length===2&&data&&typeof data==="object"){for(const t of Object.keys(data))if(data[t]&&data[t].d!==undefined)dispatch(segs[1],t,data[t].d)}}
+const me=T.p[TABID];if(me&&typeof me.t==="number"&&skew==null){skew=me.t-Date.now()}
+if(skew!=null&&!pruned&&ready){pruned=true;for(const id of Object.keys(T.p)){const v=T.p[id];if(id!==TABID&&v&&v.t!=null&&Date.now()+skew-v.t>60000){fbW(base+"/p/"+id,"DELETE").catch(()=>{});fbW(base+"/e/"+id,"DELETE").catch(()=>{})}}}
+const s=mkSig();if(s!==sig){sig=s;fire()}else if(segs[0]==="p")fire();
+if(ready&&!done&&T.p[TABID]){done=true;resolve(api)}}
+const api={
+peers,
+onPeers(fn){peerFns.add(fn);return()=>peerFns.delete(fn)},
+on(topic,fn){(handlers[topic]=handlers[topic]||[]).push(fn);return()=>{handlers[topic]=(handlers[topic]||[]).filter(x=>x!==fn)}},
+presence(obj){return fbW(base+"/p/"+TABID,"PATCH",{d:JSON.stringify(obj),t:FB_SV})},
+emit(topic,data){return new Promise((res,rej)=>{const q=Q[topic]||(Q[topic]={busy:false,pend:[]});
+if((topic==="st"||topic==="cs")&&q.busy){q.pend.forEach(x=>x.res());q.pend=[{data,res,rej}];return}
+q.pend.push({data,res,rej});pump(topic)})},
+async leave(){if(closed)return;closed=true;FBROOMS.delete(api);clearInterval(hb);clearInterval(chk);try{es&&es.close()}catch(e){}
+peerFns.clear();for(const k in handlers)handlers[k]=[];
+await Promise.all([fbW(base+"/p/"+TABID,"DELETE",undefined,true),fbW(base+"/e/"+TABID,"DELETE",undefined,true)]).catch(()=>{})},
+_kill(){try{fetch(fbUrl(base+"/p/"+TABID),{method:"DELETE",keepalive:true});fetch(fbUrl(base+"/e/"+TABID),{method:"DELETE",keepalive:true})}catch(e){}}};
+function pump(topic){const q=Q[topic];if(!q||q.busy||!q.pend.length||closed)return;const it=q.pend.shift();q.busy=true;
+fbW(base+"/e/"+TABID+"/"+topic,"PUT",{n:++cnt,d:JSON.stringify(it.data)}).then(it.res,it.rej).finally(()=>{q.busy=false;pump(topic)})}
+try{es=new EventSource(fbUrl(base))}catch(e){return reject(e)}
+const onEv=(ev,isPatch)=>{if(closed)return;let m;try{m=JSON.parse(ev.data)}catch(e){return}if(!m||typeof m.path!=="string")return;
+if(!ready&&m.path==="/"&&!isPatch){apply("/",m.data,true);ready=true;
+fbW(base+"/p/"+TABID,"PUT",{j:FB_SV,d:"{}",t:FB_SV}).catch(e=>{if(!done){done=true;reject(e)}});
+hb=setInterval(()=>{fbW(base+"/p/"+TABID,"PATCH",{t:FB_SV}).catch(()=>{})},2000);
+chk=setInterval(()=>{const s=mkSig();if(s!==sig){sig=s;fire()}},1500);FBROOMS.add(api);return}
+if(m.path==="/"&&!isPatch){apply("/",m.data,true);return}
+if(isPatch&&m.data&&typeof m.data==="object"){for(const k of Object.keys(m.data))apply((m.path==="/"?"":m.path)+"/"+k,m.data[k],false)}else apply(m.path,m.data,false)};
+es.addEventListener("put",ev=>onEv(ev,false));es.addEventListener("patch",ev=>onEv(ev,true));
+es.onerror=()=>{if(!done&&es.readyState===2){done=true;reject(new Error("stream"))}};
+setTimeout(()=>{if(!done){done=true;try{es.close()}catch(e){}reject(new Error("timeout"))}},9000)})}
+addEventListener("pagehide",()=>{FBROOMS.forEach(r=>r._kill())});
+
+window.claude={use:async n=>n==="db"?{doc:fbDoc,collection:n=>fbCol(n)}:n==="room"?{join:fbRoomJoin}:null};
 </script>
 <script>
 const ADMIN_CODE="admin";
