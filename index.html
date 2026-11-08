@@ -1289,7 +1289,7 @@ function kWork(dt){const tg=kTarget();let washing=false;
 if(K.chop&&!K.moving&&tg){if(tg.t==="board"&&tg.item&&tg.item.st==="raw"&&ING[tg.item.id].ch){tg.cp+=dt/1.5;tg.chopT=K.t;K.act=.12;K.ctm=(K.ctm||0)-dt;if(K.ctm<=0){K.ctm=.2;sfx.chop()}K.wtm-=dt;if(K.wtm<=0){K.wtm=.12;kDots(tg.x*KT+KT/2,tg.y*KT+KT/2,3,["#ffe9a8","#fff"],45)}if(tg.cp>=1){tg.item.st="chopped";tg.cp=0;sfx.done();kBurst(tg.x*KT+KT/2,tg.y*KT+KT/2,"✨")}}
 else if(tg.t==="sink"&&K.sinkd>0){washing=true;K.wp+=dt/2;K.act=.12;K.wsm=(K.wsm||0)-dt;if(K.wsm<=0){K.wsm=.3;sfx.wash()}if(K.wp>=1){K.wp=0;K.sinkd--;K.rack++;sfx.plate();kmsg("접시를 씻었어요!");kBurst(tg.x*KT+KT/2,tg.y*KT+KT/2,"🫧")}}}
 return washing}
-function kSnd(dt){{let nf=0,nb=0;for(const s of K.st){if(s.t==="pan"&&s.item&&(s.item.st==="raw"||s.item.st==="fried"||s.item.st==="baked"||s.item.st==="deep"))nf++;if(s.t==="pot"&&s.tt!=null&&!s.burnt)nb++}aLoopSet(nf,nb);if(nb){K.bbt=(K.bbt||0)-dt;if(K.bbt<=0){K.bbt=.1+Math.random()*.35/nb;sfx.bub()}}
+function kSnd(dt){{let nf=0,nb=0,no=0,nd=0;for(const s of K.st){if(s.t==="pan"){const it=s.item,on=it&&(it.st==="raw"||it.st==="fried"||it.st==="baked"||it.st==="deep");if(on){if(s.ov)no++;else if(s.dp)nd++;else nf++}if(it&&!s._si)(s.ov?sfx.ovenIn:s.dp?sfx.fryIn:sfx.panIn)();if(s.ov&&it&&s._st==="raw"&&it.st==="baked")sfx.ovenDing();s._si=!!it;s._st=it&&it.st}if(s.t==="pot"){const hv=s.tt!=null;if(hv&&!s._si)sfx.potIn();s._si=hv;if(hv&&!s.burnt)nb++}}aLoopSet(nf,nb,no,nd);if(nd){K.crt=(K.crt||0)-dt;if(K.crt<=0){K.crt=.04+Math.random()*.18/nd;sfx.crack()}}if(nb){K.bbt=(K.bbt||0)-dt;if(K.bbt<=0){K.bbt=.1+Math.random()*.35/nb;sfx.bub()}}
 if(K.moving){K.stt=(K.stt||0)-dt;if(K.stt<=0){K.stt=K.dash>0?.12:.27;sfx.step()}}const ti=Math.ceil(K.time);if(K.time<=10&&K.time>0&&ti!==K.lti){K.lti=ti;sfx.tick()}}}
 function kUpdG(dt){K.t+=dt;if(K.time>0)K.time-=dt/1.5;if(!K.qDone&&K.t>=K.qAt)kAsk();
 if(K.bt>0){K.bt-=dt;if(K.bt<=0){K.bt=0;K.bm=1;kmsg("이동속도가 원래대로 돌아왔어요")}}for(const o of K.orders)o.age+=dt/1.5;
@@ -1510,7 +1510,13 @@ n.connect(g);g.connect(o.dst||A.fx);if(o.rv&&A.rv)g.connect(A.rv);os.start(t);os
 function aN(o){const A=SND,c=A.ctx;if(!c)return;const bg=o.dst===A.bg;if((bg?A.vol.bgm:A.vol.sfx)<=0)return;const t=o.t!=null?o.t:c.currentTime,d=o.d||.1,s=c.createBufferSource();s.buffer=A.nb;s.loop=true;const f=c.createBiquadFilter();f.type=o.ft||"bandpass";f.frequency.setValueAtTime(o.f||1000,t);if(o.f2)f.frequency.exponentialRampToValueAtTime(o.f2,t+d);f.Q.value=o.q||1;
 const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(o.v||.2,t+(o.a||.003));g.gain.exponentialRampToValueAtTime(.0008,t+d);s.connect(f);f.connect(g);g.connect(o.dst||A.fx);if(o.rv&&A.rv)g.connect(A.rv);s.start(t,Math.random()*.5);s.stop(t+d+.05)}
 const sfx={
-chop(){const r=.9+Math.random()*.2;aN({ft:"bandpass",f:2600*r,q:1.8,d:.06,v:.35});aT({w:"triangle",f:700*r,f2:180,d:.05,v:.25})},
+chop(){const r=.9+Math.random()*.2;aN({ft:"bandpass",f:2600*r,q:1.8,d:.05,v:.3});aT({w:"triangle",f:700*r,f2:180,d:.05,v:.2});aN({ft:"lowpass",f:260,d:.09,v:.32});aT({f:140*r,f2:70,d:.08,v:.28})},
+panIn(){aN({ft:"highpass",f:2800,f2:4200,d:.45,v:.28,a:.01});aN({ft:"bandpass",f:5200,q:.7,d:.25,v:.12})},
+ovenIn(){const t=ctm();aN({ft:"lowpass",f:500,t,d:.12,v:.35});aT({f:110,f2:60,t,d:.14,v:.3});aT({w:"triangle",f:1180,t:t+.02,d:.35,v:.05});aN({ft:"bandpass",f:900,q:2,t:t+.16,d:.06,v:.18})},
+ovenDing(){const t=ctm();aT({f:2093,t,d:.9,v:.14});aT({f:4186,t,d:.4,v:.04});aT({f:2093,t:t+.28,d:.9,v:.1})},
+fryIn(){const t=ctm();aN({ft:"bandpass",f:1800,f2:3600,q:.6,t,d:.5,v:.32,a:.02});for(let i=0;i<6;i++)aN({ft:"highpass",f:3500+Math.random()*2500,t:t+Math.random()*.4,d:.025,v:.2})},
+crack(){aN({ft:"highpass",f:3000+Math.random()*3000,d:.02+Math.random()*.02,v:.1+Math.random()*.1})},
+potIn(){aT({f:260,f2:520,d:.12,v:.2});aN({ft:"bandpass",f:700,q:1.2,d:.15,v:.15})},
 pick(){aT({f:520,f2:980,d:.09,v:.22})},
 drop(){aT({f:280,f2:120,d:.1,v:.3});aN({ft:"lowpass",f:700,d:.05,v:.12})},
 plate(){aT({w:"triangle",f:1900,d:.12,v:.12});aT({f:2850,d:.08,v:.06})},
@@ -1531,9 +1537,9 @@ qok(){const t=ctm();[523,659,784,1047].forEach((f,i)=>aT({w:"triangle",f,t:t+i*.
 qno(){const t=ctm();[392,330,262].forEach((f,i)=>aT({w:"triangle",f,t:t+i*.12,d:.3,v:.14}))},
 win(){const t=ctm();[[62,0,.16],[66,.15,.16],[69,.3,.16],[74,.45,1]].forEach(([m,o,d])=>{aT({w:"sawtooth",f:mf(m),t:t+o,d,v:.12,a:.02,hold:1,r:.25,lp:1400,lp2:3000});aT({w:"square",f:mf(m+12),t:t+o,d,v:.025,lp:3000})});[50,54,57].forEach(m=>aT({w:"sawtooth",f:mf(m),t:t+.45,d:1,v:.05,a:.05,hold:1,r:.4,lp:1200}));aN({ft:"highpass",f:5000,t:t+.45,d:1.3,v:.1})},
 lose(){const t=ctm();[[69,0],[65,.22],[62,.44],[57,.66]].forEach(([m,o])=>aT({w:"triangle",f:mf(m),t:t+o,d:.4,v:.15}))}};
-function aLoopOn(){const A=SND,c=A.ctx;if(!c||A.lp)return;const mk=(type,f,q)=>{const s=c.createBufferSource();s.buffer=A.nb;s.loop=true;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=c.createGain();g.gain.value=0;s.connect(fl);fl.connect(g);g.connect(A.fx);s.start();return{s,g}};A.lp={sz:mk("highpass",3200,.7),bo:mk("lowpass",380,1)}}
-function aLoopSet(nf,nb){const A=SND,c=A.ctx;if(!c||!A.lp)return;A.lp.sz.g.gain.setTargetAtTime(nf?Math.min(.16,.08+.04*nf)*(.7+Math.random()*.6):0,c.currentTime,.04);A.lp.bo.g.gain.setTargetAtTime(nb?Math.min(.22,.12+.05*nb):0,c.currentTime,.1)}
-function aLoopOff(){const A=SND;if(!A.lp)return;try{A.lp.sz.s.stop();A.lp.bo.s.stop()}catch(e){}A.lp=null}
+function aLoopOn(){const A=SND,c=A.ctx;if(!c||A.lp)return;const mk=(type,f,q)=>{const s=c.createBufferSource();s.buffer=A.nb;s.loop=true;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=c.createGain();g.gain.value=0;s.connect(fl);fl.connect(g);g.connect(A.fx);s.start();return{s,g}};A.lp={sz:mk("highpass",3200,.7),bo:mk("lowpass",380,1),ov:mk("lowpass",170,1.4),dp:mk("bandpass",1300,.5)}}
+function aLoopSet(nf,nb,no,nd){const A=SND,c=A.ctx;if(!c||!A.lp)return;A.lp.ov.g.gain.setTargetAtTime(no?Math.min(.3,.2+.04*no):0,c.currentTime,.15);A.lp.dp.g.gain.setTargetAtTime(nd?Math.min(.2,.12+.04*nd)*(.75+Math.random()*.5):0,c.currentTime,.05);A.lp.sz.g.gain.setTargetAtTime(nf?Math.min(.16,.08+.04*nf)*(.7+Math.random()*.6):0,c.currentTime,.04);A.lp.bo.g.gain.setTargetAtTime(nb?Math.min(.22,.12+.05*nb):0,c.currentTime,.1)}
+function aLoopOff(){const A=SND;if(!A.lp)return;try{A.lp.sz.s.stop();A.lp.bo.s.stop();A.lp.ov.s.stop();A.lp.dp.s.stop()}catch(e){}A.lp=null}
 // 웅장한 BGM: D단조 행진풍 (현악 오스티나토 + 팀파니 + 금관 멜로디), 16마디 반복
 const BCH={Dm:{r:38,n:[50,53,57]},Bb:{r:34,n:[46,50,53]},F:{r:41,n:[53,57,60]},C:{r:36,n:[48,52,55]},Gm:{r:43,n:[55,58,62]},A:{r:45,n:[57,61,64]}};
 const BPROG=["Dm","Bb","F","C","Dm","Bb","Gm","A","Bb","C","Dm","Dm","Bb","C","A","A"];
@@ -1616,7 +1622,7 @@ ${host?`<p class="mu" style="margin:8px 0 4px">식당 고르기</p>${catRow("coC
 <p style="margin:8px 0"><b>${esc(lb)}</b> · ${vs?`각자 주문 ${tot}개 · 주문 메뉴는 사람마다 달라요`:`주문 ${tot}개 (${ppl.length}명 기준)`}</p>
 <div class="copl">${ppl.map((q,i)=>`<div class="cop${q.me?" me":""}" style="border-color:${PCOL[i]}">${chE(q.ch)}<b>${esc(q.n||"친구")}${q.me?" (나)":""}</b><small>${i===0?"👑 방장 · ":""}${(+q.cs||0)<si?"🔒 아직 못 가는 단계":!q.in?"🛒 장보는 중":vs&&!hasAll(q.pa,nd)?"🧺 재료 부족":"✅ 준비"}</small></div>`).join("")}</div>
 <p class="mu" style="margin:10px 0 4px">${vs?"내 재료 (보유 / 필요)":"모두의 재료를 합쳐서 써요 (합계 / 필요)"}</p><div class="chips">${Object.keys(pool).map(id=>`<span class="chip${pool[id]>=nd[id]?" ok":""}">${ING[id].e} ${ING[id].n} ${pool[id]} / ${nd[id]}</span>`).join("")}</div>
-<p class="mu" style="font-size:12px;margin:8px 0 0">${vs?"각자 자기 재료로 자기 주방에서 요리해요. 점수가 가장 높은 사람이 승리해서 🪙 30원을 받아요. 별 보상은 혼자하기와 같아요.":"끝나면 남은 재료는 각자 넣은 만큼 나눠서 돌려받아요. 별을 받으면 모두 같은 보상을 받아요. 인원이 많을수록 주문이 늘어나요 (3명 1.5배, 4명 2배)."}</p>${c.msg?`<p class="err">${esc(c.msg)}</p>`:""}</div>
+<p class="mu" style="font-size:12px;margin:8px 0 0">${vs?"각자 자기 재료로 자기 주방에서 요리해요. 점수가 가장 높은 사람이 승리해서 🪙 30원과 💎 보석 1개를 받아요. 별 보상은 혼자하기와 같아요.":"끝나면 남은 재료는 각자 넣은 만큼 나눠서 돌려받아요. 별을 받으면 모두 같은 보상을 받아요. 인원이 많을수록 주문이 늘어나요 (3명 1.5배, 4명 2배)."}</p>${c.msg?`<p class="err">${esc(c.msg)}</p>`:""}</div>
 ${host?`<button style="width:100%;font-size:17px" ${okI&&okL&&okIn&&okN?"":"disabled"} onclick="coStart()">${vs?"⚔️ 대결 시작!":"🍳 요리 시작!"}</button><p class="mu" style="text-align:center;margin:6px 0 10px;font-size:13px">${!okN?"친구가 들어오면 시작할 수 있어요.":!okL?"단계가 열리지 않은 친구가 있어요.":!okIn?"장보는 친구를 기다려요.":!okI?(vs?"재료가 부족한 친구가 있어요.":"재료가 부족해요. 함께 장을 봐요!"):"모두 준비됐어요!"}</p>`:`<p class="mu" style="text-align:center">방장이 시작하면 바로 주방으로 들어가요.</p>`}
 <div class="row" style="gap:8px"><button class="g" style="flex:1" onclick="CK.sel=${si};CK.view='shop';ckDraw()">🛒 장보기</button><button class="g" style="flex:1" onclick="coLeave(false)">🚪 방 나가기</button></div>`}
 tb.innerHTML=`<div id="cookroot">${h}<button class="g" style="margin-top:12px" onclick="coLeave(true)">← 혼자/같이 선택</button></div>`}
@@ -1663,12 +1669,12 @@ aLoopSet(0,0);if(!quit)stars>=1?sfx.win():sfx.lose();kStop();if(CO&&VS.host){CO.
 CK.res={stars,sv,N,pts:r.pts,gm:r.gm,unlocked:r.un,score:sc,si,vs:1,q:!!quit};VS.iv=setInterval(()=>{vsCheck();if(CK&&CK.view==="vsend")vsDrawEnd()},1000);vsCheck();if(silent)return vsClose();CK.view="vsend";ckDraw()}
 function vsCheck(){if(!VS||VS.myFin==null||VS.done)return;const now=Date.now();for(const p of Object.values(VS.players))if(p.fin==null&&now-p.last>15000){p.fin=p.sc;p.q=true;p.gone=true}
 if(Object.values(VS.players).some(p=>p.fin==null))return;VS.done=true;const sc=[VS.myQ?-1:VS.myFin].concat(Object.values(VS.players).map(p=>p.q?-1:p.fin)),top=Math.max(...sc);
-VS.win=!VS.myQ&&VS.myFin===top&&top>0;if(VS.win&&!VS.paid){VS.paid=true;S.me.coins=(S.me.coins||0)+30;ckSave()}if(VS.win)sfx.serve();if(CK&&CK.view==="vsend")vsDrawEnd()}
+VS.win=!VS.myQ&&VS.myFin===top&&top>0;if(VS.win&&!VS.paid){VS.paid=true;S.me.coins=(S.me.coins||0)+30;S.me.gems=(S.me.gems||0)+1;ckSave()}if(VS.win)sfx.serve();if(CK&&CK.view==="vsend")vsDrawEnd()}
 function vsClose(){if(!VS)return;clearInterval(VS.iv);try{VS.u.forEach(u=>u())}catch(e){}VS.g.leave().catch(()=>{});VS=null;if(CO){CO.inGame=false;CO.g=null}}
 function ckVsEnd(){vsDrawEnd()}
 function vsDrawEnd(){const r=CK&&CK.res;if(!r||!VS&&!r.vsDone)return;const v=VS,rows=[{n:S.me.name+" (나)",sc:r.score,fin:true,q:r.q,col:K?K.col:PCOL[0],me:1}].concat(v?Object.values(v.players).map(p=>({n:p.n,sc:p.sc,fin:p.fin!=null,q:p.q,gone:p.gone,col:p.col})):[]).sort((a,b)=>(b.q?-1:b.sc)-(a.q?-1:a.sc));
 const done=v&&v.done,win=v&&v.win;
-tb.innerHTML=`<div id="cookroot"><div class="card" style="text-align:center"><h2>${!done?"⏳ 친구들을 기다려요":win?"🏆 승리!":"⚔️ 대결 끝!"}</h2>${done&&win?'<p style="font-size:18px;margin:4px 0">🪙 승리 보상 30원!</p>':""}
+tb.innerHTML=`<div id="cookroot"><div class="card" style="text-align:center"><h2>${!done?"⏳ 친구들을 기다려요":win?"🏆 승리!":"⚔️ 대결 끝!"}</h2>${done&&win?'<p style="font-size:18px;margin:4px 0">🪙 승리 보상 30원 + 💎 보석 1개!</p>':""}
 <div class="vsrk">${rows.map((x,i)=>`<div class="row" style="padding:8px 4px;border-bottom:1px dashed var(--bd)"><span><b style="color:${x.col}">${done&&!x.q?(i+1)+"위":"·"}</b> ${esc(x.n)}</span><span>${x.q?(x.gone?"연결 끊김":"포기"):x.fin?"<b>"+x.sc+"점</b>":x.sc+"점 · 요리 중…"}</span></div>`).join("")}</div>
 <p style="margin-top:12px">내 결과: ${"⭐".repeat(r.stars)}${"☆".repeat(3-r.stars)} · 주문 ${r.sv}/${r.N}개 · 점수 ${r.score}</p><p class="mu">${r.q?"포기해서 별 보상이 없어요.":`보상: 점수 +${r.pts}, 💎 보석 +${r.gm}${r.unlocked?"<br>🔓 다음 단계가 열렸어요!":""}`}</p>
 <button style="width:100%" onclick="vsClose();CK.view='lobby';ckDraw()">대기실로</button></div></div>`}
