@@ -234,7 +234,7 @@ weed:`<svg class="si" viewBox="0 0 48 48"><path d="M24 42V22" stroke="#3d8a35" s
 sword:`<svg class="si" viewBox="0 0 48 48"><path d="M36 6l6 0 0 6L21 33l-6-6z" fill="#dfe6ee" stroke="#4a5868" stroke-width="2.6" stroke-linejoin="round"/><path d="M12 24l12 12" stroke="#c8892e" stroke-width="5" stroke-linecap="round"/><path d="M12 36l-6 6" stroke="#7a4a2e" stroke-width="5" stroke-linecap="round"/><circle cx="6" cy="42" r="2.4" fill="#c8892e"/></svg>`,
 pan:`<svg class="si" viewBox="0 0 48 48"><ellipse cx="20" cy="26" rx="15" ry="14" fill="#5a6270" stroke="#2f343c" stroke-width="2.6"/><ellipse cx="20" cy="25" rx="10.5" ry="9.5" fill="#7b8494"/><path d="M33 22l13-5" stroke="#8a5a38" stroke-width="5.5" stroke-linecap="round"/><circle cx="18" cy="24" r="4.5" fill="#fff"/><circle cx="18" cy="24" r="2.4" fill="#ffc83a"/></svg>`,
 heart:`<svg class="si hrt" viewBox="0 0 48 48"><path d="M24 41C8 29 6 19 12 13c5-4 10-1 12 4 2-5 7-8 12-4 6 6 4 16-12 28z" fill="#ff6b81" stroke="#c23b52" stroke-width="3" stroke-linejoin="round"/></svg>`};
-const GAMES=[{n:"제초하기",e:SVGI.weed,d:"풀을 5번 터치해 뽑고 원을 모아요"},{n:"토벌하기",e:SVGI.sword,d:"문제를 풀어 공격하거나 회피해요"},{n:"요리하기",e:SVGI.pan,d:"재료를 사고 주문받은 요리를 만들어요"}];
+const GAMES=[{n:"제초하기",e:SVGI.weed,d:"풀 10개를 뽑을 때마다 1원을 모아요"},{n:"토벌하기",e:SVGI.sword,d:"문제를 풀어 공격하거나 회피해요"},{n:"요리하기",e:SVGI.pan,d:"재료를 사고 주문받은 요리를 만들어요"}];
 let g;const TAU=6.2832;
 function star(x,y,r,rot,c){g.save();g.translate(x,y);g.rotate(rot);g.fillStyle=c;g.beginPath();for(let i=0;i<10;i++){const q=i%2?r*.45:r,a=i*Math.PI/5-Math.PI/2;g.lineTo(Math.cos(a)*q,Math.sin(a)*q)}g.closePath();g.fill();g.restore()}
 function cir(x,y,r,f,s){g.beginPath();g.arc(x,y,r,0,TAU);if(f){g.fillStyle=f;g.fill()}if(s){g.strokeStyle=s;g.lineWidth=1.5;g.stroke()}}
@@ -787,7 +787,7 @@ else if(k==="mug"){rBox(R,cx-.12,cy-.12,.24,.24,0,.24,"#6aa8e8");rBlob(R,cx+.16,
 else if(k==="robot"){rBox(R,cx-.12,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx+.04,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx-.15,cy-.1,.3,.2,.1,.28,"#9aa5b1");rBox(R,cx-.12,cy-.09,.24,.18,.38,.2,"#c9d1da");rDot(R,cx-.05,cy+.1,.5,1.6,"#4fd8ff");rDot(R,cx+.05,cy+.1,.5,1.6,"#4fd8ff");rBox(R,cx-.02,cy-.02,.04,.04,.58,.12,"#6a7a8a");rBlob(R,cx,cy,.72,2,"#e5484d")}}};
 FDEF.push({id:"wl1",t:"wall",n:"하양 가벽",p:300,o:{c:"#f6f2ea"}},{id:"wl2",t:"wall",n:"원목 가벽",p:300,o:{c:"#d9a86a"}},{id:"wl3",t:"wall",n:"하늘 가벽",p:300,o:{c:"#bcd8f5"}},{id:"wl4",t:"wall",n:"분홍 가벽",p:300,o:{c:"#f6b8cc"}});
 // ===== 추가 가구: 긴 책상·긴 러그·2인용 침대·2인용 의자·낮은 소파 =====
-function lDesk(R,x,y,w,d,o){const H=.62,lx=[.08,w-.16];for(let k=2;k<w;k+=2)lx.push(k-.04);for(const a of lx)for(const b of[.08,d-.16])rBox(R,x+a,y+b,.08,.08,0,H,o.fr);
+function lDesk(R,x,y,w,d,o){const H=.62,lx=[.08,w-.16];{const m=Math.ceil(w/2);for(let i=1;i<m;i++)lx.push(i*w/m-.04)}for(const a of lx)for(const b of[.08,d-.16])rBox(R,x+a,y+b,.08,.08,0,H,o.fr);
 rBox(R,x+.04,y+.04,w-.08,d-.08,H,.1,o.top);
 if(o.mid)rBox(R,x+.3,y+d/2-.12,w-.6,.24,H+.1,.012,o.mid);
 if(o.deco){for(let i=0;i<w;i++){const a=x+i+.5;if(i%2===0){rBox(R,a-.2,y+.2,.2,.14,H+.1,.06,"#e5564a");rBox(R,a-.19,y+.21,.18,.12,H+.16,.05,"#6aa8e8")}else{rBox(R,a-.06,y+d-.32,.12,.12,H+.1,.12,"#ffffff");rBox(R,a-.04,y+d-.3,.08,.08,H+.21,.012,"#8a5a38")}}}}
@@ -1068,7 +1068,7 @@ hud();
 if(!q){document.getElementById("wb").onpointerdown=e=>{const el=e.target.closest("[data-i]");if(el)tapCell(+el.dataset.i)};moveBtn()}
 else{const a=document.getElementById("wa");if(a&&!W.quiz.until)a.focus();if(W.quiz.until)lockQ()}}
 function hud(){if(!W)return;const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
-set("wst",W.stage+"번째 구역");set("wlf","남은 풀 "+W.left+"개");set("wer","🪙 "+W.earned+"원");
+set("wst",W.stage+"번째 구역");set("wlf","남은 풀 "+W.left+"개");set("wer","🪙 "+W.earned+"원 · 🌿 "+(W.cnt||0)+"/10");
 set("wfv",fev()?"🔥 Fever ×2 · "+((W.fever-Date.now())/1000).toFixed(1)+"초":"")}
 function moveBtn(){const m=document.getElementById("wmv");if(m)m.innerHTML=W.left===0?'<button style="width:100%;margin-top:12px;font-size:17px" onclick="wMove()">다음 장소로 이동 ▶</button>':""}
 function banner(t,sm){const r=document.getElementById("wroot");if(!r)return;const d=document.createElement("div");d.className="wbn"+(sm?" sm":"");d.textContent=t;r.appendChild(d);setTimeout(()=>d.remove(),1600)}
@@ -1081,7 +1081,7 @@ for(let k=0;k<7;k++){const d=document.createElement("div");d.className="wdirt";d
 function tapCell(i){if(!W||W.mode!=="play")return;const c=W.cells[i];if(!c||!c.t||c.gone)return;const nw=performance.now();if(nw-(W.lt||0)<333)return;W.lt=nw;aInit();c.taps++;const el=document.getElementById("wb").children[i];
 if(c.taps<5){const all=el.querySelectorAll(".wg"),gg=all[all.length-1];all.forEach(x=>x.style.transform=`scale(${1-.13*c.taps})`);gg.classList.remove("wig");void gg.offsetWidth;gg.classList.add("wig");wChar(el,false);sfx.wTug(c.taps);return}
 c.gone=true;W.left--;el.innerHTML="";wChar(el,true);wFly(el,c);sfx.wPull();sfx.ungsho();
-if(c.t===1){const v=gain(1),f=document.createElement("div");f.className="wf";f.textContent="+"+v+"원";el.appendChild(f);setTimeout(()=>f.remove(),800);hud();moveBtn()}
+if(c.t===1){W.cnt=(W.cnt||0)+1;const f=document.createElement("div");f.className="wf";if(W.cnt>=10){W.cnt=0;f.textContent="+"+gain(1)+"원"}else f.textContent=W.cnt+"/10";el.appendChild(f);setTimeout(()=>f.remove(),800);hud();moveBtn()}
 else{W.mode="quiz";W.quiz={kind:"gold",...mkQ()};drawW()}}
 function quizHTML(){const q=W.quiz,t=q.kind==="gold"?"✨ 황금풀이에요! 맞히면 Fever time!":"🚪 다음 장소로 가려면 문제를 풀어요";
 return `<div class="card" style="text-align:center"><p class="mu">${t}</p><h2 style="font-size:26px;margin:14px 0">${q.q}</h2>${q.opts?`<div class="grid wqb" style="grid-template-columns:1fr 1fr">${q.opts.map((o,i)=>`<button onclick="wAns(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<input id="wa" type="text" autocomplete="off" style="text-align:center;font-size:22px" onkeydown="if(event.key==='Enter')wAns()">`}<div id="wqm" class="err" style="text-align:center;min-height:24px"></div>${q.opts?"":`<button id="wgo" style="width:100%" onclick="wAns()">확인</button>`}</div>`}
