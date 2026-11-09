@@ -778,6 +778,7 @@ let RM=null;
 function tRoom(){const r=rCfg(),ed=RM&&RM.ed,m=S.me;let pal="";
 if(ed){const have=FDEF.filter(f=>fqOf(f.id)>0);
 pal=`<p class="mu" style="margin:8px 0 4px">${RM.sel!=null?"옮길 칸을 누르세요.":RM.pick?`<b>${FD[RM.pick].n}</b>을(를) 놓을 칸을 눌러요.`:"가구를 골라 바닥을 누르면 놓여요. 놓인 가구를 누르면 옮기거나 돌릴 수 있어요."}</p>
+${RM.sel==null&&r.f.length?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px"><button class="g" style="${RM.clr?"background:#e5484d;color:#fff;border-color:#e5484d":""}" onclick="rClearAll()">${RM.clr?"정말 모두 넣어 둘까요?":"📦 모두 넣어 두기"}</button>${RM.clr?`<button class="g" onclick="RM.clr=0;tRoom()">취소</button>`:""}</div>`:""}
 ${RM.sel!=null?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px">${fTy(r.f[RM.sel]).orn?`<button class="g" onclick="rUnder()">⬇ 아래 선반 선택</button>`:`<button class="g" onclick="rRot()">↻ 돌리기</button>`}<button class="g" onclick="rDel()">📦 넣어 두기</button><button class="g" onclick="RM.sel=null;tRoom()">취소</button></div>`:""}
 ${have.length?`<div class="rpal">${have.map(f=>{const a=rAvail(r,f.id);return `<button class="${RM.pick===f.id?"on":""}" ${a>0?"":"disabled"} onclick="rPick('${f.id}')"><img alt="" src="${rThumb(f.id)}"><small>${f.n}</small><i class="rq">×${a}</i></button>`}).join("")}</div>`:`<div class="card" style="text-align:center;margin:6px 0 0"><p class="mu" style="margin:0 0 8px">아직 가구가 없어요. 상점에서 사 오세요!</p><button onclick="S.shopTab='home';goTab('shop')">🛒 상점 인테리어 가기</button></div>`}
 <p class="mu" style="margin:10px 0 4px">벽지</p><div class="rpal sm">${WDEF.filter(w=>ownWF(w.id,WD)).map(w=>`<button class="${r.wp===w.id?"on":""}" onclick="rSet('wp','${w.id}')"><img alt="" src="${rWallThumb(w.id)}"><small>${w.n}</small></button>`).join("")}</div>
@@ -794,10 +795,10 @@ if(s>sf+.001){ox=W/2-(RM.x-RM.y)*RTW/2*s;oy=H/2-(RM.x+RM.y)*RTH/2*s+RTH*s*.5;con
 return{c:cv.getContext("2d"),s,ox,oy}}
 function rGrid(e){const cv=RM.cv,b=cv.getBoundingClientRect(),sx=(e.clientX-b.left)*cv.width/b.width,sy=(e.clientY-b.top)*cv.height/b.height,R=rView(),u=(sx-R.ox)/(RTW/2*R.s),v=(sy-R.oy)/(RTH/2*R.s);return{x:(u+v)/2,y:(v-u)/2}}
 function rDown(e){const p=rGrid(e),r=rCfg();if(!RM.ed){RM.hold=p;try{RM.cv.setPointerCapture(e.pointerId)}catch(x){}return}
-const gx=Math.floor(p.x),gy=Math.floor(p.y);if(gx<0||gy<0||gx>=RW||gy>=RD)return;
+const gx=Math.floor(p.x),gy=Math.floor(p.y);RM.clr=0;if(gx<0||gy<0||gx>=RW||gy>=RD){if(RM.sel==null&&!RM.pick){const h=rHitAt(e);if(h>=0){RM.sel=h;RM.gh=null;tRoom()}}return}
 if(RM.sel!=null){const f=r.f[RM.sel];if(gx===f[1]&&gy===f[2]&&!RM.gh){RM.sel=null;return tRoom()}if(rFits(r,f[0],gx,gy,f[3],RM.sel)){RM.gh={k:"mv",x:gx,y:gy};tRoom()}else rMsg(fTy(f).orn?"선반 위에만 놓을 수 있어요":"거기에는 놓을 수 없어요");return}
 if(RM.pick){if(rAvail(r,RM.pick)<=0){RM.pick=null;return tRoom()}if(rFits(r,RM.pick,gx,gy,0,-1)){RM.gh={k:"new",x:gx,y:gy};tRoom()}else rMsg(FT[FD[RM.pick].t].orn?"선반 위에만 놓을 수 있어요":"거기에는 놓을 수 없어요");return}
-RM.gh=null;let hit=-1;r.f.forEach((f,i)=>{const[w,d]=rFoot(f);if(gx>=f[1]&&gx<f[1]+w&&gy>=f[2]&&gy<f[2]+d&&(hit<0||fTy(f).orn||(!fTy(f).walk&&!fTy(r.f[hit]).orn)))hit=i});if(hit>=0){RM.sel=hit;RM.pick=null;tRoom()}}
+RM.gh=null;let hit=rHitAt(e);if(hit<0)r.f.forEach((f,i)=>{const[w,d]=rFoot(f);if(gx>=f[1]&&gx<f[1]+w&&gy>=f[2]&&gy<f[2]+d&&(hit<0||fTy(f).orn||(!fTy(f).walk&&!fTy(r.f[hit]).orn)))hit=i});if(hit>=0){RM.sel=hit;RM.pick=null;tRoom()}}
 function rMsg(t){const e=document.getElementById("rmsg");if(e){e.textContent=t;e.style.opacity=1;clearTimeout(rMsg.t);rMsg.t=setTimeout(()=>{e.style.opacity=0},1400)}}
 function rPick(k){RM.pick=RM.pick===k?null:k;RM.sel=null;RM.gh=null;tRoom()}
 function rGhNo(){if(RM)RM.gh=null;tRoom()}
@@ -812,6 +813,10 @@ function xfp(x,y){const X=RXF,u=x-X.x0,v=y-X.y0;let a,b;if(X.k===1){a=X.d-v;b=u}
 function rRotDraw(R,f,z,fn){const t=fTy(f),k=(f[3]||0)%4;if(!k||t===FT.wall)return fn();RXF={x0:f[1],y0:f[2],k,w:t.w,d:t.d,q:[]};try{fn()}finally{const q=RXF.q;RXF.q=null;try{isoSort(q).forEach(o=>o.fn())}finally{RXF=null}}}
 function rxq(b,fn){if(RXF&&RXF.q){RXF.q.push({b,fn});return true}return false}
 const xb=pts=>{let a=1e9,b=-1e9,c=1e9,d=-1e9,e=1e9,g=-1e9;pts.forEach(p=>{const q=xfp(p[0],p[1]);a=Math.min(a,q[0]);b=Math.max(b,q[0]);c=Math.min(c,q[1]);d=Math.max(d,q[1]);e=Math.min(e,p[2]||0);g=Math.max(g,p[2]||0)});return[a,b,c,d,e,g]};
+function rHitAt(e){const H=RM&&RM.hit;if(!H||!RM.cv)return-1;const b=RM.cv.getBoundingClientRect(),px=Math.floor((e.clientX-b.left)*RM.cv.width/b.width),py=Math.floor((e.clientY-b.top)*RM.cv.height/b.height);
+let oc=rHitAt.c;if(!oc){oc=rHitAt.c=document.createElement("canvas")}oc.width=H.W;oc.height=H.H;const x=oc.getContext("2d",{willReadFrequently:true}),R0=H.R,old=R0.c;let hit=-1;
+try{x.setTransform(old.getTransform());R0.c=x;RWALL=H.rw;for(let k=H.seq.length-1;k>=0;k--){const o=H.seq[k];x.save();x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,oc.width,oc.height);x.restore();o.fn();if(x.getImageData(px,py,1,1).data[3]>20){hit=o.i;break}}}catch(err){hit=-1}finally{R0.c=old;RWALL=new Map()}return hit}
+function rClearAll(){if(!RM)return;if(!RM.clr){RM.clr=1;tRoom();return}RM.clr=0;const r=rCfg();r.f.length=0;RM.sel=null;RM.pick=null;RM.gh=null;rDirty();tRoom();rMsg("모든 가구를 넣어 두었어요")}
 function rRot(){const r=rCfg(),f=r.f[RM.sel];if(!f)return;RM.gh=null;const nr=((f[3]||0)+1)%4;if(rFits(r,f[0],f[1],f[2],nr,RM.sel)){const[W0,D0]=rFoot(f);if(!fTy(f).orn)rOns(r,RM.sel).forEach(j=>{const o=r.f[j],a=o[1]-f[1],b=o[2]-f[2];o[1]=f[1]+(D0-1-b);o[2]=f[2]+a;o[3]=((o[3]||0)+1)%4});f[3]=nr;rDirty();tRoom()}else rMsg("자리가 좁아서 못 돌려요")}
 function rUnder(){const r=rCfg(),f=r.f[RM.sel],sf=f&&rSurf(r,f[1],f[2]);if(sf){RM.sel=r.f.indexOf(sf.f);tRoom()}}
 function rDel(){RM.gh=null;const r=rCfg(),f=r.f[RM.sel],ix=[RM.sel,...(fTy(f).orn?[]:rOns(r,RM.sel))].sort((a,b)=>b-a);ix.forEach(j=>r.f.splice(j,1));RM.sel=null;rDirty();tRoom()}
@@ -849,7 +854,7 @@ if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>FT.
 fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
 const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i};(t.walk?ws:fo).push(o)});
 const ord=isoSort(fo);if(!pv){const ch={b:[RM.x-.3,RM.x+.3,RM.y-.3,RM.y+.3,0,2],fn:()=>rChar(R)};let at=0;ord.forEach((o,k)=>{if(isoBefore(o.b,ch.b)&&!isoBefore(ch.b,o.b))at=k+1});ord.splice(at,0,ch)}
-ws.sort((a,b)=>a.i-b.i).forEach(o=>o.fn());ord.forEach(o=>{o.fn();if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>q.fn())});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>q.fn());RWALL=new Map()}
+const seq=[];ws.sort((a,b)=>a.i-b.i).forEach(o=>seq.push(o));ord.forEach(o=>{seq.push(o);if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>seq.push(q))});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>seq.push(q));seq.forEach(o=>o.fn());if(!pv&&RM)RM.hit={R,seq:seq.filter(o=>o.i!=null&&!gi.includes(o.i)&&o.i<r.f.length),W:cv.width,H:cv.height,rw:new Map(RWALL)};RWALL=new Map()}
 function rChar(R){const c=R.c,p=rP(R,RM.x,RM.y,0),im=chImgOf(chKey()),bob=RM.mv?Math.abs(Math.sin(RM.t*10))*5:Math.sin(RM.t*2.4)*1.5;
 c.fillStyle="rgba(40,30,30,.22)";c.beginPath();c.ellipse(p[0],p[1],20*R.s/2*1.2,8*R.s/2*1.2,0,0,6.2832);c.fill();
 if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.save();c.translate(p[0],p[1]-bob);c.scale(RM.fx<0?-1:1,1);c.drawImage(im,-w/2,-h+4,w,h);c.restore()}}
