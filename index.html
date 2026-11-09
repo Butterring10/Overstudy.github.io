@@ -709,7 +709,7 @@ FDEF.forEach(f=>{f.p*=15});[...WDEF,...FLDEF].forEach(w=>{w.p*=15});
 for(const t of Object.keys(BO)){const base=Math.min(...FDEF.filter(f=>f.t===t).map(f=>f.p));bl.push({id:"ba_"+t,t,n:"평범한 "+FTN[t],p:Math.max(10,Math.floor(base*.5/10)*10),o:BO[t]})}FDEF.unshift(...bl)}
 let RWALL=new Map();
 function rFill(R,pts,col){const c=R.c;c.beginPath();pts.forEach((q,i)=>{const p=rP(R,q[0],q[1],q[2]);i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])});c.closePath();c.fillStyle=col;c.fill()}
-FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const c=o.c,H=2.4,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),sm=(a,b)=>K(a,b)===c,E=K(1,0),S=K(0,1),ct=R.c;ct.save();ct.globalAlpha*=.4;
+FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const c=o.c,H=RWH,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),sm=(a,b)=>K(a,b)===c,E=K(1,0),S=K(0,1),ct=R.c;ct.save();ct.globalAlpha*=.4;
 if(!S){rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,H],[x,y+1,H]],shd(c,.9));rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,.35],[x,y+1,.35]],shd(c,.7));rFill(R,[[x,y+1,H],[x+1,y+1,H],[x+1,y+1,H-.18],[x,y+1,H-.18]],shd(c,.82))}
 if(!E){rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,H],[x+1,y,H]],shd(c,.75));rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,.35],[x+1,y,.35]],shd(c,.58))}
 rFill(R,[[x,y,H],[x+1,y,H],[x+1,y+1,H],[x,y+1,H]],c);
