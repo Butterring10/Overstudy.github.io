@@ -756,7 +756,7 @@ FDEF.push({id:"wn1",t:"win",n:"아침 창문",p:40,o:{sky:"morning"}},{id:"wn2",
 function wlPos(p,id,rot0){const T=FT[FD[id].t],X=p.x-p.y,w=T.w;if(X>=0){const a=Math.max(0,Math.min(RW-w,Math.floor(X-(w-1)/2)));return{x:a,y:0,rot:0}}const a=Math.max(0,Math.min(RD-w,Math.floor(-X-(w-1)/2)));return{x:0,y:a,rot:1}}
 let RWALL=new Map();
 function rFill(R,pts,col){const c=R.c;c.beginPath();pts.forEach((q,i)=>{const p=rP(R,q[0],q[1],q[2]);i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])});c.closePath();c.fillStyle=col;c.fill()}
-FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const c=o.c,H=RWH,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),sm=(a,b)=>K(a,b)===c,E=K(1,0),S=K(0,1),ct=R.c;ct.save();ct.globalAlpha*=.4;
+FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const c=o.c,H=RWH,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),sm=(a,b)=>{const v=K(a,b);return v===c||String(v).startsWith("door:")},E=K(1,0),S=K(0,1),ct=R.c;ct.save();ct.globalAlpha*=.4;
 if(!S){rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,H],[x,y+1,H]],shd(c,.9));rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,.35],[x,y+1,.35]],shd(c,.7));rFill(R,[[x,y+1,H],[x+1,y+1,H],[x+1,y+1,H-.18],[x,y+1,H-.18]],shd(c,.82))}
 if(!E){rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,H],[x+1,y,H]],shd(c,.75));rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,.35],[x+1,y,.35]],shd(c,.58))}
 rFill(R,[[x,y,H],[x+1,y,H],[x+1,y+1,H],[x,y+1,H]],c);
@@ -790,7 +790,7 @@ FDEF.push({id:"wl1",t:"wall",n:"하양 가벽",p:300,o:{c:"#f6f2ea"}},{id:"wl2",
 FT.door={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const ct=R.c,H=RWH,hz=2.35,fr=o.fr,c=o.c,rt=o.rt,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),
 M=(u,v)=>rt?[x+v,y+u]:[x+u,y+v],
 bx=(u0,u1,v0,v1,z0,z1,col)=>{const[X0,Y0]=M(rt?v0:u0,rt?u0:v0),[X1,Y1]=M(rt?v1:u1,rt?u1:v1),xa=Math.min(X0,X1),xb=Math.max(X0,X1),ya=Math.min(Y0,Y1),yb=Math.max(Y0,Y1),
-eW=xa<=x+1e-6?K(-1,0):null,eE=xb>=x+1-1e-6?K(1,0):null,eN=ya<=y+1e-6?K(0,-1):null,eS=yb>=y+1-1e-6?K(0,1):null,same=v=>v===col;
+eW=xa<=x+1e-6?K(-1,0):null,eE=xb>=x+1-1e-6?K(1,0):null,eN=ya<=y+1e-6?K(0,-1):null,eS=yb>=y+1-1e-6?K(0,1):null,same=v=>!!v;
 const ga=ct.globalAlpha;ct.globalAlpha=ga*.4;
 if(!eS)rFill(R,[[xa,yb,z0],[xb,yb,z0],[xb,yb,z1],[xa,yb,z1]],shd(col,.9));
 if(!eE)rFill(R,[[xb,ya,z0],[xb,yb,z0],[xb,yb,z1],[xb,ya,z1]],shd(col,.75));
@@ -969,7 +969,7 @@ if(o.pat==="dots")for(let i=0;i<L;i++)for(let j=0;j<4;j++)rDot(R,...(plane==="y"
 if(o.pat==="brick"){for(let j=1;j<8;j++)rLine(R,P(0,j*.4),P(L,j*.4),shd(o.c2,k),1.3);for(let j=0;j<8;j++)for(let i=0;i<L;i++)rLine(R,P(i+(j%2?.5:0)+.01,j*.4),P(i+(j%2?.5:0)+.01,j*.4+.4),shd(o.c2,k),1.3)}
 if(o.pat==="stars")for(let off=0;off<L;off+=8)for(const[a,z]of[[.7,2.6],[1.8,1.6],[2.9,2.8],[3.7,1.2],[4.6,2.4],[5.5,1.5],[6.4,2.8],[7.2,1.9],[2.2,.9],[5,.8]])if(a+off<L)rDot(R,...(plane==="y"?[a+off,0]:[0,a+off]),z,3.4,o.c2);
 rPoly(R,[P(0,0),P(L,0),P(L,RWH),P(0,RWH)],null,1.8)}
-function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;RWALL=new Map();(r.f||[]).forEach(f=>{const q=FD[f[0]];if(q&&q.t==="wall")RWALL.set(f[1]+","+f[2],q.o.c);else if(q&&q.t==="door")RWALL.set(f[1]+","+f[2],q.o.fr)});c.clearRect(0,0,cv.width,cv.height);RSH=1;
+function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;RWALL=new Map();(r.f||[]).forEach(f=>{const q=FD[f[0]];if(q&&q.t==="wall")RWALL.set(f[1]+","+f[2],q.o.c);else if(q&&q.t==="door")RWALL.set(f[1]+","+f[2],"door:"+q.o.fr)});c.clearRect(0,0,cv.width,cv.height);RSH=1;
 rWall(R,"x",W,.86);rWall(R,"y",W,1);
 rPoly(R,[[0,0,0],[RW,0,0],[RW,0,.35],[0,0,.35]],"#fffaf0",1.2);rPoly(R,[[0,0,0],[0,RD,0],[0,RD,.35],[0,0,.35]],"#f3ead8",1.2);
 for(let x=0;x<RW;x++)for(let y=0;y<RD;y++)rPoly(R,[[x,y,0],[x+1,y,0],[x+1,y+1,0],[x,y+1,0]],floorCol(F,x,y),0);
