@@ -797,8 +797,8 @@ if(!eE)rFill(R,[[xb,ya,z0],[xb,yb,z0],[xb,yb,z1],[xb,ya,z1]],shd(col,.75));
 rFill(R,[[xa,ya,z1],[xb,ya,z1],[xb,yb,z1],[xa,yb,z1]],col);
 ct.globalAlpha=ga*.6;ct.strokeStyle="#4a2c2a";ct.lineWidth=1.3*R.s;ct.lineCap="round";const L=(a,b)=>{const p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);ct.beginPath();ct.moveTo(p[0],p[1]);ct.lineTo(q[0],q[1]);ct.stroke()};
 const tN=ya<=y+1e-6,tW=xa<=x+1e-6,tS=yb>=y+1-1e-6,tE=xb>=x+1-1e-6,iT=z1>=H-1e-6;if(!same(eN)&&(tN||!iT))L([xa,ya,z1],[xb,ya,z1]);if(!same(eW)&&(tW||!iT))L([xa,ya,z1],[xa,yb,z1]);if(!same(eS)&&(tS||!iT))L([xa,yb,z1],[xb,yb,z1]);if(!same(eE)&&(tE||!iT))L([xb,ya,z1],[xb,yb,z1]);
-if(!eS){if(z0===0)L([xa,yb,0],[xb,yb,0]);else L([xa,yb,z0],[xb,yb,z0]);if(!same(eW))L([xa,yb,z0],[xa,yb,z1]);if(!same(eE))L([xb,yb,z0],[xb,yb,z1])}
-if(!eE){if(z0===0)L([xb,ya,0],[xb,yb,0]);else L([xb,ya,z0],[xb,yb,z0]);if(!same(eN))L([xb,ya,z0],[xb,ya,z1]);if(eS&&!same(eS))L([xb,yb,z0],[xb,yb,z1])}
+if(!eS){if(z0===0)L([xa,yb,0],[xb,yb,0]);if(!same(eW))L([xa,yb,z0],[xa,yb,z1]);if(!same(eE))L([xb,yb,z0],[xb,yb,z1])}
+if(!eE){if(z0===0)L([xb,ya,0],[xb,yb,0]);if(!same(eN))L([xb,ya,z0],[xb,ya,z1]);if(eS&&!same(eS))L([xb,yb,z0],[xb,yb,z1])}
 ct.globalAlpha=ga};
 const ga=ct.globalAlpha;
 if(o.op){ct.globalAlpha=ga*.4;const[a,b]=M(.1,.5);rt?rBox(R,a-.82,b,.8,.06,0,hz-.04,c):rBox(R,a,b-.82,.06,.8,0,hz-.04,c);ct.globalAlpha=ga}
