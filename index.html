@@ -1068,11 +1068,11 @@ hud();
 if(!q){document.getElementById("wb").onpointerdown=e=>{const el=e.target.closest("[data-i]");if(el)tapCell(+el.dataset.i)};moveBtn()}
 else{const a=document.getElementById("wa");if(a&&!W.quiz.until)a.focus();if(W.quiz.until)lockQ()}}
 function hud(){if(!W)return;const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
-set("wst",W.stage+"번째 구역");set("wlf","남은 풀 "+W.left+"개");set("wer","🪙 "+W.earned+"원 · 🌿 "+(W.cnt||0)+"/10");
-set("wfv",fev()?"🔥 Fever ×2 · "+((W.fever-Date.now())/1000).toFixed(1)+"초":"")}
+set("wst",W.stage+"번째 구역");set("wlf","남은 풀 "+W.left+"개");set("wer","🪙 "+W.earned+"원 · 🌿 "+(W.cnt||0)+"/"+(fev()?2:10));
+set("wfv",fev()?"🔥 Fever · 풀 2개당 1원 · "+((W.fever-Date.now())/1000).toFixed(1)+"초":"")}
 function moveBtn(){const m=document.getElementById("wmv");if(m)m.innerHTML=W.left===0?'<button style="width:100%;margin-top:12px;font-size:17px" onclick="wMove()">다음 장소로 이동 ▶</button>':""}
 function banner(t,sm){const r=document.getElementById("wroot");if(!r)return;const d=document.createElement("div");d.className="wbn"+(sm?" sm":"");d.textContent=t;r.appendChild(d);setTimeout(()=>d.remove(),1600)}
-function gain(n){const v=n*(fev()?2:1);W.earned+=v;S.me.coins+=v;S.me.points+=v;W.dirty=true;clearTimeout(W.sv);W.sv=setTimeout(saveWeed,1500);hud();return v}
+function gain(n,raw){const v=raw?n:n*(fev()?2:1);W.earned+=v;S.me.coins+=v;S.me.points+=v;W.dirty=true;clearTimeout(W.sv);W.sv=setTimeout(saveWeed,1500);hud();return v}
 function wChar(el,fin){const b=document.getElementById("wb");if(!b)return;let p=document.getElementById("wpl"),nw=false;const x=(el.offsetLeft+el.offsetWidth/2)+"px",y=(el.offsetTop+el.offsetHeight*.92)+"px";if(!p){p=document.createElement("div");p.id="wpl";p.className="wpl";p.innerHTML=myChar().e;p.style.opacity=0;p.style.left=x;p.style.top=y;b.appendChild(p);nw=true}
 const moved=p.style.left!==x||p.style.top!==y;p.style.left=x;p.style.top=y;p.style.opacity=1;if(nw)void p.offsetWidth;if(moved||nw)sfx.wStep();p.classList.remove("tug","pull");void p.offsetWidth;p.classList.add(fin?"pull":"tug");
 clearTimeout(W.pt);W.pt=setTimeout(()=>{const q=document.getElementById("wpl");if(q){q.style.opacity=0;setTimeout(()=>{if(q.style.opacity==="0")q.remove()},320)}},1600)}
@@ -1081,7 +1081,7 @@ for(let k=0;k<7;k++){const d=document.createElement("div");d.className="wdirt";d
 function tapCell(i){if(!W||W.mode!=="play")return;const c=W.cells[i];if(!c||!c.t||c.gone)return;const nw=performance.now();if(nw-(W.lt||0)<333)return;W.lt=nw;aInit();c.taps++;const el=document.getElementById("wb").children[i];
 if(c.taps<5){const all=el.querySelectorAll(".wg"),gg=all[all.length-1];all.forEach(x=>x.style.transform=`scale(${1-.13*c.taps})`);gg.classList.remove("wig");void gg.offsetWidth;gg.classList.add("wig");wChar(el,false);sfx.wTug(c.taps);return}
 c.gone=true;W.left--;el.innerHTML="";wChar(el,true);wFly(el,c);sfx.wPull();sfx.ungsho();
-if(c.t===1){W.cnt=(W.cnt||0)+1;const f=document.createElement("div");f.className="wf";if(W.cnt>=10){W.cnt=0;f.textContent="+"+gain(1)+"원"}else f.textContent=W.cnt+"/10";el.appendChild(f);setTimeout(()=>f.remove(),800);hud();moveBtn()}
+if(c.t===1){W.cnt=(W.cnt||0)+1;const nd=fev()?2:10,f=document.createElement("div");f.className="wf";if(W.cnt>=nd){W.cnt=0;f.textContent="+"+gain(1,1)+"원"}else f.textContent=W.cnt+"/"+nd;el.appendChild(f);setTimeout(()=>f.remove(),800);hud();moveBtn()}
 else{W.mode="quiz";W.quiz={kind:"gold",...mkQ()};drawW()}}
 function quizHTML(){const q=W.quiz,t=q.kind==="gold"?"✨ 황금풀이에요! 맞히면 Fever time!":"🚪 다음 장소로 가려면 문제를 풀어요";
 return `<div class="card" style="text-align:center"><p class="mu">${t}</p><h2 style="font-size:26px;margin:14px 0">${q.q}</h2>${q.opts?`<div class="grid wqb" style="grid-template-columns:1fr 1fr">${q.opts.map((o,i)=>`<button onclick="wAns(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<input id="wa" type="text" autocomplete="off" style="text-align:center;font-size:22px" onkeydown="if(event.key==='Enter')wAns()">`}<div id="wqm" class="err" style="text-align:center;min-height:24px"></div>${q.opts?"":`<button id="wgo" style="width:100%" onclick="wAns()">확인</button>`}</div>`}
