@@ -797,6 +797,7 @@ function rGhNo(){if(RM)RM.gh=null;tRoom()}
 function rGhOk(){const G=RM&&RM.gh;if(!G)return;const r=rCfg();RM.gh=null;
 if(G.k==="mv"){const f=r.f[RM.sel];if(f&&rFits(r,f[0],G.x,G.y,f[3],RM.sel)){const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
 else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,0,-1)){r.f.push([RM.pick,G.x,G.y,0]);if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
+function rMir(R,f,w,d,z,fn){const t=fTy(f);if(!f[3]||t.w!==t.d)return fn();const c=R.c,p=rP(R,f[1]+w/2,f[2]+d/2,z);c.save();c.translate(p[0],0);c.scale(-1,1);c.translate(-p[0],0);fn();c.restore()}
 function rRot(){const r=rCfg(),f=r.f[RM.sel];if(!f)return;const nr=f[3]?0:1;if(rFits(r,f[0],f[1],f[2],nr,RM.sel)){if(!fTy(f).orn)rOns(r,RM.sel).forEach(j=>{const o=r.f[j],a=o[1]-f[1],b=o[2]-f[2];o[1]=f[1]+b;o[2]=f[2]+a});f[3]=nr;rDirty();tRoom()}else rMsg("자리가 좁아서 못 돌려요")}
 function rUnder(){const r=rCfg(),f=r.f[RM.sel],sf=f&&rSurf(r,f[1],f[2]);if(sf){RM.sel=r.f.indexOf(sf.f);tRoom()}}
 function rDel(){RM.gh=null;const r=rCfg(),f=r.f[RM.sel],ix=[RM.sel,...(fTy(f).orn?[]:rOns(r,RM.sel))].sort((a,b)=>b-a);ix.forEach(j=>r.f.splice(j,1));RM.sel=null;rDirty();tRoom()}
@@ -829,7 +830,7 @@ rPoly(R,[[0,RD,0],[RW,RD,0],[RW,0,0],[RW,0,-.35],[RW,RD,-.35],[0,RD,-.35]],shd(F
 if(pv&&pv.hl){const[a,b,w,d]=pv.hl;rPoly(R,[[a,b,.01],[a+w,b,.01],[a+w,b+d,.01],[a,b+d,.01]],"rgba(255,150,20,.55)",2.4)}
 if(!pv&&RM.ed&&RM.sel!=null&&r.f[RM.sel]){const f=r.f[RM.sel],[w,d]=rFoot(f);rPoly(R,[[f[1],f[2],.01],[f[1]+w,f[2],.01],[f[1]+w,f[2]+d,.01],[f[1],f[2]+d,.01]],"rgba(79,124,255,.35)",2)}
 let rr=r;const gi=[];if(!pv&&RM&&RM.ed&&RM.gh){const G=RM.gh;rr={...r,f:r.f.slice()};let its=[];if(G.k==="new"&&RM.pick)its=[[RM.pick,G.x,G.y,0]];else if(G.k==="mv"&&r.f[RM.sel]){const f0=r.f[RM.sel],dx=G.x-f0[1],dy=G.y-f0[2];its=[[f0[0],G.x,G.y,f0[3]],...(fTy(f0).orn?[]:rOns(r,RM.sel)).map(j=>{const o=r.f[j];return[o[0],o[1]+dx,o[2]+dy,o[3]]})]}its.forEach(it=>{gi.push(rr.f.length);rr.f.push(it)})}
-const obj=rr.f.map(f=>{const[w,d]=rFoot(f);if(fTy(f).orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0,sk=sf?sf.f[1]+sf.f[2]+rFoot(sf.f)[0]+rFoot(sf.f)[1]-1:f[1]+f[2]+1;return{k:sk+.02+(f[1]+f[2])*.001,fn:()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o)}}return{k:fTy(f).walk?-99:f[1]+f[2]+w+d-1,fn:()=>fTy(f).dr(R,f[1],f[2],w,d,FD[f[0]].o)}});
+const obj=rr.f.map(f=>{const[w,d]=rFoot(f);if(fTy(f).orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0,sk=sf?sf.f[1]+sf.f[2]+rFoot(sf.f)[0]+rFoot(sf.f)[1]-1:f[1]+f[2]+1;return{k:sk+.02+(f[1]+f[2])*.001,fn:()=>rMir(R,f,1,1,z,()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o))}}return{k:fTy(f).walk?-99:f[1]+f[2]+w+d-1,fn:()=>rMir(R,f,w,d,0,()=>fTy(f).dr(R,f[1],f[2],w,d,FD[f[0]].o))}});
 gi.forEach(i=>{const o=obj[i],fn=o.fn;o.k+=.001;o.fn=()=>{c.save();c.globalAlpha=.5;fn();c.restore()}});
 if(!pv)obj.push({k:RM.x+RM.y,fn:()=>rChar(R)});obj.sort((a,b)=>a.k-b.k).forEach(o=>o.fn());RWALL=new Map()}
 function rChar(R){const c=R.c,p=rP(R,RM.x,RM.y,0),im=chImgOf(chKey()),bob=RM.mv?Math.abs(Math.sin(RM.t*10))*5:Math.sin(RM.t*2.4)*1.5;
