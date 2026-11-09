@@ -637,7 +637,7 @@ ${d.miss.length?`<div style="text-align:left;margin-top:8px"><b>틀린 문제</b
 <button style="width:100%;margin-top:12px" onclick="sdStart('${d.md==="basic"?"basic":"all"}')">한 번 더 하기</button>${d.md!=="basic"&&(qcfg().custom||[]).some(stWrong)?`<button class="g" style="width:100%;margin-top:8px" onclick="sdStart('wrong')">틀린 문제만 다시 풀기</button>`:""}<button class="g" style="width:100%;margin-top:8px" onclick="tStudy()">학습 처음으로</button></div>`}
 // ===== 방 꾸미기 (등각투영) =====
 let RW=8,RD=8;const RTW=64,RTH=32,RWH=3.2,RLN="#4a2c2a";
-function rP(R,x,y,z){return[R.ox+(x-y)*RTW/2*R.s,R.oy+(x+y)*RTH/2*R.s-(z||0)*RTH*R.s]}
+function rP(R,x,y,z){if(RXF){const q=xfp(x,y);x=q[0];y=q[1]}return[R.ox+(x-y)*RTW/2*R.s,R.oy+(x+y)*RTH/2*R.s-(z||0)*RTH*R.s]}
 let RSH=0;function rPoly(R,pts,f,lw){const c=R.c;c.beginPath();pts.forEach((p,i)=>{const q=rP(R,p[0],p[1],p[2]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();if(f){c.fillStyle=f;c.fill()}if(lw!==0){c.strokeStyle=RSH?"rgba(74,44,42,.8)":RLN;c.lineWidth=(lw||1.4)*R.s;c.lineJoin="round";c.stroke()}}
 const shd=(h,k)=>{const n=parseInt(h.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(v*k)));return"#"+[(n>>16)&255,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,"0")).join("")};
 function rBox(R,x,y,w,d,z,h,col){const z1=z+h;rPoly(R,[[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z1],[x,y+d,z1]],shd(col,.9));rPoly(R,[[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z1],[x+w,y,z1]],shd(col,.75));rPoly(R,[[x,y,z1],[x+w,y,z1],[x+w,y+d,z1],[x,y+d,z1]],col)}
@@ -745,7 +745,7 @@ FDEF.push({id:"wl1",t:"wall",n:"하양 가벽",p:300,o:{c:"#f6f2ea"}},{id:"wl2",
 const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
 const fTy=f=>FT[FD[f[0]].t];
-function rFoot(f){const t=fTy(f);return f[3]?[t.d,t.w]:[t.w,t.d]}
+function rFoot(f){const t=fTy(f);return f[3]%2?[t.d,t.w]:[t.w,t.d]}
 const fqOf=id=>(S.me.fq&&+S.me.fq[id])||0;
 const ownWF=(id,def)=>!!def[id]&&(def[id].p===0||S.me.items.includes(id));
 function rCfg(){const m=S.me;let r=m.room;if(!r||typeof r!=="object"||r.v!==2||!Array.isArray(r.f))r=m.room={v:2,f:[],wp:"w0",fl:"f0"};
@@ -753,7 +753,14 @@ const cnt={};r.f=r.f.filter(f=>{if(!Array.isArray(f)||!FD[f[0]])return false;cnt
 if(!ownWF(r.wp,WD))r.wp="w0";if(!ownWF(r.fl,FLD))r.fl="f0";r.w=RW=Math.min(20,Math.max(8,Math.floor(+r.w)||8));r.d=RD=Math.min(20,Math.max(8,Math.floor(+r.d)||8));return r}
 const rAvail=(r,id)=>fqOf(id)-r.f.filter(f=>f[0]===id).length;
 function rBlocked(r,ex){const g={};r.f.forEach((f,i)=>{if(i===ex||fTy(f).walk||fTy(f).orn)return;const[w,d]=rFoot(f);for(let a=0;a<w;a++)for(let b=0;b<d;b++)g[(f[1]+a)+","+(f[2]+b)]=1});return g}
-function rFits(r,id,x,y,rot,ex){const T=FT[FD[id].t],w=rot?T.d:T.w,d=rot?T.w:T.d;if(x<0||y<0||x+w>RW||y+d>RD)return false;if(T.orn)return!!rSurf(r,x,y)&&!r.f.some((f,i)=>i!==ex&&fTy(f).orn&&f[1]===x&&f[2]===y);if(T.walk)return!r.f.some((f,i)=>i!==ex&&fTy(f).walk&&(()=>{const[fw,fd]=rFoot(f);return x<f[1]+fw&&f[1]<x+w&&y<f[2]+fd&&f[2]<y+d})());const g=rBlocked(r,ex);for(let a=0;a<w;a++)for(let b=0;b<d;b++)if(g[(x+a)+","+(y+b)])return false;return true}
+function rFits(r,id,x,y,rot,ex){const T=FT[FD[id].t],w=rot%2?T.d:T.w,d=rot%2?T.w:T.d;if(x<0||y<0||x+w>RW||y+d>RD)return false;if(T.orn)return!!rSurf(r,x,y)&&!r.f.some((f,i)=>i!==ex&&fTy(f).orn&&f[1]===x&&f[2]===y);if(T.walk)return!r.f.some((f,i)=>i!==ex&&fTy(f).walk&&(()=>{const[fw,fd]=rFoot(f);return x<f[1]+fw&&f[1]<x+w&&y<f[2]+fd&&f[2]<y+d})());const g=rBlocked(r,ex);for(let a=0;a<w;a++)for(let b=0;b<d;b++)if(g[(x+a)+","+(y+b)])return false;return true}
+{const _B=rBox,_P=rPoly,_F=rFill,_D=rDot,_L=rBlob,_N=rLine;
+rBox=function(R,x,y,w,d,z,h,col){if(!RXF)return _B(R,x,y,w,d,z,h,col);const p1=xfp(x,y),p2=xfp(x+w,y+d),nx=Math.min(p1[0],p2[0]),ny=Math.min(p1[1],p2[1]),nw=Math.abs(p2[0]-p1[0]),nd=Math.abs(p2[1]-p1[1]);const go=()=>{const s=RXF;RXF=null;try{_B(R,nx,ny,nw,nd,z,h,col)}finally{RXF=s}};if(!rxq([nx,nx+nw,ny,ny+nd,z,z+h],go))go()};
+rPoly=function(R,pts,f,lw){if(!RXF||!RXF.q)return _P(R,pts,f,lw);rxq(xb(pts),()=>_P(R,pts,f,lw))};
+rFill=function(R,pts,col){if(!RXF||!RXF.q)return _F(R,pts,col);rxq(xb(pts),()=>_F(R,pts,col))};
+rDot=function(R,x,y,z,r,col){if(!RXF||!RXF.q)return _D(R,x,y,z,r,col);rxq(xb([[x,y,z]]),()=>_D(R,x,y,z,r,col))};
+rBlob=function(R,x,y,z,r,col){if(!RXF||!RXF.q)return _L(R,x,y,z,r,col);rxq(xb([[x,y,z]]),()=>_L(R,x,y,z,r,col))};
+rLine=function(R,a,b,...o){if(!RXF||!RXF.q)return _N(R,a,b,...o);rxq(xb([a,b]),()=>_N(R,a,b,...o))};}
 // ---- 썸네일 ----
 const rTh={};
 function rThumb(id){if(rTh[id])return rTh[id];const Z=2,cv=document.createElement("canvas");cv.width=cv.height=120*Z;const c=cv.getContext("2d"),F=FD[id],T=FT[F.t],w=T.w,d=T.d,R={c,s:Math.min(.95,2.1/(w+d))*Z,ox:60*Z,oy:0};R.oy=(F.t==="wardrobe"||F.t==="bed"||F.t==="shelf"&&!F.o.low?112:108)*Z-(w+d)*RTH/2*R.s;if(F.t==="wardrobe"||F.t==="shelf"||F.t==="bed")R.s*=.78,R.oy=104*Z-(w+d)*RTH/2*R.s;R.ox=60*Z-(w-d)*RTW/4*R.s;T.dr(R,0,0,w,d,F.o);return rTh[id]=cv.toDataURL()}
@@ -797,8 +804,15 @@ function rGhNo(){if(RM)RM.gh=null;tRoom()}
 function rGhOk(){const G=RM&&RM.gh;if(!G)return;const r=rCfg();RM.gh=null;
 if(G.k==="mv"){const f=r.f[RM.sel];if(f&&rFits(r,f[0],G.x,G.y,f[3],RM.sel)){const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
 else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,0,-1)){r.f.push([RM.pick,G.x,G.y,0]);if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
-function rMir(R,f,w,d,z,fn){const t=fTy(f);if(!f[3]||t.w!==t.d)return fn();const c=R.c,p=rP(R,f[1]+w/2,f[2]+d/2,z);c.save();c.translate(p[0],0);c.scale(-1,1);c.translate(-p[0],0);fn();c.restore()}
-function rRot(){const r=rCfg(),f=r.f[RM.sel];if(!f)return;const nr=f[3]?0:1;if(rFits(r,f[0],f[1],f[2],nr,RM.sel)){if(!fTy(f).orn)rOns(r,RM.sel).forEach(j=>{const o=r.f[j],a=o[1]-f[1],b=o[2]-f[2];o[1]=f[1]+b;o[2]=f[2]+a});f[3]=nr;rDirty();tRoom()}else rMsg("자리가 좁아서 못 돌려요")}
+const isoBefore=(a,b)=>a[1]<=b[0]+1e-6||a[3]<=b[2]+1e-6||a[5]<=b[4]+1e-6;
+function isoSort(L){const n=L.length,pre=L.map(()=>[]);for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(i!==j&&isoBefore(L[j].b,L[i].b)&&!isoBefore(L[i].b,L[j].b))pre[i].push(j);
+const done=new Array(n).fill(false),out=[];for(let k=0;k<n;k++){let pick=-1;for(let i=0;i<n;i++)if(!done[i]&&pre[i].every(j=>done[j])){pick=i;break}if(pick<0)pick=done.indexOf(false);done[pick]=true;out.push(L[pick])}return out}
+let RXF=null;
+function xfp(x,y){const X=RXF,u=x-X.x0,v=y-X.y0;let a,b;if(X.k===1){a=X.d-v;b=u}else if(X.k===2){a=X.w-u;b=X.d-v}else{a=v;b=X.w-u}return[X.x0+a,X.y0+b]}
+function rRotDraw(R,f,z,fn){const t=fTy(f),k=(f[3]||0)%4;if(!k||t===FT.wall)return fn();RXF={x0:f[1],y0:f[2],k,w:t.w,d:t.d,q:[]};try{fn()}finally{const q=RXF.q;RXF.q=null;try{isoSort(q).forEach(o=>o.fn())}finally{RXF=null}}}
+function rxq(b,fn){if(RXF&&RXF.q){RXF.q.push({b,fn});return true}return false}
+const xb=pts=>{let a=1e9,b=-1e9,c=1e9,d=-1e9,e=1e9,g=-1e9;pts.forEach(p=>{const q=xfp(p[0],p[1]);a=Math.min(a,q[0]);b=Math.max(b,q[0]);c=Math.min(c,q[1]);d=Math.max(d,q[1]);e=Math.min(e,p[2]||0);g=Math.max(g,p[2]||0)});return[a,b,c,d,e,g]};
+function rRot(){const r=rCfg(),f=r.f[RM.sel];if(!f)return;RM.gh=null;const nr=((f[3]||0)+1)%4;if(rFits(r,f[0],f[1],f[2],nr,RM.sel)){const[W0,D0]=rFoot(f);if(!fTy(f).orn)rOns(r,RM.sel).forEach(j=>{const o=r.f[j],a=o[1]-f[1],b=o[2]-f[2];o[1]=f[1]+(D0-1-b);o[2]=f[2]+a;o[3]=((o[3]||0)+1)%4});f[3]=nr;rDirty();tRoom()}else rMsg("자리가 좁아서 못 돌려요")}
 function rUnder(){const r=rCfg(),f=r.f[RM.sel],sf=f&&rSurf(r,f[1],f[2]);if(sf){RM.sel=r.f.indexOf(sf.f);tRoom()}}
 function rDel(){RM.gh=null;const r=rCfg(),f=r.f[RM.sel],ix=[RM.sel,...(fTy(f).orn?[]:rOns(r,RM.sel))].sort((a,b)=>b-a);ix.forEach(j=>r.f.splice(j,1));RM.sel=null;rDirty();tRoom()}
 function rSet(k,i){rCfg()[k]=i;rDirty();tRoom()}
@@ -830,9 +844,12 @@ rPoly(R,[[0,RD,0],[RW,RD,0],[RW,0,0],[RW,0,-.35],[RW,RD,-.35],[0,RD,-.35]],shd(F
 if(pv&&pv.hl){const[a,b,w,d]=pv.hl;rPoly(R,[[a,b,.01],[a+w,b,.01],[a+w,b+d,.01],[a,b+d,.01]],"rgba(255,150,20,.55)",2.4)}
 if(!pv&&RM.ed&&RM.sel!=null&&r.f[RM.sel]){const f=r.f[RM.sel],[w,d]=rFoot(f);rPoly(R,[[f[1],f[2],.01],[f[1]+w,f[2],.01],[f[1]+w,f[2]+d,.01],[f[1],f[2]+d,.01]],"rgba(79,124,255,.35)",2)}
 let rr=r;const gi=[];if(!pv&&RM&&RM.ed&&RM.gh){const G=RM.gh;rr={...r,f:r.f.slice()};let its=[];if(G.k==="new"&&RM.pick)its=[[RM.pick,G.x,G.y,0]];else if(G.k==="mv"&&r.f[RM.sel]){const f0=r.f[RM.sel],dx=G.x-f0[1],dy=G.y-f0[2];its=[[f0[0],G.x,G.y,f0[3]],...(fTy(f0).orn?[]:rOns(r,RM.sel)).map(j=>{const o=r.f[j];return[o[0],o[1]+dx,o[2]+dy,o[3]]})]}its.forEach(it=>{gi.push(rr.f.length);rr.f.push(it)})}
-const obj=rr.f.map(f=>{const[w,d]=rFoot(f);if(fTy(f).orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0,sk=sf?sf.f[1]+sf.f[2]+rFoot(sf.f)[0]+rFoot(sf.f)[1]-1:f[1]+f[2]+1;return{k:sk+.02+(f[1]+f[2])*.001,fn:()=>rMir(R,f,1,1,z,()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o))}}return{k:fTy(f).walk?-99:f[1]+f[2]+w+d-1,fn:()=>rMir(R,f,w,d,0,()=>fTy(f).dr(R,f[1],f[2],w,d,FD[f[0]].o))}});
-gi.forEach(i=>{const o=obj[i],fn=o.fn;o.k+=.001;o.fn=()=>{c.save();c.globalAlpha=.5;fn();c.restore()}});
-if(!pv)obj.push({k:RM.x+RM.y,fn:()=>rChar(R)});obj.sort((a,b)=>a.k-b.k).forEach(o=>o.fn());RWALL=new Map()}
+const ws=[],fo=[],orns=[];rr.f.forEach((f,i)=>{const t=fTy(f),[w,d]=rFoot(f),gh=gi.includes(i);let fn;
+if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i});return}
+fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
+const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i};(t.walk?ws:fo).push(o)});
+const ord=isoSort(fo);if(!pv){const ch={b:[RM.x-.3,RM.x+.3,RM.y-.3,RM.y+.3,0,2],fn:()=>rChar(R)};let at=0;ord.forEach((o,k)=>{if(isoBefore(o.b,ch.b)&&!isoBefore(ch.b,o.b))at=k+1});ord.splice(at,0,ch)}
+ws.sort((a,b)=>a.i-b.i).forEach(o=>o.fn());ord.forEach(o=>{o.fn();if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>q.fn())});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>q.fn());RWALL=new Map()}
 function rChar(R){const c=R.c,p=rP(R,RM.x,RM.y,0),im=chImgOf(chKey()),bob=RM.mv?Math.abs(Math.sin(RM.t*10))*5:Math.sin(RM.t*2.4)*1.5;
 c.fillStyle="rgba(40,30,30,.22)";c.beginPath();c.ellipse(p[0],p[1],20*R.s/2*1.2,8*R.s/2*1.2,0,0,6.2832);c.fill();
 if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.save();c.translate(p[0],p[1]-bob);c.scale(RM.fx<0?-1:1,1);c.drawImage(im,-w/2,-h+4,w,h);c.restore()}}
