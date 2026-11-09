@@ -787,11 +787,24 @@ else if(k==="candle"){rBox(R,cx-.14,cy-.14,.28,.28,0,.05,"#c8946a");rBox(R,cx-.0
 else if(k==="mug"){rBox(R,cx-.12,cy-.12,.24,.24,0,.24,"#6aa8e8");rBlob(R,cx+.16,cy+.02,.12,2.4,"#6aa8e8");rPoly(R,[[cx-.1,cy-.1,.245],[cx+.1,cy-.1,.245],[cx+.1,cy+.1,.245],[cx-.1,cy+.1,.245]],"#6b4226",0)}
 else if(k==="robot"){rBox(R,cx-.12,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx+.04,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx-.15,cy-.1,.3,.2,.1,.28,"#9aa5b1");rBox(R,cx-.12,cy-.09,.24,.18,.38,.2,"#c9d1da");rDot(R,cx-.05,cy+.1,.5,1.6,"#4fd8ff");rDot(R,cx+.05,cy+.1,.5,1.6,"#4fd8ff");rBox(R,cx-.02,cy-.02,.04,.04,.58,.12,"#6a7a8a");rBlob(R,cx,cy,.72,2,"#e5484d")}}};
 FDEF.push({id:"wl1",t:"wall",n:"하양 가벽",p:300,o:{c:"#f6f2ea"}},{id:"wl2",t:"wall",n:"원목 가벽",p:300,o:{c:"#d9a86a"}},{id:"wl3",t:"wall",n:"하늘 가벽",p:300,o:{c:"#bcd8f5"}},{id:"wl4",t:"wall",n:"분홍 가벽",p:300,o:{c:"#f6b8cc"}},{id:"wl5",t:"wall",n:"기본 벽지색 가벽",p:300,o:{c:"#f4f1ea"}},{id:"wl6",t:"wall",n:"하늘 벽지색 가벽",p:300,o:{c:"#cfe3ff"}},{id:"wl7",t:"wall",n:"연두 벽지색 가벽",p:300,o:{c:"#e2f3d3"}},{id:"wl8",t:"wall",n:"노랑 벽지색 가벽",p:300,o:{c:"#fff3cc"}},{id:"wl9",t:"wall",n:"분홍 벽지색 가벽",p:300,o:{c:"#ffe1ea"}},{id:"wl10",t:"wall",n:"보라 벽지색 가벽",p:300,o:{c:"#ebe3ff"}},{id:"wl11",t:"wall",n:"민트 벽지색 가벽",p:300,o:{c:"#d6f3ec"}},{id:"wl12",t:"wall",n:"살구 벽지색 가벽",p:300,o:{c:"#ffe4d1"}},{id:"wl13",t:"wall",n:"회색 벽지색 가벽",p:300,o:{c:"#e4e6eb"}},{id:"wl14",t:"wall",n:"남색 벽지색 가벽",p:300,o:{c:"#5a6a96"}},{id:"dr1",t:"door",n:"원목 문",p:250,o:{c:"#c08a5a",fr:"#8a5a38"}},{id:"dr2",t:"door",n:"하양 문",p:250,o:{c:"#f7f3ec",fr:"#c9b49a"}},{id:"dr3",t:"door",n:"분홍 문",p:250,o:{c:"#f6b8cc",fr:"#c97a96"}},{id:"dr4",t:"door",n:"하늘 문",p:250,o:{c:"#bcd8f5",fr:"#7a9cc8"}},{id:"dr5",t:"door",n:"민트 문",p:250,o:{c:"#bfe9de",fr:"#6fb8a4"}},{id:"dr6",t:"door",n:"남색 문",p:250,o:{c:"#5a6a96",fr:"#3a4670"}},{id:"dr7",t:"door",n:"기본 벽지색 문",p:250,o:{c:"#dbd8d2",fr:"#f4f1ea"}},{id:"dr8",t:"door",n:"하늘 벽지색 문",p:250,o:{c:"#bacce5",fr:"#cfe3ff"}},{id:"dr9",t:"door",n:"연두 벽지색 문",p:250,o:{c:"#cbdabd",fr:"#e2f3d3"}},{id:"dr10",t:"door",n:"노랑 벽지색 문",p:250,o:{c:"#e5dab7",fr:"#fff3cc"}},{id:"dr11",t:"door",n:"분홍 벽지색 문",p:250,o:{c:"#e5cad2",fr:"#ffe1ea"}},{id:"dr12",t:"door",n:"보라 벽지색 문",p:250,o:{c:"#d3cce5",fr:"#ebe3ff"}},{id:"dr13",t:"door",n:"민트 벽지색 문",p:250,o:{c:"#c0dad4",fr:"#d6f3ec"}},{id:"dr14",t:"door",n:"살구 벽지색 문",p:250,o:{c:"#e5cdbc",fr:"#ffe4d1"}},{id:"dr15",t:"door",n:"회색 벽지색 문",p:250,o:{c:"#cdcfd3",fr:"#e4e6eb"}},{id:"dr16",t:"door",n:"남색 벽지색 문",p:250,o:{c:"#515f87",fr:"#5a6a96"}});
-FT.door={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const ct=R.c,ga=ct.globalAlpha,q=RXF&&RXF.q,n=q?q.length:0,AL=.4;ct.globalAlpha=ga*AL;try{const H=RWH,hz=2.35,fr=o.fr,c=o.c,ym=y+.5;
-if(o.op){rBox(R,x+.1,ym-.82,.06,.8,0,hz-.04,c);rDot(R,x+.17,ym-.7,1.05,.035,"#e8c060")}
-rBox(R,x,y,.1,1,0,H,fr);rBox(R,x+.9,y,.1,1,0,H,fr);rBox(R,x+.1,y,.8,1,hz,H-hz,fr);
-if(!o.op){rBox(R,x+.1,ym-.03,.8,.06,0,hz,c);rBox(R,x+.18,ym+.03,.64,.015,1.35,.8,shd(c,.9));rBox(R,x+.18,ym+.03,.64,.015,.25,.85,shd(c,.9));rDot(R,x+.78,ym+.08,1.05,.045,"#e8c060");rDot(R,x+.78,ym-.08,1.05,.045,"#e8c060")}}finally{ct.globalAlpha=ga}
-if(q)for(let k=n;k<q.length;k++){const f0=q[k].fn;q[k].fn=()=>{const g=R.c.globalAlpha;R.c.globalAlpha=g*AL;try{f0()}finally{R.c.globalAlpha=g}}}}};
+FT.door={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const ct=R.c,H=RWH,hz=2.35,fr=o.fr,c=o.c,rt=o.rt,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),
+M=(u,v)=>rt?[x+v,y+u]:[x+u,y+v],
+bx=(u0,u1,v0,v1,z0,z1,col)=>{const[X0,Y0]=M(rt?v0:u0,rt?u0:v0),[X1,Y1]=M(rt?v1:u1,rt?u1:v1),xa=Math.min(X0,X1),xb=Math.max(X0,X1),ya=Math.min(Y0,Y1),yb=Math.max(Y0,Y1),
+eW=xa<=x+1e-6?K(-1,0):null,eE=xb>=x+1-1e-6?K(1,0):null,eN=ya<=y+1e-6?K(0,-1):null,eS=yb>=y+1-1e-6?K(0,1):null,same=v=>v===col;
+const ga=ct.globalAlpha;ct.globalAlpha=ga*.4;
+if(!eS)rFill(R,[[xa,yb,z0],[xb,yb,z0],[xb,yb,z1],[xa,yb,z1]],shd(col,.9));
+if(!eE)rFill(R,[[xb,ya,z0],[xb,yb,z0],[xb,yb,z1],[xb,ya,z1]],shd(col,.75));
+rFill(R,[[xa,ya,z1],[xb,ya,z1],[xb,yb,z1],[xa,yb,z1]],col);
+ct.globalAlpha=ga*.6;ct.strokeStyle="#4a2c2a";ct.lineWidth=1.3*R.s;ct.lineCap="round";const L=(a,b)=>{const p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);ct.beginPath();ct.moveTo(p[0],p[1]);ct.lineTo(q[0],q[1]);ct.stroke()};
+const tN=ya<=y+1e-6,tW=xa<=x+1e-6,tS=yb>=y+1-1e-6,tE=xb>=x+1-1e-6,iT=z1>=H-1e-6;if(!same(eN)&&(tN||!iT))L([xa,ya,z1],[xb,ya,z1]);if(!same(eW)&&(tW||!iT))L([xa,ya,z1],[xa,yb,z1]);if(!same(eS)&&(tS||!iT))L([xa,yb,z1],[xb,yb,z1]);if(!same(eE)&&(tE||!iT))L([xb,ya,z1],[xb,yb,z1]);
+if(!eS){if(z0===0)L([xa,yb,0],[xb,yb,0]);else L([xa,yb,z0],[xb,yb,z0]);if(!same(eW))L([xa,yb,z0],[xa,yb,z1]);if(!same(eE))L([xb,yb,z0],[xb,yb,z1])}
+if(!eE){if(z0===0)L([xb,ya,0],[xb,yb,0]);else L([xb,ya,z0],[xb,yb,z0]);if(!same(eN))L([xb,ya,z0],[xb,ya,z1]);if(eS&&!same(eS))L([xb,yb,z0],[xb,yb,z1])}
+ct.globalAlpha=ga};
+const ga=ct.globalAlpha;
+if(o.op){ct.globalAlpha=ga*.4;const[a,b]=M(.1,.5);rt?rBox(R,a-.82,b,.8,.06,0,hz-.04,c):rBox(R,a,b-.82,.06,.8,0,hz-.04,c);ct.globalAlpha=ga}
+bx(0,.1,0,1,0,H,fr);bx(.9,1,0,1,0,H,fr);bx(.1,.9,0,1,hz,H,fr);
+if(!o.op){ct.globalAlpha=ga*.4;const P=(u0,u1,v0,v1,z,h,col)=>{const[a0,b0]=M(u0,v0);rt?rBox(R,a0,b0,v1-v0,u1-u0,z,h,col):rBox(R,a0,b0,u1-u0,v1-v0,z,h,col)};
+P(.1,.9,.47,.53,0,hz,c);P(.18,.82,.53,.545,1.35,.8,shd(c,.9));P(.18,.82,.53,.545,.25,.85,shd(c,.9));ct.globalAlpha=ga;const[k1,k2]=M(.78,.58),[k3,k4]=M(.78,.42);rDot(R,k1,k2,1.05,.045,"#e8c060");rDot(R,k3,k4,1.05,.045,"#e8c060")}}};
 // ===== 추가 가구: 긴 책상·긴 러그·2인용 침대·2인용 의자·낮은 소파 =====
 function lDesk(R,x,y,w,d,o){const H=.62,lx=[.08,w-.16];{const m=Math.ceil(w/2);for(let i=1;i<m;i++)lx.push(i*w/m-.04)}for(const a of lx)for(const b of[.08,d-.16])rBox(R,x+a,y+b,.08,.08,0,H,o.fr);
 rBox(R,x+.04,y+.04,w-.08,d-.08,H,.1,o.top);
@@ -925,7 +938,7 @@ function isoSort(L){const n=L.length,pre=L.map(()=>[]);for(let i=0;i<n;i++)for(l
 const done=new Array(n).fill(false),out=[];for(let k=0;k<n;k++){let pick=-1;for(let i=0;i<n;i++)if(!done[i]&&pre[i].every(j=>done[j])){pick=i;break}if(pick<0)pick=done.indexOf(false);done[pick]=true;out.push(L[pick])}return out}
 let RXF=null;
 function xfp(x,y){const X=RXF,u=x-X.x0,v=y-X.y0;let a,b;if(X.k===1){a=X.d-v;b=u}else if(X.k===2){a=X.w-u;b=X.d-v}else{a=v;b=X.w-u}return[X.x0+a,X.y0+b]}
-let RSEAT=null;function rRotDraw(R,f,z,fn){const t=fTy(f),k=(f[3]||0)%4;if(!k||t===FT.wall)return fn();RXF={x0:f[1],y0:f[2],k,w:t.w,d:t.d,q:[]};if(RSEAT&&RSEAT.f===f){const sz=RM.sz||0;RXF.q.push({b:[RM.x-.2,RM.x+.2,RM.y-.2,RM.y+.2,sz,sz+1.5],fn:()=>{const s0=RXF;RXF=null;try{rChar(R)}finally{RXF=s0}}})}try{fn()}finally{const q=RXF.q;RXF.q=null;try{isoSort(q).forEach(o=>o.fn())}finally{RXF=null}}}
+let RSEAT=null;function rRotDraw(R,f,z,fn){const t=fTy(f),k=(f[3]||0)%4;if(!k||t===FT.wall||t===FT.door)return fn();RXF={x0:f[1],y0:f[2],k,w:t.w,d:t.d,q:[]};if(RSEAT&&RSEAT.f===f){const sz=RM.sz||0;RXF.q.push({b:[RM.x-.2,RM.x+.2,RM.y-.2,RM.y+.2,sz,sz+1.5],fn:()=>{const s0=RXF;RXF=null;try{rChar(R)}finally{RXF=s0}}})}try{fn()}finally{const q=RXF.q;RXF.q=null;try{isoSort(q).forEach(o=>o.fn())}finally{RXF=null}}}
 function rxq(b,fn){if(RXF&&RXF.q){RXF.q.push({b,fn});return true}return false}
 const xb=pts=>{let a=1e9,b=-1e9,c=1e9,d=-1e9,e=1e9,g=-1e9;pts.forEach(p=>{const q=xfp(p[0],p[1]);a=Math.min(a,q[0]);b=Math.max(b,q[0]);c=Math.min(c,q[1]);d=Math.max(d,q[1]);e=Math.min(e,p[2]||0);g=Math.max(g,p[2]||0)});return[a,b,c,d,e,g]};
 function rHitAt(e){const H=RM&&RM.hit;if(!H||!RM.cv)return-1;const b=RM.cv.getBoundingClientRect(),px=Math.floor((e.clientX-b.left)*RM.cv.width/b.width),py=Math.floor((e.clientY-b.top)*RM.cv.height/b.height);
@@ -956,7 +969,7 @@ if(o.pat==="dots")for(let i=0;i<L;i++)for(let j=0;j<4;j++)rDot(R,...(plane==="y"
 if(o.pat==="brick"){for(let j=1;j<8;j++)rLine(R,P(0,j*.4),P(L,j*.4),shd(o.c2,k),1.3);for(let j=0;j<8;j++)for(let i=0;i<L;i++)rLine(R,P(i+(j%2?.5:0)+.01,j*.4),P(i+(j%2?.5:0)+.01,j*.4+.4),shd(o.c2,k),1.3)}
 if(o.pat==="stars")for(let off=0;off<L;off+=8)for(const[a,z]of[[.7,2.6],[1.8,1.6],[2.9,2.8],[3.7,1.2],[4.6,2.4],[5.5,1.5],[6.4,2.8],[7.2,1.9],[2.2,.9],[5,.8]])if(a+off<L)rDot(R,...(plane==="y"?[a+off,0]:[0,a+off]),z,3.4,o.c2);
 rPoly(R,[P(0,0),P(L,0),P(L,RWH),P(0,RWH)],null,1.8)}
-function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;RWALL=new Map();(r.f||[]).forEach(f=>{const q=FD[f[0]];if(q&&q.t==="wall")RWALL.set(f[1]+","+f[2],q.o.c)});c.clearRect(0,0,cv.width,cv.height);RSH=1;
+function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;RWALL=new Map();(r.f||[]).forEach(f=>{const q=FD[f[0]];if(q&&q.t==="wall")RWALL.set(f[1]+","+f[2],q.o.c);else if(q&&q.t==="door")RWALL.set(f[1]+","+f[2],q.o.fr)});c.clearRect(0,0,cv.width,cv.height);RSH=1;
 rWall(R,"x",W,.86);rWall(R,"y",W,1);
 rPoly(R,[[0,0,0],[RW,0,0],[RW,0,.35],[0,0,.35]],"#fffaf0",1.2);rPoly(R,[[0,0,0],[0,RD,0],[0,RD,.35],[0,0,.35]],"#f3ead8",1.2);
 for(let x=0;x<RW;x++)for(let y=0;y<RD;y++)rPoly(R,[[x,y,0],[x+1,y,0],[x+1,y+1,0],[x,y+1,0]],floorCol(F,x,y),0);
@@ -968,7 +981,7 @@ let rr=r;const gi=[];if(!pv&&RM&&RM.ed&&RM.gh){const G=RM.gh;rr={...r,f:r.f.slic
 const ws=[],fo=[],orns=[],wls=[];rr.f.forEach((f,i)=>{const t=fTy(f),[w,d]=rFoot(f),gh=gi.includes(i);let fn;
 if(t.wl){const od=f[3]%2,a=od?f[2]:f[1];fn=()=>wlDraw(R,od?"x":"y",a,a+t.w,FD[f[0]].o);if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}wls.push({fn,i,f});return}
 if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i});return}
-fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,t===FT.door?{...FD[f[0]].o,op:f[4]?1:0}:FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
+fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,t===FT.door?{...FD[f[0]].o,op:f[4]?1:0,rt:(f[3]||0)%2}:FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
 const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i};(t.walk?ws:fo).push(o)});
 const ord=isoSort(fo);const sF=!pv&&RM&&RM.seat?r.f[RM.seat.i]:null,sEmb=sF&&(sF[3]||0)%4!==0&&fTy(sF)!==FT.wall;if(!pv&&!sEmb){const ch={b:[RM.x-.08,RM.x+.08,RM.y-.08,RM.y+.08,0,2],fn:()=>rChar(R)};let at=0;const si=RM.seat?ord.findIndex(o=>o.i===RM.seat.i):-1;if(si>=0)at=si+1;else ord.forEach((o,k)=>{if(isoBefore(o.b,ch.b)&&!isoBefore(ch.b,o.b))at=k+1});ord.splice(at,0,ch)}
 if(!pv)visOthers().forEach(o=>{const ch={b:[o.x-.08,o.x+.08,o.y-.08,o.y+.08,0,2],fn:()=>rCharO(R,o)};let at=0;const si=o.z>0?ord.findIndex(q=>q.f&&SEATZ[FD[q.f[0]].t]!=null&&(()=>{const[w,d]=rFoot(q.f);return o.x>=q.f[1]&&o.x<=q.f[1]+w&&o.y>=q.f[2]&&o.y<=q.f[2]+d})()):-1;if(si>=0)at=si+1;else ord.forEach((q,k)=>{if(isoBefore(q.b,ch.b)&&!isoBefore(ch.b,q.b))at=k+1});ord.splice(at,0,ch)});
