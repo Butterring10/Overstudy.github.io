@@ -534,7 +534,7 @@ await db.doc("classes/"+code).set({name:n,code,owner:ow,createdAt:Date.now()});S
 function selC(c){S.tsel=c;loadT()}
 async function playT(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;
 try{const ref=db.doc("students/"+sel.code+"_teacher");let d=await ref.get();let me;
-const ttl=tTitle(sel.owner);if(d.exists){me=dc(d.data());if(me.name!==ttl){me.name=ttl;try{await ref.update({name:ttl})}catch(e){}}if(!me.bonus1m){me.bonus1m=1;if((me.coins||0)<1000000)me.coins=1000000;try{await ref.update({coins:me.coins,bonus1m:1})}catch(e){}}}else{me={bonus1m:1,cls:sel.code,sid:"teacher",name:ttl,pw:"",points:0,coins:1000000,items:["a1"],equip:{avatar:"a1"},isTeacher:true};await ref.set(me)}
+const ttl=tTitle(sel.owner);if(d.exists){me=dc(d.data());if(me.name!==ttl){me.name=ttl;try{await ref.update({name:ttl})}catch(e){}}if(!me.bonus1m){me.bonus1m=1;if((me.coins||0)<1000000)me.coins=1000000;try{await ref.update({coins:me.coins,bonus1m:1})}catch(e){}}if(!me.bonusG){me.bonusG=1;if((me.gems||0)<10000)me.gems=10000;try{await ref.update({gems:me.gems,bonusG:1})}catch(e){}}}else{me={bonus1m:1,cls:sel.code,sid:"teacher",name:ttl,pw:"",points:0,coins:1000000,gems:10000,bonusG:1,items:["a1"],equip:{avatar:"a1"},isTeacher:true};await ref.set(me)}
 S.isT=1;nav("class",{cls:sel,me,tab:me.char?"my":"game"})}catch(e){nav("teacher",{err:"입장하지 못했어요."})}}
 async function mkStu(){const names=nm.value.split("\n").map(s=>s.trim()).filter(Boolean);if(!names.length)return nav("teacher",{err:"이름을 입력해 주세요."});
 let n=S.tstu.length;try{for(const name of names){n++;let sid="s"+String(n).padStart(2,"0");while(S.tstu.some(x=>x.sid===sid)){n++;sid="s"+String(n).padStart(2,"0")}
