@@ -672,9 +672,9 @@ if(o.cube){const cs=o.cube;for(let k=0;k<rows;k++)for(let i=0;i<3;i++)rBox(R,x+.
 else{const cs=["#e5564a","#6aa8e8","#ffd24a","#8fd466","#c79af0"];for(let k=0;k<rows;k++)for(let i=0;i<4;i++)rBox(R,x+.9,y+.3+i*.11,.03,.09,.15+k*(o.low?.45:.6),.4,cs[(i+k)%5])}}},
 plant:{w:1,d:1,dr:(R,x,y,w,d,o)=>{const k=o.k;if(k==="cactus"){rBox(R,x+.3,y+.3,.4,.4,0,.4,o.pot);rBox(R,x+.4,y+.4,.2,.2,.4,.75,"#58b848");rBox(R,x+.22,y+.42,.18,.14,.7,.1,"#58b848");rBox(R,x+.22,y+.42,.1,.14,.7,.4,"#58b848");rBox(R,x+.62,y+.42,.18,.14,.85,.1,"#58b848");rBox(R,x+.7,y+.42,.1,.14,.85,.3,"#58b848");rDot(R,x+.5,y+.62,1.2,.03,"#ff8fb1")}
 else if(k==="tree"){rBox(R,x+.38,y+.38,.24,.24,0,.9,"#a8744a");rBlob(R,x+.5,y+.5,1.4,20,"#58b848");rBlob(R,x+.3,y+.55,1.7,15,"#6cc450");rBlob(R,x+.62,y+.4,1.95,16,"#7ccb5c");rBlob(R,x+.5,y+.5,2.35,12,"#8fd466")}
-else if(k==="flower"){rBox(R,x+.25,y+.25,.5,.5,0,.35,o.pot);for(const[a,b,z,c]of[[.35,.5,.75,"#ff8fb1"],[.6,.4,.9,"#ffd24a"],[.5,.62,1.05,"#ff6a6a"]]){rBox(R,x+a-.02,y+b-.02,.04,.04,.35,z-.35,"#58b848");rBlob(R,x+a,y+b,z+.1,7,c)}}
+else if(k==="flower")vaseDraw(R,x+.5,y+.5,o);
 else{rBox(R,x+.3,y+.3,.4,.4,0,.4,o.pot);rBlob(R,x+.5,y+.5,.75,13,"#58b848");rBlob(R,x+.35,y+.55,.95,10,"#6cc450");rBlob(R,x+.6,y+.4,1.05,10,"#7ccb5c")}}},
-lamp:{w:1,d:1,dr:(R,x,y,w,d,o)=>{rBox(R,x+.35,y+.35,.3,.3,0,.06,"#9aa5b1");rBox(R,x+.47,y+.47,.06,.06,.06,1.2,"#c9d1da");if(o.round)rBlob(R,x+.5,y+.5,1.5,15,o.sh);else rBox(R,x+.28,y+.28,.44,.44,1.2,.35,o.sh)}},
+lamp:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.k)return lampDraw(R,x,y,o);rBox(R,x+.35,y+.35,.3,.3,0,.06,"#9aa5b1");rBox(R,x+.47,y+.47,.06,.06,.06,1.2,"#c9d1da");if(o.round)rBlob(R,x+.5,y+.5,1.5,15,o.sh);else rBox(R,x+.28,y+.28,.44,.44,1.2,.35,o.sh)}},
 sofa:{w:2,d:1,dr:(R,x,y,w,d,o)=>{const r=w>d,c=o.c;rBox(R,x+.05,y+.05,w-.1,d-.1,0,.4,c);if(r){rBox(R,x+.05,y+.05,w-.1,.25,.4,.45,c);rBox(R,x+.05,y+.3,.22,d-.35,.4,.22,shd(c,.9));rBox(R,x+w-.27,y+.3,.22,d-.35,.4,.22,shd(c,.9));rBox(R,x+.5,y+.34,.5,.4,.4,.1,shd(c,1.1));rBox(R,x+1,y+.34,.5,.4,.4,.1,shd(c,1.1))}
 else{rBox(R,x+.05,y+.05,.25,d-.1,.4,.45,c);rBox(R,x+.3,y+.05,w-.35,.22,.4,.22,shd(c,.9));rBox(R,x+.3,y+d-.27,w-.35,.22,.4,.22,shd(c,.9))}}},
 table:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.round){rBox(R,x+.42,y+.42,.16,.16,0,.4,o.fr);rRound(R,x+.5,y+.5,.42,.4,shd(o.top,.8));rRound(R,x+.5,y+.5,.42,.46,o.top);rBox(R,x+.38,y+.36,.16,.16,.46,.14,"#fff")}
@@ -742,6 +742,69 @@ else if(k==="candle"){rBox(R,cx-.14,cy-.14,.28,.28,0,.05,"#c8946a");rBox(R,cx-.0
 else if(k==="mug"){rBox(R,cx-.12,cy-.12,.24,.24,0,.24,"#6aa8e8");rBlob(R,cx+.16,cy+.02,.12,2.4,"#6aa8e8");rPoly(R,[[cx-.1,cy-.1,.245],[cx+.1,cy-.1,.245],[cx+.1,cy+.1,.245],[cx-.1,cy+.1,.245]],"#6b4226",0)}
 else if(k==="robot"){rBox(R,cx-.12,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx+.04,cy-.1,.08,.2,0,.1,"#6a7a8a");rBox(R,cx-.15,cy-.1,.3,.2,.1,.28,"#9aa5b1");rBox(R,cx-.12,cy-.09,.24,.18,.38,.2,"#c9d1da");rDot(R,cx-.05,cy+.1,.5,1.6,"#4fd8ff");rDot(R,cx+.05,cy+.1,.5,1.6,"#4fd8ff");rBox(R,cx-.02,cy-.02,.04,.04,.58,.12,"#6a7a8a");rBlob(R,cx,cy,.72,2,"#e5484d")}}};
 FDEF.push({id:"wl1",t:"wall",n:"하양 가벽",p:300,o:{c:"#f6f2ea"}},{id:"wl2",t:"wall",n:"원목 가벽",p:300,o:{c:"#d9a86a"}},{id:"wl3",t:"wall",n:"하늘 가벽",p:300,o:{c:"#bcd8f5"}},{id:"wl4",t:"wall",n:"분홍 가벽",p:300,o:{c:"#f6b8cc"}});
+// ===== 추가 가구: 긴 책상·긴 러그·2인용 침대·2인용 의자·낮은 소파 =====
+function lDesk(R,x,y,w,d,o){const H=.62,lx=[.08,w-.16];for(let k=2;k<w;k+=2)lx.push(k-.04);for(const a of lx)for(const b of[.08,d-.16])rBox(R,x+a,y+b,.08,.08,0,H,o.fr);
+if(o.bar)rBox(R,x+.12,y+d/2-.03,w-.24,.06,.18,.06,o.fr);rBox(R,x+.04,y+.04,w-.08,d-.08,H,.1,o.top);
+if(o.mid)rBox(R,x+.3,y+d/2-.12,w-.6,.24,H+.1,.012,o.mid);
+if(o.deco){for(let i=0;i<w;i++){const a=x+i+.5;if(i%2===0){rBox(R,a-.2,y+.2,.2,.14,H+.1,.06,"#e5564a");rBox(R,a-.19,y+.21,.18,.12,H+.16,.05,"#6aa8e8")}else{rBox(R,a-.06,y+d-.32,.12,.12,H+.1,.12,"#ffffff");rBox(R,a-.04,y+d-.3,.08,.08,H+.21,.012,"#8a5a38")}}}}
+function lRug(R,x,y,w,d,o){const z=.02;rPoly(R,[[x+.08,y+.08,z],[x+w-.08,y+.08,z],[x+w-.08,y+d-.08,z],[x+.08,y+d-.08,z]],o.c1);
+if(o.st==="stripe"){const n=Math.round(w*2);for(let i=0;i<n;i+=2){const a=x+.2+i*(w-.4)/n,b=a+(w-.4)/n;rPoly(R,[[a,y+.2,.03],[b,y+.2,.03],[b,y+d-.2,.03],[a,y+d-.2,.03]],o.c2,0)}}
+else if(o.st==="check"){for(let a=0;a<w*2-1;a++)for(let b=0;b<d*2-1;b++)if((a+b)%2){const px=x+.25+a*.5,py=y+.25+b*.5;if(px+.5<=x+w-.2&&py+.5<=y+d-.2)rPoly(R,[[px,py,.03],[px+.5,py,.03],[px+.5,py+.5,.03],[px,py+.5,.03]],o.c2,0)}}
+else if(o.st==="dia"){const cx=x+w/2,cy=y+d/2,rx=w/2-.4,ry=d/2-.3;rPoly(R,[[cx-rx,cy,.03],[cx,cy-ry,.03],[cx+rx,cy,.03],[cx,cy+ry,.03]],o.c2,1);rPoly(R,[[cx-rx*.45,cy,.035],[cx,cy-ry*.45,.035],[cx+rx*.45,cy,.035],[cx,cy+ry*.45,.035]],o.c3||o.c1,0)}
+rPoly(R,[[x+.25,y+.25,.03],[x+w-.25,y+.25,.03],[x+w-.25,y+d-.25,.03],[x+.25,y+d-.25,.03]],null,.9);
+if(o.fr)for(const a of[x+.08,x+w-.08])for(let b=y+.18;b<y+d-.1;b+=.16)rLine(R,[a,b,.025],[a+(a<x+1?-.1:.1),b,.02],o.fr,1.2)}
+function dBed2(R,x,y,w,d,o){rBox(R,x+.04,y+.02,w-.08,.14,0,o.hb||1.05,o.fr);rBox(R,x+.06,y+.16,w-.12,d-.24,.08,.3,o.fr);rBox(R,x+.1,y+.18,w-.2,d-.3,.38,.14,"#ffffff");
+rBox(R,x+.2,y+.24,.72,.34,.52,.12,o.pl);rBox(R,x+1.08,y+.24,.72,.34,.52,.12,o.pl);rBox(R,x+.08,y+.74,w-.16,d-.86,.52,.08,o.bl);rBox(R,x+.08,y+.7,w-.16,.14,.52,.11,shd(o.bl,1.18));
+if(o.dots)for(const[a,b]of[[.4,1.2],[1.1,1.05],[1.5,1.5],[.7,1.6]])rDot(R,x+a,y+b,.61,.05,o.dc);rBox(R,x+.04,y+d-.1,w-.08,.08,0,.5,o.fr)}
+function dBench(R,x,y,w,d,o){for(const a of[.12,w-.2])for(const b of[.2,d-.24])rBox(R,x+a,y+b,.08,.08,0,.42,o.fr);
+if(o.slat){for(let i=0;i<3;i++)rBox(R,x+.08,y+.2+i*.2,w-.16,.16,.42,.06,o.seat);rBox(R,x+.08,y+.12,w-.16,.06,.5,.18,o.back);rBox(R,x+.08,y+.12,w-.16,.06,.78,.18,o.back);for(const a of[.14,w-.2])rBox(R,x+a,y+.12,.06,.06,.42,.58,o.fr)}
+else{rBox(R,x+.08,y+.16,w-.16,d-.3,.42,.08,o.fr);rBox(R,x+.08,y+.12,w-.16,.08,.5,.55,o.back);rBox(R,x+.14,y+.24,(w-.34)/2,d-.42,.5,.07,o.seat);rBox(R,x+w/2+.03,y+.24,(w-.34)/2,d-.42,.5,.07,o.seat);for(const a of[.06,w-.14])rBox(R,x+a,y+.16,.08,d-.3,.42,.26,o.fr)}}
+function dLSofa(R,x,y,w,d,o){const c=o.c;rBox(R,x+.05,y+.08,w-.1,d-.14,0,.22,c);rBox(R,x+.05,y+.08,w-.1,.24,.22,.32,shd(c,.93));for(const a of[.05,w-.25])rBox(R,x+a,y+.32,.2,d-.4,.22,.14,shd(c,.9));
+rBox(R,x+.27,y+.34,(w-.56)/2,d-.44,.22,.1,shd(c,1.1));rBox(R,x+w/2+.01,y+.34,(w-.56)/2,d-.44,.22,.1,shd(c,1.1));if(o.ac){rBox(R,x+.32,y+.3,.3,.1,.32,.26,o.ac);rBox(R,x+w-.62,y+.3,.3,.1,.32,.26,o.ac2||o.ac)}}
+Object.assign(FT,{ldesk2:{w:2,d:1,cat:"desk",dr:lDesk},ldesk3:{w:3,d:1,cat:"desk",dr:lDesk},ldesk4:{w:4,d:2,cat:"desk",dr:lDesk},
+rug2:{w:3,d:1,walk:1,cat:"rug",dr:lRug},rug3:{w:3,d:2,walk:1,cat:"rug",dr:lRug},rug4:{w:4,d:2,walk:1,cat:"rug",dr:lRug},
+bed2:{w:2,d:2,cat:"bed",dr:dBed2},bench:{w:2,d:1,cat:"chair",dr:dBench},lsofa:{w:2,d:1,cat:"sofa",dr:dLSofa}});
+FDEF.push({id:"ld4p",t:"ldesk2",n:"원목 4인용 긴 책상",p:120,o:{fr:"#a8744a",top:"#d9a86a",deco:1}},{id:"ld4w",t:"ldesk2",n:"흰색 4인용 긴 책상",p:120,o:{fr:"#c9d1da",top:"#ffffff",bar:1}},{id:"ld6",t:"ldesk3",n:"원목 6인용 긴 책상",p:170,o:{fr:"#8a5a38",top:"#c8946a",deco:1,bar:1}},{id:"ld8",t:"ldesk4",n:"8인용 회의 책상",p:240,o:{fr:"#4a5568",top:"#e2e8f0",mid:"#9cc8f0"}},
+{id:"rl1",t:"rug2",n:"복도 긴 러그 (3칸)",p:45,o:{c1:"#c95a4a",c2:"#f2d6a0",st:"stripe",fr:"#f2d6a0"}},{id:"rl2",t:"rug3",n:"체크 긴 러그 (3×2)",p:60,o:{c1:"#9cc8f0",c2:"#e6f3ff",st:"check"}},{id:"rl3",t:"rug4",n:"거실 큰 러그 (4×2)",p:80,o:{c1:"#d9b8a0",c2:"#8a5a38",c3:"#f6e7c8",st:"dia",fr:"#f6e7c8"}},{id:"rl4",t:"rug3",n:"민트 줄무늬 러그 (3×2)",p:60,o:{c1:"#8fd4c0",c2:"#e8faf4",st:"stripe"}},
+{id:"bq1",t:"bed2",n:"하늘 2인용 침대",p:160,o:{fr:"#c8946a",bl:"#8fb8f0",pl:"#fff8e8"}},{id:"bq2",t:"bed2",n:"분홍 2인용 침대",p:180,o:{fr:"#ffffff",bl:"#f6a8c0",pl:"#fff0d8",hb:.85}},{id:"bq3",t:"bed2",n:"별빛 2인용 침대",p:200,o:{fr:"#4a5a8a",bl:"#3a4a7a",pl:"#e8e8ff",dots:1,dc:"#ffd24a"}},
+{id:"bn1",t:"bench",n:"원목 2인용 의자",p:45,o:{fr:"#a8744a",seat:"#f0b45e",back:"#d9a86a"}},{id:"bn2",t:"bench",n:"분홍 2인용 의자",p:55,o:{fr:"#ffffff",seat:"#f6a8c0",back:"#f6a8c0"}},{id:"bn3",t:"bench",n:"공원 벤치",p:60,o:{slat:1,fr:"#4a5568",seat:"#c8946a",back:"#c8946a"}},
+{id:"ls1",t:"lsofa",n:"베이지 낮은 소파",p:90,o:{c:"#e6d3b3",ac:"#f6a8c0"}},{id:"ls2",t:"lsofa",n:"민트 낮은 소파",p:90,o:{c:"#9fd8c8",ac:"#ffd24a"}},{id:"ls3",t:"lsofa",n:"회색 낮은 소파",p:95,o:{c:"#a8b0bc",ac:"#ffffff",ac2:"#9cc8f0"}},
+{id:"pl5",t:"plant",n:"튤립 화병",p:30,o:{k:"flower",fl:"tulip",pot:"#ffffff"}},{id:"pl6",t:"plant",n:"해바라기 화병",p:35,o:{k:"flower",fl:"sun",pot:"#e07a4a"}},
+{id:"lp4",t:"lamp",n:"원뿔 스탠드",p:35,o:{k:"cone",sh:"#ffd9a0"}},{id:"lp5",t:"lamp",n:"아치 스탠드",p:55,o:{k:"arc",sh:"#4a5568"}},{id:"lp6",t:"lamp",n:"삼각대 스탠드",p:45,o:{k:"tri",sh:"#f6e7c8"}},{id:"lp7",t:"lamp",n:"버섯 조명",p:30,o:{k:"mush",sh:"#e5564a"}},{id:"lp8",t:"lamp",n:"랜턴 조명",p:40,o:{k:"lantern",sh:"#ffe08a"}},{id:"lp9",t:"lamp",n:"달 조명",p:50,o:{k:"moon",sh:"#fff3c4"}},{id:"lp10",t:"lamp",n:"별 조명",p:45,o:{k:"star",sh:"#ffd24a"}});
+Object.assign(FTN,{ldesk2:"책상",ldesk3:"책상",ldesk4:"책상",rug2:"러그",rug3:"러그",rug4:"러그",bed2:"침대",bench:"의자",lsofa:"소파"});
+// 꽃 화병 (화면 좌표로 그림)
+function rGlow(c,x,y,r,col){const gr=c.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col);gr.addColorStop(1,"rgba(255,230,150,0)");c.fillStyle=gr;c.beginPath();c.arc(x,y,r,0,6.2832);c.fill()}
+function vaseDraw(R,cx,cy,o){const c=R.c,p=rP(R,cx,cy,0),u=R.s,X=p[0],Y=p[1],LN="#4a2c2a",fl=o.fl||"mix";c.save();c.lineJoin="round";c.lineCap="round";
+c.fillStyle="rgba(40,30,30,.18)";c.beginPath();c.ellipse(X,Y,12*u,4*u,0,0,6.2832);c.fill();
+const stems=fl==="sun"?[[-6,-64,-1],[7,-72,1],[-1,-56,0]]:fl==="tulip"?[[-10,-58,-1],[-3,-66,0],[5,-62,1],[11,-54,1]]:[[-12,-56,-1],[-4,-66,0],[6,-70,1],[13,-55,1],[1,-50,0]];
+c.strokeStyle="#3f8a35";c.lineWidth=1.8*u;for(const[a,b,s]of stems){c.beginPath();c.moveTo(X+a*.3*u,Y-28*u);c.quadraticCurveTo(X+(a*.5+s*3)*u,Y+(b*.55-12)*u,X+a*u,Y+b*u);c.stroke()}
+c.fillStyle="#58b848";for(const[a,b,s]of stems){const lx=X+a*.55*u,ly=Y+(b*.5-14)*u;c.beginPath();c.ellipse(lx+s*3*u,ly,4.5*u,1.8*u,s*.6+(s?0:.8),0,6.2832);c.fill();c.strokeStyle="#3f8a35";c.lineWidth=.8*u;c.stroke()}
+const VB=()=>{c.beginPath();c.moveTo(X-7*u,Y);c.bezierCurveTo(X-15*u,Y-8*u,X-13*u,Y-20*u,X-4.5*u,Y-25*u);c.lineTo(X-6.5*u,Y-30*u);c.lineTo(X+6.5*u,Y-30*u);c.lineTo(X+4.5*u,Y-25*u);c.bezierCurveTo(X+13*u,Y-20*u,X+15*u,Y-8*u,X+7*u,Y);c.closePath()};
+const gr=c.createLinearGradient(X-14*u,0,X+14*u,0);gr.addColorStop(0,shd(o.pot,1.25));gr.addColorStop(.55,o.pot);gr.addColorStop(1,shd(o.pot,.72));VB();c.fillStyle=gr;c.fill();c.strokeStyle=LN;c.lineWidth=1.3*u;c.stroke();
+c.fillStyle=shd(o.pot,.55);c.beginPath();c.ellipse(X,Y-30*u,6.5*u,1.8*u,0,0,6.2832);c.fill();c.stroke();c.fillStyle="rgba(255,255,255,.55)";c.beginPath();c.ellipse(X-7*u,Y-14*u,1.8*u,5*u,.15,0,6.2832);c.fill();
+if(fl==="mix"){c.strokeStyle=shd(o.pot,.8);c.lineWidth=1*u;c.beginPath();c.moveTo(X-11.5*u,Y-11*u);c.quadraticCurveTo(X,Y-8*u,X+11.5*u,Y-11*u);c.stroke()}
+const cols=fl==="sun"?["#ffcc1f","#ffd84a","#ffc400"]:fl==="tulip"?["#ff5a6a","#ffb3cf","#ffd24a","#ff7a3a"]:["#ff8fb1","#ffd24a","#ff6a6a","#c79af0","#ffffff"];
+stems.forEach(([a,b],i)=>{const hx=X+a*u,hy=Y+b*u,col=cols[i%cols.length];c.strokeStyle=LN;c.lineWidth=.9*u;
+if(fl==="tulip"){c.beginPath();c.moveTo(hx-4.5*u,hy-1*u);c.lineTo(hx-4*u,hy-8*u);c.lineTo(hx-1.5*u,hy-5*u);c.lineTo(hx,hy-9*u);c.lineTo(hx+1.5*u,hy-5*u);c.lineTo(hx+4*u,hy-8*u);c.lineTo(hx+4.5*u,hy-1*u);c.quadraticCurveTo(hx,hy+4*u,hx-4.5*u,hy-1*u);c.closePath();c.fillStyle=col;c.fill();c.stroke();c.fillStyle="rgba(255,255,255,.4)";c.beginPath();c.ellipse(hx-2*u,hy-3*u,1*u,2.2*u,0,0,6.2832);c.fill()}
+else{const n=fl==="sun"?12:6,pr=fl==="sun"?7:4.6,pw=fl==="sun"?2.2:2.6;for(let k=0;k<n;k++){const an=k/n*6.2832+i;c.save();c.translate(hx+Math.cos(an)*pr*.55*u,hy+Math.sin(an)*pr*.45*u);c.rotate(an);c.beginPath();c.ellipse(0,0,pr*.6*u,pw*u,0,0,6.2832);c.fillStyle=col;c.fill();c.lineWidth=.6*u;c.stroke();c.restore()}
+c.beginPath();c.arc(hx,hy,(fl==="sun"?3.6:1.9)*u,0,6.2832);c.fillStyle=fl==="sun"?"#6a3a1a":col==="#ffd24a"?"#ff8a3a":"#ffd24a";c.fill();c.lineWidth=.7*u;c.stroke()}});c.restore()}
+// 스탠드 조명 (화면 좌표)
+function lampDraw(R,x,y,o){const c=R.c,p=rP(R,x+.5,y+.5,0),u=R.s,X=p[0],Y=p[1],LN="#4a2c2a",k=o.k,sh=o.sh,GL="rgba(255,230,150,.42)";c.save();c.lineJoin="round";c.lineCap="round";c.strokeStyle=LN;
+const base=(w,h,col)=>{c.fillStyle="rgba(40,30,30,.18)";c.beginPath();c.ellipse(X,Y,w*1.3*u,w*.5*u,0,0,6.2832);c.fill();c.fillStyle=col||"#6a7a8a";c.beginPath();c.ellipse(X,Y-h*u,w*u,w*.42*u,0,0,6.2832);c.fill();c.lineWidth=1.1*u;c.stroke()};
+const pole=(y1,col)=>{c.lineWidth=3.2*u;c.beginPath();c.moveTo(X,Y-1*u);c.lineTo(X,Y-y1*u);c.stroke();c.strokeStyle=col||"#c9d1da";c.lineWidth=1.8*u;c.stroke();c.strokeStyle=LN};
+if(k==="cone"){base(7,0);pole(48);rGlow(c,X,Y-44*u,26*u,GL);c.beginPath();c.moveTo(X-4.5*u,Y-60*u);c.lineTo(X+4.5*u,Y-60*u);c.lineTo(X+10*u,Y-44*u);c.quadraticCurveTo(X,Y-41*u,X-10*u,Y-44*u);c.closePath();c.fillStyle=sh;c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle="#fff6d6";c.beginPath();c.ellipse(X,Y-43.5*u,9*u,2.4*u,0,0,6.2832);c.fill()}
+else if(k==="arc"){c.fillStyle="#3a3f4a";c.beginPath();c.ellipse(X-10*u,Y-1*u,7*u,3*u,0,0,6.2832);c.fill();c.lineWidth=1.1*u;c.stroke();c.lineWidth=3*u;c.beginPath();c.moveTo(X-10*u,Y-2*u);c.quadraticCurveTo(X-14*u,Y-78*u,X+12*u,Y-58*u);c.stroke();c.strokeStyle="#c9d1da";c.lineWidth=1.6*u;c.stroke();c.strokeStyle=LN;
+rGlow(c,X+12*u,Y-48*u,26*u,GL);c.beginPath();c.moveTo(X+3*u,Y-50*u);c.quadraticCurveTo(X+12*u,Y-66*u,X+21*u,Y-50*u);c.closePath();c.fillStyle=sh;c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle="#fff3c4";c.beginPath();c.ellipse(X+12*u,Y-50*u,9*u,2*u,0,0,6.2832);c.fill()}
+else if(k==="tri"){c.lineWidth=2.4*u;c.strokeStyle="#8a5a38";for(const[a,b]of[[-11,1],[11,1],[1,4]]){c.beginPath();c.moveTo(X,Y-36*u);c.lineTo(X+a*u,Y+b*u-2*u);c.stroke()}c.strokeStyle=LN;rGlow(c,X,Y-44*u,24*u,GL);
+c.fillStyle=sh;c.beginPath();c.moveTo(X-10*u,Y-56*u);c.lineTo(X+10*u,Y-56*u);c.lineTo(X+10*u,Y-40*u);c.quadraticCurveTo(X,Y-37*u,X-10*u,Y-40*u);c.closePath();c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle=shd(sh,.9);c.beginPath();c.ellipse(X,Y-56*u,10*u,2.6*u,0,0,6.2832);c.fill();c.stroke()}
+else if(k==="mush"){rGlow(c,X,Y-12*u,20*u,GL);c.fillStyle="#fff6e6";c.beginPath();c.moveTo(X-3.5*u,Y);c.lineTo(X-3*u,Y-12*u);c.lineTo(X+3*u,Y-12*u);c.lineTo(X+3.5*u,Y);c.quadraticCurveTo(X,Y+1.5*u,X-3.5*u,Y);c.closePath();c.fill();c.lineWidth=1.1*u;c.stroke();
+c.fillStyle=sh;c.beginPath();c.moveTo(X-11*u,Y-11*u);c.bezierCurveTo(X-11*u,Y-25*u,X+11*u,Y-25*u,X+11*u,Y-11*u);c.quadraticCurveTo(X,Y-8*u,X-11*u,Y-11*u);c.closePath();c.fill();c.stroke();c.fillStyle="#fff";for(const[a,b,r]of[[-5,-17,2.2],[3,-20,1.6],[6,-14,1.8],[-1,-13,1.2]]){c.beginPath();c.arc(X+a*u,Y+b*u,r*u,0,6.2832);c.fill()}}
+else if(k==="lantern"){base(6,0,"#3a3f4a");pole(46,"#6a7a8a");c.lineWidth=1.2*u;c.beginPath();c.moveTo(X,Y-46*u);c.quadraticCurveTo(X+6*u,Y-50*u,X+8*u,Y-46*u);c.stroke();rGlow(c,X+8*u,Y-38*u,22*u,GL);
+c.fillStyle=sh;c.fillRect(X+3*u,Y-42*u,10*u,11*u);c.strokeRect(X+3*u,Y-42*u,10*u,11*u);c.beginPath();c.moveTo(X+8*u,Y-42*u);c.lineTo(X+8*u,Y-31*u);c.stroke();c.fillStyle="#3a3f4a";c.beginPath();c.moveTo(X+1.5*u,Y-42*u);c.lineTo(X+8*u,Y-47*u);c.lineTo(X+14.5*u,Y-42*u);c.closePath();c.fill();c.stroke();c.fillRect(X+2.5*u,Y-31*u,11*u,2*u)}
+else if(k==="moon"){base(6,0,"#e2e8f0");pole(36,"#c9d1da");rGlow(c,X,Y-48*u,30*u,"rgba(255,240,180,.5)");c.fillStyle=sh;c.beginPath();c.arc(X,Y-48*u,11*u,0,6.2832);c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle="rgba(200,180,120,.35)";for(const[a,b,r]of[[-4,-51,2.6],[4,-45,1.8],[2,-54,1.3]]){c.beginPath();c.arc(X+a*u,Y+b*u,r*u,0,6.2832);c.fill()}}
+else if(k==="star"){base(6,0,"#c8946a");pole(34,"#a8744a");rGlow(c,X,Y-46*u,28*u,GL);c.fillStyle=sh;c.beginPath();for(let i=0;i<10;i++){const rr=(i%2?5:12)*u,an=i*Math.PI/5-Math.PI/2;c.lineTo(X+Math.cos(an)*rr,Y-46*u+Math.sin(an)*rr)}c.closePath();c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle="rgba(255,255,255,.6)";c.beginPath();c.arc(X-3*u,Y-49*u,1.8*u,0,6.2832);c.fill()}
+c.restore()}
+
 const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
 const fTy=f=>FT[FD[f[0]].t];
@@ -794,9 +857,9 @@ let ox=W/2-(RW-RD)*RTW/4*s,oy=H/2-(hh-RWH*RTH)*s/2;
 if(s>sf+.001){ox=W/2-(RM.x-RM.y)*RTW/2*s;oy=H/2-(RM.x+RM.y)*RTH/2*s+RTH*s*.5;const a=W-RW*RTW/2*s,b=RD*RTW/2*s;ox=Math.min(b,Math.max(a,ox));const c=H-hh*s,d=RWH*RTH*s;oy=Math.min(d,Math.max(c,oy))}
 return{c:cv.getContext("2d"),s,ox,oy}}
 function rGrid(e){const cv=RM.cv,b=cv.getBoundingClientRect(),sx=(e.clientX-b.left)*cv.width/b.width,sy=(e.clientY-b.top)*cv.height/b.height,R=rView(),u=(sx-R.ox)/(RTW/2*R.s),v=(sy-R.oy)/(RTH/2*R.s);return{x:(u+v)/2,y:(v-u)/2}}
-function rDown(e){const p=rGrid(e),r=rCfg();if(!RM.ed){RM.hold=p;try{RM.cv.setPointerCapture(e.pointerId)}catch(x){}return}
-const gx=Math.floor(p.x),gy=Math.floor(p.y);RM.clr=0;if(gx<0||gy<0||gx>=RW||gy>=RD){if(RM.sel==null&&!RM.pick){const h=rHitAt(e);if(h>=0){RM.sel=h;RM.gh=null;tRoom()}}return}
-if(RM.sel!=null){const f=r.f[RM.sel];if(gx===f[1]&&gy===f[2]&&!RM.gh){RM.sel=null;return tRoom()}if(rFits(r,f[0],gx,gy,f[3],RM.sel)){RM.gh={k:"mv",x:gx,y:gy};tRoom()}else rMsg(fTy(f).orn?"선반 위에만 놓을 수 있어요":"거기에는 놓을 수 없어요");return}
+function rDown(e){const p=rGrid(e),r=rCfg();if(!RM.ed){const h=rHitAt(e);if(h>=0&&r.f[h]&&SEATZ[FD[r.f[h][0]].t]!=null){rSit(r,h,p);return}if(RM.seat)rStand();RM.hold=p;try{RM.cv.setPointerCapture(e.pointerId)}catch(x){}return}
+const gx=Math.floor(p.x),gy=Math.floor(p.y);RM.clr=0;if(gx<0||gy<0||gx>=RW||gy>=RD){if(!RM.pick){const h=rHitAt(e);if(h>=0&&h!==RM.sel){RM.sel=h;RM.gh=null;tRoom()}}return}
+if(RM.sel!=null){const f=r.f[RM.sel],hh=rHitAt(e);if(hh>=0&&hh!==RM.sel&&r.f[hh]&&!fTy(r.f[hh]).walk&&!(fTy(f).orn&&SURF[FD[r.f[hh][0]].t])){RM.sel=hh;RM.gh=null;return tRoom()}if(gx===f[1]&&gy===f[2]&&!RM.gh){RM.sel=null;return tRoom()}if(rFits(r,f[0],gx,gy,f[3],RM.sel)){RM.gh={k:"mv",x:gx,y:gy};tRoom()}else rMsg(fTy(f).orn?"선반 위에만 놓을 수 있어요":"거기에는 놓을 수 없어요");return}
 if(RM.pick){if(rAvail(r,RM.pick)<=0){RM.pick=null;return tRoom()}if(rFits(r,RM.pick,gx,gy,0,-1)){RM.gh={k:"new",x:gx,y:gy};tRoom()}else rMsg(FT[FD[RM.pick].t].orn?"선반 위에만 놓을 수 있어요":"거기에는 놓을 수 없어요");return}
 RM.gh=null;let hit=rHitAt(e);if(hit<0)r.f.forEach((f,i)=>{const[w,d]=rFoot(f);if(gx>=f[1]&&gx<f[1]+w&&gy>=f[2]&&gy<f[2]+d&&(hit<0||fTy(f).orn||(!fTy(f).walk&&!fTy(r.f[hit]).orn)))hit=i});if(hit>=0){RM.sel=hit;RM.pick=null;tRoom()}}
 function rMsg(t){const e=document.getElementById("rmsg");if(e){e.textContent=t;e.style.opacity=1;clearTimeout(rMsg.t);rMsg.t=setTimeout(()=>{e.style.opacity=0},1400)}}
@@ -827,9 +890,11 @@ function rWalk(r,x,y){const g=rBlocked(r,-1),c=.22;if(x<c||y<c||x>RW-c||y>RD-c)r
 function rLoop(ts){if(!RM||!RM.cv||!document.body.contains(RM.cv)){if(RM){RM.run=false;if(RM.dirty){RM.dirty=false;ckSave()}}return}
 const dt=Math.min(.05,(ts-(RM.lt||ts))/1000);RM.lt=ts;RM.t+=dt;const r=rCfg(),k=RM.keys;let vx=0,vy=0;
 const sx=(k.ArrowRight||k.d?1:0)-(k.ArrowLeft||k.a?1:0),sy=(k.ArrowDown||k.s?1:0)-(k.ArrowUp||k.w?1:0);
+if(RM.seat){const sf=r.f[RM.seat.i];if(sx||sy||RM.hold||RM.ed||!sf||sf[0]!==RM.seat.id)rStand()}
+if(RM.seat){RM.mv=false;rDraw(r);requestAnimationFrame(rLoop);return}
 if(sx||sy){vx=sx/RTW*2+sy/RTH;vy=sy/RTH-sx/RTW*2;RM.hold=null}
 else if(RM.hold&&!RM.ed){vx=RM.hold.x-RM.x;vy=RM.hold.y-RM.y;if(Math.hypot(vx,vy)<.08){vx=vy=0}}
-const L=Math.hypot(vx,vy);RM.mv=L>0;if(L>0){const sp=3.9*dt;vx=vx/L*sp;vy=vy/L*sp;if(rWalk(r,RM.x+vx,RM.y))RM.x+=vx;if(rWalk(r,RM.x,RM.y+vy))RM.y+=vy;const scx=vx-vy;if(Math.abs(scx)>.001)RM.fx=scx>0?1:-1}
+const L=Math.hypot(vx,vy);RM.mv=L>0;if(L>0){const sp=3.9*dt;vx=vx/L*sp;vy=vy/L*sp;if(rWalk(r,RM.x+vx,RM.y))RM.x+=vx;if(rWalk(r,RM.x,RM.y+vy))RM.y+=vy;const scx=vx-vy,scy=vx+vy;if(Math.abs(scx)>.001)RM.fx=scx>0?1:-1;RM.dir=Math.abs(scx)>=Math.abs(scy)*.9?(scx>0?.08:3.06):(scy>0?1.57:-1.57)}
 if(!rWalk(r,RM.x,RM.y)){let bd=1e9,bx=RM.x,by=RM.y;for(let a=0;a<RW*RD;a++){const X=(a%RW)+.5,Y=Math.floor(a/RW)+.5,dd=(X-RM.x)**2+(Y-RM.y)**2;if(dd<bd&&rWalk(r,X,Y)){bd=dd;bx=X;by=Y}}RM.x=bx;RM.y=by}
 rDraw(r);requestAnimationFrame(rLoop)}
 function rWall(R,plane,o,k){const L=plane==="y"?RW:RD,P=(a,z)=>plane==="y"?[a,0,z]:[0,a,z];
@@ -853,18 +918,25 @@ const ws=[],fo=[],orns=[];rr.f.forEach((f,i)=>{const t=fTy(f),[w,d]=rFoot(f),gh=
 if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i});return}
 fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
 const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i};(t.walk?ws:fo).push(o)});
-const ord=isoSort(fo);if(!pv){const ch={b:[RM.x-.3,RM.x+.3,RM.y-.3,RM.y+.3,0,2],fn:()=>rChar(R)};let at=0;ord.forEach((o,k)=>{if(isoBefore(o.b,ch.b)&&!isoBefore(ch.b,o.b))at=k+1});ord.splice(at,0,ch)}
+const ord=isoSort(fo);if(!pv){const ch={b:[RM.x-.3,RM.x+.3,RM.y-.3,RM.y+.3,0,2],fn:()=>rChar(R)};let at=0;const si=RM.seat?ord.findIndex(o=>o.i===RM.seat.i):-1;if(si>=0)at=si+1;else ord.forEach((o,k)=>{if(isoBefore(o.b,ch.b)&&!isoBefore(ch.b,o.b))at=k+1});ord.splice(at,0,ch)}
 const seq=[];ws.sort((a,b)=>a.i-b.i).forEach(o=>seq.push(o));ord.forEach(o=>{seq.push(o);if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>seq.push(q))});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>seq.push(q));seq.forEach(o=>o.fn());if(!pv&&RM)RM.hit={R,seq:seq.filter(o=>o.i!=null&&!gi.includes(o.i)&&o.i<r.f.length),W:cv.width,H:cv.height,rw:new Map(RWALL)};RWALL=new Map()}
-function rChar(R){const c=R.c,p=rP(R,RM.x,RM.y,0),im=chImgOf(chKey()),bob=RM.mv?Math.abs(Math.sin(RM.t*10))*5:Math.sin(RM.t*2.4)*1.5;
-c.fillStyle="rgba(40,30,30,.22)";c.beginPath();c.ellipse(p[0],p[1],20*R.s/2*1.2,8*R.s/2*1.2,0,0,6.2832);c.fill();
-if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.save();c.translate(p[0],p[1]-bob);c.scale(RM.fx<0?-1:1,1);c.drawImage(im,-w/2,-h+4,w,h);c.restore()}}
+const SEATZ={chair:.48,sofa:.5,lsofa:.32,bench:.5,bed:.56,bed2:.62};
+function rChar(R){const c=R.c,z=RM.seat?RM.sz:0,p=rP(R,RM.x,RM.y,z),[cid,hid0,tid0]=String(chKey()).split("|"),ch=CHR[(+String(cid).slice(1))-1];
+if(!ch){const im=chImgOf(chKey());if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.drawImage(im,p[0]-w/2,p[1]-h+4,w,h)}return}
+const hid=HATS[hid0]?hid0:"",tid=tid0&&TOOLS[tid0]?tid0:"",a=RM.dir==null?1.2:RM.dir,mv=!!RM.mv&&!RM.seat,wob=mv?Math.sin(RM.t*13):0,bob=mv?Math.abs(Math.sin(RM.t*13))*1.6:0,k=1.55*R.s,back=Math.sin(a)<-.55,cc=(hid==="h14"||hid==="h15")?{...ch,ear:"none"}:ch;
+c.save();c.translate(p[0],p[1]);c.scale(k,k);c.translate(0,(RM.seat?-11:-15)-bob);const sv=g;g=c;try{drawChar(cc,0,0,a,mv?1:0,wob,1,RM.t,0)}finally{g=sv}
+if(hid){const hp2=HATPOS[ch.ear]||HATPOS.round;c.save();c.translate(hp2[0],hp2[1]+(HATDY[hid]||0));c.rotate(hp2[3]);c.scale(hp2[2],hp2[2]);HATS[hid](c);c.restore()}
+if(tid&&!back){c.save();c.translate(0,5);c.rotate(a);c.translate(11.4,3.4);c.rotate(.45);c.scale(.72,.72);const gp=TGRIP[tid]||[0,3];c.translate(-gp[0],-gp[1]);TOOLS[tid](c);c.restore();if(tid!=="t11"&&tid!=="t16"){c.save();c.translate(0,5);c.rotate(a);c.beginPath();c.ellipse(11.4,3.4,3.6,3.6,0,0,TAU);c.fillStyle=ch.c1;c.fill();c.strokeStyle="#4a2c2a";c.lineWidth=1.4;c.stroke();c.restore()}}
+c.restore()}
+function rSit(r,i,p){const f=r.f[i],t=FD[f[0]].t,[w,d]=rFoot(f),cx=Math.min(f[1]+w-1,Math.max(f[1],Math.floor(p.x))),cy=Math.min(f[2]+d-1,Math.max(f[2],Math.floor(p.y)));RM.seat={i,id:f[0]};RM.sz=SEATZ[t];RM.x=cx+.5;RM.y=cy+.5;RM.hold=null;RM.mv=false;RM.dir=1.57}
+function rStand(){RM.seat=null;RM.sz=0}
 addEventListener("keydown",e=>{if(!RM||!RM.run||RM.ed||/INPUT|TEXTAREA/.test((e.target||{}).tagName||""))return;const k=e.key.length===1?e.key.toLowerCase():e.key;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","a","s","d"].includes(k)){RM.keys[k]=true;e.preventDefault()}});
 addEventListener("keyup",e=>{if(!RM)return;const k=e.key.length===1?e.key.toLowerCase():e.key;RM.keys[k]=false});
 // ---- 상점 인테리어 ----
 function shopHome(){const m=S.me,t=S.homeTab||"furn",TT=[["furn","🪑 가구"],["wall","🧱 벽지"],["floor","🟫 바닥"],["size","📐 방 넓히기"]];
 const sub=`<div class="stp">${TT.map(([k,l])=>`<button class="stb${t===k?" on":""}" onclick="S.homeTab='${k}';tShop()">${l}</button>`).join("")}</div>`;let body="";
-if(t==="furn"){const tys=S.furnTy||"all",ts=Object.keys(FTN);
-body=`<div class="stp">${[["all","전체"],...ts.map(k=>[k,FTN[k]])].map(([k,l])=>`<button class="stb${tys===k?" on":""}" style="font-size:12px" onclick="S.furnTy='${k}';tShop()">${l}</button>`).join("")}</div><div class="grid">${FDEF.filter(f=>tys==="all"||f.t===tys).map(f=>`<div class="it${f.t==="orn"?" orn":""}"><img class="rsi" alt="" src="${rThumb(f.id)}">${f.n}<br>${f.t==="orn"?`<span class="orb">선반 위에 올려요</span><br>`:""}<span class="mu">🪙 ${f.p}${fqOf(f.id)?` · 보유 ${fqOf(f.id)}`:""}</span><br><button class="g pvb" onclick="shopPrev('furn','${f.id}')">미리보기</button><br><button onclick="buyF('${f.id}')">구매</button></div>`).join("")}</div>`}
+if(t==="furn"){const tys=S.furnTy||"all",ts=Object.keys(FTN).filter(k=>!(FT[k]&&FT[k].cat));
+body=`<div class="stp">${[["all","전체"],...ts.map(k=>[k,FTN[k]])].map(([k,l])=>`<button class="stb${tys===k?" on":""}" style="font-size:12px" onclick="S.furnTy='${k}';tShop()">${l}</button>`).join("")}</div><div class="grid">${FDEF.filter(f=>tys==="all"||(FT[f.t].cat||f.t)===tys).map(f=>`<div class="it${f.t==="orn"?" orn":""}"><img class="rsi" alt="" src="${rThumb(f.id)}">${f.n}<br>${f.t==="orn"?`<span class="orb">선반 위에 올려요</span><br>`:""}<span class="mu">🪙 ${f.p}${fqOf(f.id)?` · 보유 ${fqOf(f.id)}`:""}</span><br><button class="g pvb" onclick="shopPrev('furn','${f.id}')">미리보기</button><br><button onclick="buyF('${f.id}')">구매</button></div>`).join("")}</div>`}
 else if(t==="size"){const r=rCfg(),bx=(k,l)=>{const nw=r.w+(k==="w"?1:0),nd=r.d+(k==="d"?1:0),mx=r[k]>=20,F=FLD[r.fl]||FLD.f0,W=WD[r.wp]||WD.w0;
 return `<div class="it" style="padding:12px;width:auto"><span style="font-size:15px;font-weight:700;display:block;margin-bottom:6px">${l}</span>
 <div class="ba"><figure><img alt="" src="${rSizeThumb(r.w,r.d,r.w,r.d,nw,nd,F,W)}"><figcaption>지금<br><b>${r.w}×${r.d}</b></figcaption></figure><span class="baa">${mx?"":"➜"}</span>${mx?"":`<figure><img alt="" src="${rSizeThumb(nw,nd,r.w,r.d,nw,nd,F,W)}"><figcaption>구매 후<br><b>${nw}×${nd}</b></figcaption></figure>`}</div>
