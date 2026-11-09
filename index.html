@@ -2217,7 +2217,7 @@ if(p.r>G.r&&p.q&&p.ph==="q"){G.r=p.r;G.q=p.q;G.hp=[p.hp[1],p.hp[0]];duNewQ();ret
 if(p.r===G.r&&p.ph==="pick"&&G.ph==="q"){G.ord=p.ord===1?0:1;duPickPhase();return}
 if(p.r===G.r&&p.rs&&G.ph!=="rs"&&G.ph!=="end"&&!G.anim){const rs=p.rs;G.ph="rs";duAnim({ev:rs.ev.map(e=>({...e,k:1-e.k})),hp:[rs.hp[1],rs.hp[0]],end:rs.end==null?null:1-rs.end,skip:rs.skip,cu:rs.cu?[rs.cu[1],rs.cu[0]]:[0,0]})}}
 function duRound(){const d=DU;if(!d||!d.G)return;const G=d.G;G.r++;G.q=mkQ();G.opAn=null;G.opA=null;G.opC=null;G.opCP=false;G.ord=null;G.rs=null;duNewQ();duHP()}
-function duNewQ(){const d=DU,G=d.G;G.aid=(G.aid||0)+1;G.ph="q";G.my=null;G.myA=null;G.myC=null;G.myCP=0;G.anim=false;G.t0=Date.now();G.log=`${G.r}번째 문제! 먼저 맞히면 선공이에요.`;clearTimeout(d.tq);clearTimeout(d.tp);
+function duNewQ(){const d=DU,G=d.G;G.aid=(G.aid||0)+1;G.ph="q";G.my=null;G.myA=null;G.myC=null;G.myCP=0;G.sa=null;G.sc=null;G.dw=0;G.anim=false;G.t0=Date.now();G.log=`${G.r}번째 문제! 먼저 맞히면 선공이에요.`;clearTimeout(d.tq);clearTimeout(d.tp);
 d.tq=setTimeout(()=>{if(DU===d&&G.ph==="q"&&!G.my)duAnsV(null)},DU_QT*1000);duTick();duDraw();if(!d.host)duGP()}
 function duTick(){const d=DU;clearInterval(d.ti);d.ti=setInterval(()=>{if(DU!==d)return;const e=document.getElementById("dut");if(!e)return;const G=d.G,lim=G.ph==="q"?DU_QT:DU_PT,s=Math.max(0,Math.ceil(lim-(Date.now()-(G.ph==="q"?G.t0:G.tp0))/1000));e.textContent=s+"초"},250)}
 function duAnsI(i){const G=DU&&DU.G;if(!G||G.ph!=="q"||G.my)return;duAnsV(G.q.opts[i])}
@@ -2228,18 +2228,21 @@ function duHostCheck(){const d=DU,G=d.G;
 if(G.ph==="q"&&G.my&&G.opAn&&!G.my.ok&&!G.opAn.ok){G.ord=0;G.rs={ev:[],hp:G.hp.slice(),end:null,skip:1};G.ph="rs";duHP();duAnim(G.rs);return}
 if(G.ph==="q"&&G.my&&G.opAn){const k=a=>(a.ok?0:1e7)+a.t,km=k(G.my),ko=k(G.opAn);G.ord=km<ko?0:km>ko?1:(Math.random()<.5?0:1);duPickPhase();duHP();return}
 if(G.ph==="pick"&&G.myA&&G.opA)duResolve()}
-function duPickPhase(){const d=DU,G=d.G;G.ph="pick";G.tp0=Date.now();clearTimeout(d.tp);d.tp=setTimeout(()=>{if(DU===d&&G.ph==="pick"&&!G.myA)duPick("def")},DU_PT*1000);
+function duPickPhase(){const d=DU,G=d.G;G.ph="pick";G.tp0=Date.now();clearTimeout(d.tp);d.tp=setTimeout(()=>{if(DU===d&&G.ph==="pick"&&!G.myA)duPick(G.sa||"def",G.sc)},DU_PT*1000);
 G.log=(G.ord===0?"🥇 내가 선공!":"🥈 상대가 선공!")+" 공격할까요, 방어할까요?";duDraw()}
-function duPick(a){const d=DU;if(!d||!d.G)return;const G=d.G;if(G.ph!=="pick"||G.myA)return;if(a==="draw"){if(G.drew||!(G.hp[0]<G.hp[1]))return;G.drew=1;G.cd={k:CDK[Math.floor(Math.random()*4)],known:0}}if(a==="card"){if(!G.cd)return;G.myC=G.cd.k;G.myCP=(S.me.coins||0)>=1}
-G.myA=a;clearTimeout(d.tp);G.log=({atk:"⚔️ 공격",def:"🛡️ 방어",draw:"🎴 찬스카드 뽑기",card:"🎴 카드 발동"}[a])+"을(를) 골랐어요. 상대를 기다려요…";if(d.host)duHostCheck();else duGP();duDraw()}
+function duPick(a,cm){const d=DU;if(!d||!d.G)return;const G=d.G;if(G.ph!=="pick"||G.myA)return;if(a!=="atk")a="def";if(cm==="draw"&&(G.drew||!(G.hp[0]<G.hp[1])))cm=null;if(cm==="use"&&!G.cd)cm=null;
+G.dw=0;if(cm==="draw"){G.drew=1;G.dw=1;G.cd={k:CDK[Math.floor(Math.random()*4)],known:0}}if(cm==="use"){G.myC=G.cd.k;G.myCP=(S.me.coins||0)>=1}
+G.myA=a;clearTimeout(d.tp);G.log=(a==="atk"?"⚔️ 공격":"🛡️ 방어")+(cm==="draw"?" + 🎴 찬스카드 뽑기":cm==="use"?" + 🎴 카드 발동":"")+"을(를) 골랐어요. 상대를 기다려요…";if(d.host)duHostCheck();else duGP();duDraw()}
+function duSelA(a){const G=DU&&DU.G;if(!G||G.ph!=="pick"||G.myA)return;G.sa=a;duDraw()}
+function duSelC(c){const G=DU&&DU.G;if(!G||G.ph!=="pick"||G.myA)return;G.sc=G.sc===c?null:c;duDraw()}
 function duResolve(){const d=DU,G=d.G,acts=[G.myA,G.opA],cs=[G.myC,G.opC],cp=[!!G.myCP,!!G.opCP],hp=G.hp.slice(),ev=[],cu=[0,0],spent=[0,0];let end=null;
-const ck=k=>acts[k]==="card"?cs[k]:null,inc=k=>{const o=1-k;return acts[o]==="atk"||ck(o)==="double"};
+const ck=k=>cs[k]||null,inc=k=>acts[1-k]==="atk";
 for(const k of[G.ord,1-G.ord]){if(end!=null)break;const a=acts[k],c=ck(k);
-if(a==="draw"){ev.push({k,a:"draw"});continue}
+if(c&&CDDEF.includes(c)){const nc=c==="evade"&&!cp[k];if(!inc(k)||nc)ev.push({k,a:"idle",c,nc:nc&&inc(k)})}
+if(c==="double"&&a!=="atk")ev.push({k,a:"idle",c,nd:1});
 if(a==="def"){ev.push({k,a:"def"});continue}
-if(c&&CDDEF.includes(c)){const nc=c==="evade"&&!cp[k];if(!inc(k)||nc)ev.push({k,a:"idle",c,nc:nc&&inc(k)});continue}
-if(a!=="atk"&&c!=="double")continue;
-const n=c==="double"?2:1;if(c==="double")cu[k]=1;
+if(a!=="atk")continue;
+const n=c==="double"?2:1;if(n===2)cu[k]=1;
 for(let i=0;i<n&&end==null;i++){const t=1-k,tc=ck(t);let res="hit",pay=0;
 if(!spent[t]&&tc&&CDDEF.includes(tc)&&!(tc==="evade"&&!cp[t])){res=tc;spent[t]=1;cu[t]=1;pay=tc==="evade"?1:0}
 const cr=res==="hit"&&Math.random()<CRIT,df=res==="hit"&&acts[t]==="def";
@@ -2248,11 +2251,11 @@ ev.push({k,a:"atk",dm:dmg,cr,df,res,pay,i,dbl:n===2});
 if(res==="hit"){hp[t]=Math.max(0,hp[t]-dmg);if(hp[t]<=0)end=k}else if(res==="reflect"){hp[k]=Math.max(0,hp[k]-dmg);if(hp[k]<=0)end=t}}}
 G.rs={ev,hp,end,cu};G.ph="rs";duHP();duAnim(G.rs)}
 function duAnim(rs){const d=DU,G=d.G,aid=G.aid;G.anim=true;clearTimeout(d.tp);const q=[[0,()=>{G.log=rs.skip?"😵 둘 다 틀렸어요! 공격·방어 없이 다음 문제로 넘어가요.":G.ord===0?"🥇 내가 먼저 움직여요!":"🥈 상대가 먼저 움직여요!";G.fx={}}]];if(rs.skip)q.push([1400,()=>{}]);
+if(G.dw)q.push([1000,()=>{G.fx={};G.log="🎴 찬스카드를 뽑았어요! 발동해 봐야 뭔지 알 수 있어요"}]);
 const hp=G.hp.slice(),cn=c=>CDD[c][0]+" "+CDD[c][1];
 rs.ev.forEach(e=>{const me=e.k===0;
 if(e.a==="def")q.push([800,()=>{G.fx={[me?"m":"o"]:"du-def"};G.log=me?"🛡️ 나는 방어 자세!":"🛡️ 상대는 방어 자세!"}]);
-else if(e.a==="draw")q.push([1100,()=>{G.fx={};if(!me)G.opHas=1;G.log=me?"🎴 찬스카드를 뽑았어요! 발동해 봐야 뭔지 알 수 있어요":"🎴 상대가 찬스카드를 뽑았어요!"}]);
-else if(e.a==="idle")q.push([1200,()=>{G.fx={};G.log=me?(e.nc?`🎴 ${cn(e.c)} 카드! 하지만 1원이 없어서 쓸 수 없어요`:`🎴 ${cn(e.c)} 카드! 상대가 공격하지 않아 아껴 뒀어요`):"🎴 상대가 카드를 꺼냈지만 쓰지 못했어요"}]);
+else if(e.a==="idle"){if(me)q.push([1200,()=>{G.fx={};G.log=e.nd?`🎴 ${cn(e.c)} 카드! 공격을 골라야 쓸 수 있어서 아껴 뒀어요`:e.nc?`🎴 ${cn(e.c)} 카드! 하지만 1원이 없어서 쓸 수 없어요`:`🎴 ${cn(e.c)} 카드! 상대가 공격하지 않아 아껴 뒀어요`}])}
 else{
 const hold=e.res!=="hit"?1-e.k:-1,hm=hold===0;
 if(e.dbl&&e.i===0)q.push([900,()=>{G.fx={};G.log=(me?"🎴 나의 카드: ":"🎴 상대의 카드: ")+cn("double")+"!"}]);
@@ -2263,7 +2266,7 @@ if(e.res==="negate"){G.fx={[ts]:"du-def"};G.pop={s:ts,t:"🚫 무효!",c:"#6b4fd
 else if(e.res==="evade"){G.pop={s:ts,t:"💨 회피!",c:"#2a9bd6"};G.log=hm?"💨 1원을 내고 공격을 피했어요!":"💨 상대가 공격을 피했어요";if(hm){S.me.coins=Math.max(0,(S.me.coins||0)-1);try{db.doc("students/"+S.me.cls+"_"+S.me.sid).update({coins:S.me.coins}).catch(()=>{})}catch(x){}}}
 else if(e.res==="reflect"){hp[e.k]=Math.max(0,hp[e.k]-e.dm);G.hp=hp.slice();G.fx={[as]:"phit"};G.pop={s:as,t:"🪞 반사 -"+e.dm,c:"#e5484d"};G.log=hm?"🪞 공격을 그대로 되돌려줬어요!":"🪞 내 공격이 반사됐어요!"+` (-${e.dm})`}
 else{hp[t]=Math.max(0,hp[t]-e.dm);G.hp=hp.slice();G.fx={[ts]:"phit"};G.pop={s:ts,t:(e.cr?"CRIT! ":"")+"-"+e.dm,c:"#e5484d"};G.log=(e.cr?"💥 크리티컬! ":"")+(e.df?(me?"상대가 방어했어요":"내가 방어했어요"):(me?"공격 성공!":"공격을 받았어요!"))+` (-${e.dm})`}}])}});
-q.push([900,()=>{G.hp=rs.hp.slice();G.fx={};if(G.myA==="card"&&G.cd){if(rs.cu&&rs.cu[0])G.cd=null;else G.cd.known=1}if(rs.cu&&rs.cu[1])G.opHas=0;if(rs.end!=null){duEnd(rs.end===0)}else{G.anim=false;if(d.host)duRound();else{G.log="다음 문제를 기다려요…";setTimeout(()=>{if(DU===d)duGChange()},0)}}}]);
+q.push([900,()=>{G.hp=rs.hp.slice();G.fx={};G.dw=0;if(G.myC&&G.cd){if(rs.cu&&rs.cu[0])G.cd=null;else G.cd.known=1}if(rs.end!=null){duEnd(rs.end===0)}else{G.anim=false;if(d.host)duRound();else{G.log="다음 문제를 기다려요…";setTimeout(()=>{if(DU===d)duGChange()},0)}}}]);
 let t=0;q.forEach(([dl,fn])=>{t+=dl;setTimeout(()=>{if(DU!==d||d.G!==G||G.aid!==aid)return;fn();duDraw()},t)})}
 async function duEnd(win,why){const d=DU,G=d.G;if(G.paid)return;G.paid=true;G.ph="end";G.win=win;clearTimeout(d.tq);clearTimeout(d.tp);clearInterval(d.ti);
 if(d.host)duHP();const cn=win?20:10,pt=win?3:1;G.res=(why?why+" ":"")+`🪙 ${cn}원, ⭐ ${pt}점을 받았어요!`;S.me.coins=(S.me.coins||0)+cn;S.me.points=(S.me.points||0)+pt;duDraw();
@@ -2279,11 +2282,12 @@ tb.innerHTML=`<div id="duroot"><div class="card"><h2>⚔️ 대결하기</h2><p 
 const G=d.G,hp=hearts,pop=s=>G.pop&&G.pop.s===s?`<span class="pp${/CRIT/.test(G.pop.t)?" cr":""}" style="color:${G.pop.c}">${G.pop.t}</span>`:"";let body;
 if(G.ph==="wait")body='<p class="mu" style="text-align:center">상대를 기다리는 중…</p>';
 else if(G.ph==="q")body=G.my?`<p style="text-align:center;margin:10px 0">${G.my.ok?"✅ 정답!":"❌ 오답!"} 상대가 답하길 기다려요…</p>`:`<p class="mu" style="text-align:center;margin:0">남은 시간 <b id="dut">${DU_QT}초</b></p><h2 style="text-align:center;font-size:24px;line-height:1.4">${esc(G.q.q)}</h2>`+(G.q.opts?`<div class="grid" style="grid-template-columns:1fr 1fr">${G.q.opts.map((o,i)=>`<button onclick="duAnsI(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<div class="row" style="gap:8px"><input id="dua" autocomplete="off" style="margin:0;font-size:18px" onkeydown="if(event.key==='Enter')duAnsT()"><button onclick="duAnsT()" style="white-space:nowrap">확인</button></div>`);
-else if(G.ph==="pick")body=G.myA?`<p style="text-align:center;margin:10px 0">${{atk:"⚔️ 공격",def:"🛡️ 방어",draw:"🎴 찬스카드 뽑기",card:"🎴 카드 발동"}[G.myA]} 선택! 상대를 기다려요…</p>`:`<h2 style="text-align:center">${G.ord===0?"🥇 내가 선공!":"🥈 상대가 선공"}</h2><p class="mu" style="text-align:center;margin:0 0 8px">${G.my&&!G.my.ok?"오답이라 후공이에요. ":""}남은 시간 <b id="dut">${DU_PT}초</b> (안 고르면 방어)</p><div class="row" style="flex-wrap:wrap"><button style="flex:1" onclick="duPick('atk')">⚔️ 공격</button><button style="flex:1" onclick="duPick('def')">🛡️ 방어</button>${!G.drew&&G.hp[0]<G.hp[1]?`<button style="flex:1 1 100%;background:#7a4ff0" onclick="duPick('draw')">🎴 찬스카드 뽑기</button>`:""}${G.cd?`<button style="flex:1 1 100%;background:#e08a00" onclick="duPick('card')">🎴 카드 발동 ${G.cd.known?"("+CDD[G.cd.k][0]+" "+CDD[G.cd.k][1]+")":"(?)"}</button>`:""}</div>${!G.drew&&G.hp[0]<G.hp[1]?'<p class="mu" style="text-align:center;margin:8px 0 0;font-size:12px">체력이 낮아서 찬스카드를 한 번 뽑을 수 있어요. 뽑는 턴에는 공격·방어를 못 해요!</p>':G.cd?'<p class="mu" style="text-align:center;margin:8px 0 0;font-size:12px">카드는 발동해야 뭔지 알 수 있어요. 방어 카드는 상대가 공격할 때 효과가 나요.</p>':""}`;
+else if(G.ph==="pick")body=G.myA?`<p style="text-align:center;margin:10px 0">${G.myA==="atk"?"⚔️ 공격":"🛡️ 방어"}${G.dw?" + 🎴 찬스카드 뽑기":G.myC?" + 🎴 카드 발동":""} 선택! 상대를 기다려요…</p>`:(()=>{const co=!G.drew&&G.hp[0]<G.hp[1]?"draw":G.cd?"use":null,on=(c,k)=>c===k?";outline:3px solid #ffd23a;outline-offset:-3px":"";
+return `<h2 style="text-align:center">${G.ord===0?"🥇 내가 선공!":"🥈 상대가 선공"}</h2><p class="mu" style="text-align:center;margin:0 0 8px">${G.my&&!G.my.ok?"오답이라 후공이에요. ":""}남은 시간 <b id="dut">${DU_PT}초</b> (안 고르면 방어)</p><div class="row"><button style="flex:1${on(G.sa,"atk")}" onclick="${co?"duSelA":"duPick"}('atk')">⚔️ 공격</button><button style="flex:1${on(G.sa,"def")}" onclick="${co?"duSelA":"duPick"}('def')">🛡️ 방어</button></div>`+(co?`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd)"><p class="mu" style="text-align:center;margin:0 0 6px;font-size:12px">${co==="draw"?"체력이 낮아서 찬스카드를 한 번 뽑을 수 있어요. 공격·방어와 따로 골라요!":"카드는 발동해야 뭔지 알 수 있어요. 2회 공격은 ‘공격’과 함께, 방어 카드는 상대가 공격할 때 효과가 나요."}</p><button style="width:100%;background:${co==="draw"?"#7a4ff0":"#e08a00"}${G.sc?";outline:3px solid #ffd23a;outline-offset:-3px":""}" onclick="duSelC('${co}')">${G.sc?"✔ ":""}🎴 ${co==="draw"?"찬스카드 뽑기":"카드 발동 "+(G.cd.known?"("+CDD[G.cd.k][0]+" "+CDD[G.cd.k][1]+")":"(?)")}</button><button style="width:100%;margin-top:8px" ${G.sa?"":"disabled"} onclick="duPick(G.sa,G.sc)">✅ 결정${G.sa?"":" (공격/방어를 먼저 골라요)"}</button></div>`:"")})();
 else if(G.ph==="rs")body='<p class="mu" style="text-align:center;margin:14px 0">…</p>';
 else body=`<h2>${G.nr?"대결 종료":G.win?"🎉 승리!":"😢 패배"}</h2><p class="mu">${esc(G.res||"")}</p><button onclick="duBack()">다른 대결하기</button> <button class="g" onclick="duExit()">토벌 메뉴</button>`;
 const fm=G.fx.m||"",fo=G.fx.o||"";
-tb.innerHTML=`<div id="duroot"><div class="card arena" id="duarena"><div class="row" style="align-items:flex-end;justify-content:space-around"><div style="text-align:center;position:relative">${pop("m")}<span class="${fm}" style="font-size:56px;display:inline-block;line-height:1;position:relative">${fm==="du-def"?'<i class="dush">🛡️</i>':""}${chH(chKey())}</span><div style="font-size:13px;margin-top:4px"><b>나</b>${G.cd?" 🎴":""}<br>${hp(G.hp[0],DU_HP,"❤️")}</div></div><div style="font-size:22px;font-weight:900;color:#ee3d52;align-self:center">VS</div><div style="text-align:center;position:relative">${pop("o")}<span style="display:inline-block;transform:scaleX(-1)"><span class="${fo}" style="font-size:56px;display:inline-block;line-height:1;position:relative">${fo==="du-def"?'<i class="dush">🛡️</i>':""}${chH(d.op.ch)}</span></span><div style="font-size:13px;margin-top:4px"><b>${esc(d.op.n)}</b>${G.opHas?" 🎴":""}<br>${hp(G.hp[1],DU_HP,"💙")}</div></div></div><p style="text-align:center;margin:10px 0 0;font-size:14px;min-height:20px">${esc(G.log)}</p></div><div class="card">${body}</div>${G.ph==="end"?"":`<button class="g" ${G.arm?'style="background:#e5484d;color:#fff"':''} onclick="duGiveUp()">${G.arm?'정말 포기할까요? (상대 승리)':'대결 포기'}</button>`}</div>`;
+tb.innerHTML=`<div id="duroot"><div class="card arena" id="duarena"><div class="row" style="align-items:flex-end;justify-content:space-around"><div style="text-align:center;position:relative">${pop("m")}<span class="${fm}" style="font-size:56px;display:inline-block;line-height:1;position:relative">${fm==="du-def"?'<i class="dush">🛡️</i>':""}${chH(chKey())}</span><div style="font-size:13px;margin-top:4px"><b>나</b>${G.cd?" 🎴":""}<br>${hp(G.hp[0],DU_HP,"❤️")}</div></div><div style="font-size:22px;font-weight:900;color:#ee3d52;align-self:center">VS</div><div style="text-align:center;position:relative">${pop("o")}<span style="display:inline-block;transform:scaleX(-1)"><span class="${fo}" style="font-size:56px;display:inline-block;line-height:1;position:relative">${fo==="du-def"?'<i class="dush">🛡️</i>':""}${chH(d.op.ch)}</span></span><div style="font-size:13px;margin-top:4px"><b>${esc(d.op.n)}</b><br>${hp(G.hp[1],DU_HP,"💙")}</div></div></div><p style="text-align:center;margin:10px 0 0;font-size:14px;min-height:20px">${esc(G.log)}</p></div><div class="card">${body}</div>${G.ph==="end"?"":`<button class="g" ${G.arm?'style="background:#e5484d;color:#fff"':''} onclick="duGiveUp()">${G.arm?'정말 포기할까요? (상대 승리)':'대결 포기'}</button>`}</div>`;
 G.pop=null;const a=document.getElementById("dua");if(a)a.focus()}
 function duGiveUp(){const G=DU&&DU.G;if(!G)return;if(!G.arm){G.arm=1;duDraw();return}duExit()}
 
