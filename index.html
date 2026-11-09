@@ -913,8 +913,8 @@ function rGhNo(){if(RM)RM.gh=null;tRoom()}
 function rGhOk(){const G=RM&&RM.gh;if(!G)return;const r=rCfg();RM.gh=null;
 if(G.k==="mv"){const f=r.f[RM.sel],gr=G.rot!=null?G.rot:f&&f[3];if(f&&rFits(r,f[0],G.x,G.y,gr,RM.sel)){f[3]=gr;const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
 else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,G.rot||0,-1)){r.f.push([RM.pick,G.x,G.y,G.rot||0]);if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
-const isoBefore=(a,b)=>a[1]<=b[0]+1e-6||a[3]<=b[2]+1e-6||a[5]<=b[4]+1e-6;
-function isoSort(L){const n=L.length,pre=L.map(()=>[]);for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(i!==j&&isoBefore(L[j].b,L[i].b)&&!isoBefore(L[i].b,L[j].b))pre[i].push(j);
+const isoBefore=(a,b)=>a[1]<=b[0]+.02||a[3]<=b[2]+.02||a[5]<=b[4]+.05;
+function isoSort(L){const n=L.length,pre=L.map(()=>[]);for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(i!==j){const bj=L[j].b,bi=L[i].b,ji=isoBefore(bj,bi),ij=isoBefore(bi,bj);if(ji&&!ij)pre[i].push(j);else if(!ji&&!ij){const kj=(bj[0]+bj[1]+bj[2]+bj[3])/2,ki=(bi[0]+bi[1]+bi[2]+bi[3])/2;if(kj<ki-1e-6||(Math.abs(kj-ki)<=1e-6&&(bj[4]+bj[5])<(bi[4]+bi[5])-1e-6))pre[i].push(j)}}
 const done=new Array(n).fill(false),out=[];for(let k=0;k<n;k++){let pick=-1;for(let i=0;i<n;i++)if(!done[i]&&pre[i].every(j=>done[j])){pick=i;break}if(pick<0)pick=done.indexOf(false);done[pick]=true;out.push(L[pick])}return out}
 let RXF=null;
 function xfp(x,y){const X=RXF,u=x-X.x0,v=y-X.y0;let a,b;if(X.k===1){a=X.d-v;b=u}else if(X.k===2){a=X.w-u;b=X.d-v}else{a=v;b=X.w-u}return[X.x0+a,X.y0+b]}
