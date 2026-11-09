@@ -791,14 +791,14 @@ FT.door={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const ct=R.c,H=RWH,hz=2.35,fr=o.fr,c=o.c
 M=(u,v)=>rt?[x+v,y+u]:[x+u,y+v],
 bx=(u0,u1,v0,v1,z0,z1,col)=>{const[X0,Y0]=M(rt?v0:u0,rt?u0:v0),[X1,Y1]=M(rt?v1:u1,rt?u1:v1),xa=Math.min(X0,X1),xb=Math.max(X0,X1),ya=Math.min(Y0,Y1),yb=Math.max(Y0,Y1),
 eW=xa<=x+1e-6?K(-1,0):null,eE=xb>=x+1-1e-6?K(1,0):null,eN=ya<=y+1e-6?K(0,-1):null,eS=yb>=y+1-1e-6?K(0,1):null,same=v=>!!v;
-const ga=ct.globalAlpha;ct.globalAlpha=ga*.4;
-if(!eS)rFill(R,[[xa,yb,z0],[xb,yb,z0],[xb,yb,z1],[xa,yb,z1]],shd(col,.9));
-if(!eE)rFill(R,[[xb,ya,z0],[xb,yb,z0],[xb,yb,z1],[xb,ya,z1]],shd(col,.75));
+const tS0=yb>=y+1-1e-6,tE0=xb>=x+1-1e-6,dS=!eS&&tS0,dE=!eE&&tE0,ga=ct.globalAlpha;ct.globalAlpha=ga*.4;
+if(dS)rFill(R,[[xa,yb,z0],[xb,yb,z0],[xb,yb,z1],[xa,yb,z1]],shd(col,.9));
+if(dE)rFill(R,[[xb,ya,z0],[xb,yb,z0],[xb,yb,z1],[xb,ya,z1]],shd(col,.75));
 rFill(R,[[xa,ya,z1],[xb,ya,z1],[xb,yb,z1],[xa,yb,z1]],col);
 ct.globalAlpha=ga*.6;ct.strokeStyle="#4a2c2a";ct.lineWidth=1.3*R.s;ct.lineCap="round";const L=(a,b)=>{const p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);ct.beginPath();ct.moveTo(p[0],p[1]);ct.lineTo(q[0],q[1]);ct.stroke()};
 const tN=ya<=y+1e-6,tW=xa<=x+1e-6,tS=yb>=y+1-1e-6,tE=xb>=x+1-1e-6,iT=z1>=H-1e-6;if(!same(eN)&&(tN||!iT))L([xa,ya,z1],[xb,ya,z1]);if(!same(eW)&&(tW||!iT))L([xa,ya,z1],[xa,yb,z1]);if(!same(eS)&&(tS||!iT))L([xa,yb,z1],[xb,yb,z1]);if(!same(eE)&&(tE||!iT))L([xb,ya,z1],[xb,yb,z1]);
-if(!eS){if(z0===0)L([xa,yb,0],[xb,yb,0]);if(!same(eW))L([xa,yb,z0],[xa,yb,z1]);if(!same(eE))L([xb,yb,z0],[xb,yb,z1])}
-if(!eE){if(z0===0)L([xb,ya,0],[xb,yb,0]);if(!same(eN))L([xb,ya,z0],[xb,ya,z1]);if(eS&&!same(eS))L([xb,yb,z0],[xb,yb,z1])}
+if(dS){if(z0===0)L([xa,yb,0],[xb,yb,0]);if(!same(eW))L([xa,yb,z0],[xa,yb,z1]);if(!same(eE))L([xb,yb,z0],[xb,yb,z1])}
+if(dE){if(z0===0)L([xb,ya,0],[xb,yb,0]);if(!same(eN))L([xb,ya,z0],[xb,ya,z1]);if(eS&&!same(eS))L([xb,yb,z0],[xb,yb,z1])}
 ct.globalAlpha=ga};
 const ga=ct.globalAlpha;
 if(o.op){ct.globalAlpha=ga*.4;const[a,b]=M(.1,.5);rt?rBox(R,a-.82,b,.8,.06,0,hz-.04,c):rBox(R,a,b-.82,.06,.8,0,hz-.04,c);ct.globalAlpha=ga}
