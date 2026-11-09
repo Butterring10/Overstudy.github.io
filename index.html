@@ -1089,7 +1089,7 @@ function wMove(){if(!W||W.left>0)return;W.mode="quiz";W.quiz={kind:"move",...mkQ
 function lockQ(){const a=document.getElementById("wa"),b=document.getElementById("wgo");if(a)a.disabled=true;if(b)b.disabled=true;document.querySelectorAll(".wqb button").forEach(x=>x.disabled=true)}
 function wAns(i){if(!W||W.mode!=="quiz"||W.quiz.until)return;const q=W.quiz,v=typeof i==="number"?q.opts[i]:document.getElementById("wa").value.trim();if(v==="")return;
 if(same(v,q.ans)){if(q.kind==="gold"){gain(2);W.fever=Date.now()+10000;W.mode="play";W.quiz=null;drawW();banner("Fever time!")}else{W.mode="play";newStage();drawW()}return}
-if(q.kind==="gold"){gain(1);W.mode="play";W.quiz=null;drawW();banner("아쉬워요! 일반 풀처럼 +1원",1);return}
+if(q.kind==="gold"){gain(1);W.mode="play";W.quiz=null;drawW();banner("아쉬워요! +1원",1);return}
 q.until=Date.now()+5000;lockQ();const m=document.getElementById("wqm");if(m)m.textContent="틀렸어요! 5초 뒤에 새 문제를 풀 수 있어요"}
 function wTick(){if(!document.getElementById("wroot")){stopWeed();return}
 hud();const q=W.quiz;
