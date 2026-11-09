@@ -1893,7 +1893,7 @@ if(d.host){if(!p||p.r!==G.r)return;if(G.ph==="q"&&p.an&&!G.opAn){G.opAn=p.an;duH
 if(!p||!p.h||G.anim)return;
 if(p.r>G.r&&p.q&&p.ph==="q"){G.r=p.r;G.q=p.q;G.hp=[p.hp[1],p.hp[0]];duNewQ();return}
 if(p.r===G.r&&p.ph==="pick"&&G.ph==="q"){G.ord=p.ord===1?0:1;duPickPhase();return}
-if(p.r===G.r&&p.rs&&G.ph!=="rs"&&G.ph!=="end"&&!G.anim){const rs=p.rs;G.ph="rs";duAnim({ev:rs.ev.map(e=>({...e,k:1-e.k})),hp:[rs.hp[1],rs.hp[0]],end:rs.end==null?null:1-rs.end})}}
+if(p.r===G.r&&p.rs&&G.ph!=="rs"&&G.ph!=="end"&&!G.anim){const rs=p.rs;G.ph="rs";duAnim({ev:rs.ev.map(e=>({...e,k:1-e.k})),hp:[rs.hp[1],rs.hp[0]],end:rs.end==null?null:1-rs.end,skip:rs.skip})}}
 function duRound(){const d=DU;if(!d||!d.G)return;const G=d.G;G.r++;G.q=mkQ();G.opAn=null;G.opA=null;G.ord=null;G.rs=null;duNewQ();duHP()}
 function duNewQ(){const d=DU,G=d.G;G.aid=(G.aid||0)+1;G.ph="q";G.my=null;G.myA=null;G.anim=false;G.t0=Date.now();G.log=`${G.r}번째 문제! 먼저 맞히면 선공이에요.`;clearTimeout(d.tq);clearTimeout(d.tp);
 d.tq=setTimeout(()=>{if(DU===d&&G.ph==="q"&&!G.my)duAnsV(null)},DU_QT*1000);duTick();duDraw();if(!d.host)duGP()}
@@ -1903,6 +1903,7 @@ function duAnsT(){const G=DU&&DU.G;if(!G||G.ph!=="q"||G.my)return;const v=docume
 function duAnsV(v){const d=DU,G=d.G;G.my={ok:v!=null&&same(v,G.q.ans),t:v==null?DU_QT*1000:Date.now()-G.t0};clearTimeout(d.tq);G.log=G.my.ok?"정답! 상대를 기다려요…":`오답! (정답 ${G.q.ans}) 상대를 기다려요…`;
 if(d.host)duHostCheck();else duGP();duDraw()}
 function duHostCheck(){const d=DU,G=d.G;
+if(G.ph==="q"&&G.my&&G.opAn&&!G.my.ok&&!G.opAn.ok){G.ord=0;G.rs={ev:[],hp:G.hp.slice(),end:null,skip:1};G.ph="rs";duHP();duAnim(G.rs);return}
 if(G.ph==="q"&&G.my&&G.opAn){const k=a=>(a.ok?0:1e7)+a.t,km=k(G.my),ko=k(G.opAn);G.ord=km<ko?0:km>ko?1:(Math.random()<.5?0:1);duPickPhase();duHP();return}
 if(G.ph==="pick"&&G.myA&&G.opA)duResolve()}
 function duPickPhase(){const d=DU,G=d.G;G.ph="pick";G.tp0=Date.now();clearTimeout(d.tp);d.tp=setTimeout(()=>{if(DU===d&&G.ph==="pick"&&!G.myA)duPick("def")},DU_PT*1000);
@@ -1911,7 +1912,7 @@ function duPick(a){const d=DU;if(!d||!d.G)return;const G=d.G;if(G.ph!=="pick"||G
 function duResolve(){const d=DU,G=d.G,acts=[G.myA,G.opA],hp=G.hp.slice(),ev=[];let end=null;
 for(const k of[G.ord,1-G.ord]){if(acts[k]==="atk"){const t=1-k,cr=Math.random()<CRIT,df=acts[t]==="def",dm=(df?.5:1)*(cr?2:1);hp[t]=Math.max(0,hp[t]-dm);ev.push({k,a:"atk",dm,cr,df});if(hp[t]<=0){end=k;break}}else ev.push({k,a:"def"})}
 G.rs={ev,hp,end};G.ph="rs";duHP();duAnim(G.rs)}
-function duAnim(rs){const d=DU,G=d.G,aid=G.aid;G.anim=true;clearTimeout(d.tp);const q=[[0,()=>{G.log=G.ord===0?"🥇 내가 먼저 움직여요!":"🥈 상대가 먼저 움직여요!";G.fx={}}]];
+function duAnim(rs){const d=DU,G=d.G,aid=G.aid;G.anim=true;clearTimeout(d.tp);const q=[[0,()=>{G.log=rs.skip?"😵 둘 다 틀렸어요! 공격·방어 없이 다음 문제로 넘어가요.":G.ord===0?"🥇 내가 먼저 움직여요!":"🥈 상대가 먼저 움직여요!";G.fx={}}]];if(rs.skip)q.push([1400,()=>{}]);
 const hp=G.hp.slice();
 rs.ev.forEach(e=>{const me=e.k===0;
 if(e.a==="def")q.push([800,()=>{G.fx={[me?"m":"o"]:"du-def"};G.log=me?"🛡️ 나는 방어 자세!":"🛡️ 상대는 방어 자세!"}]);
@@ -1929,7 +1930,7 @@ if(!d.g){const ps=duPeers(),me=d.me;let L;
 if(d.st==="conn")L='<p class="mu">연결하는 중…</p>';else if(d.st==="none")L='<p class="err">실시간 연결을 사용할 수 없어요. 잠시 후 다시 해 보세요.</p>';
 else L=ps.length?ps.map(p=>{const q=p.presence,inc=q.inv&&q.inv.to===me,mine=d.inv&&d.inv.to===p.peer;
 return `<div class="row" style="gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="font-size:30px;line-height:1">${chH(q.ch)}</span><b style="flex:1">${esc(q.n)}</b>${q.bz?'<span class="mu">대결 중</span>':inc?`<button onclick="duAccept('${p.peer}')">✅ 수락</button>`:mine?`<span class="mu">신청함…</span><button class="g" onclick="duCancel()">취소</button>`:`<button ${d.inv?"disabled":""} onclick="duInvite('${p.peer}')">⚔️ 대결 신청</button>`}</div>`}).join(""):'<p class="mu">지금 대결하기에 들어와 있는 친구가 없어요. 친구가 들어오면 여기에 나타나요.</p>';
-tb.innerHTML=`<div id="duroot"><div class="card"><h2>⚔️ 대결하기</h2><p class="mu">같은 반 친구에게 대결을 신청해요. 수학 문제를 먼저 맞힌 사람이 선공! 틀리면 후공이에요.<br>승리 🪙20원·⭐3점 / 패배 🪙10원·⭐1점</p>${L}${d.msg?`<p class="err">${esc(d.msg)}</p>`:""}</div><button class="g" onclick="duExit()">← 토벌 메뉴</button></div>`;return}
+tb.innerHTML=`<div id="duroot"><div class="card"><h2>⚔️ 대결하기</h2><p class="mu">같은 반 친구에게 대결을 신청해요. 수학 문제를 먼저 맞힌 사람이 선공! 틀리면 후공이고, 둘 다 틀리면 다음 문제로 넘어가요.<br>승리 🪙20원·⭐3점 / 패배 🪙10원·⭐1점</p>${L}${d.msg?`<p class="err">${esc(d.msg)}</p>`:""}</div><button class="g" onclick="duExit()">← 토벌 메뉴</button></div>`;return}
 const G=d.G,hp=hearts,pop=s=>G.pop&&G.pop.s===s?`<span class="pp${/CRIT/.test(G.pop.t)?" cr":""}" style="color:${G.pop.c}">${G.pop.t}</span>`:"";let body;
 if(G.ph==="wait")body='<p class="mu" style="text-align:center">상대를 기다리는 중…</p>';
 else if(G.ph==="q")body=G.my?`<p style="text-align:center;margin:10px 0">${G.my.ok?"✅ 정답!":"❌ 오답!"} 상대가 답하길 기다려요…</p>`:`<p class="mu" style="text-align:center;margin:0">남은 시간 <b id="dut">${DU_QT}초</b></p><h2 style="text-align:center;font-size:24px;line-height:1.4">${esc(G.q.q)}</h2>`+(G.q.opts?`<div class="grid" style="grid-template-columns:1fr 1fr">${G.q.opts.map((o,i)=>`<button onclick="duAnsI(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<div class="row" style="gap:8px"><input id="dua" autocomplete="off" style="margin:0;font-size:18px" onkeydown="if(event.key==='Enter')duAnsT()"><button onclick="duAnsT()" style="white-space:nowrap">확인</button></div>`);
