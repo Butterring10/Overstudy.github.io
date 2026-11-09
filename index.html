@@ -714,7 +714,7 @@ if(!S){rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,H],[x,y+1,H]],shd(c,.9));rFill(R,
 if(!E){rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,H],[x+1,y,H]],shd(c,.75));rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,.35],[x+1,y,.35]],shd(c,.58))}
 rFill(R,[[x,y,H],[x+1,y,H],[x+1,y+1,H],[x,y+1,H]],c);
 ct.globalAlpha=Math.min(1,ct.globalAlpha/.4*.6);ct.strokeStyle="#4a2c2a";ct.lineWidth=1.3*R.s;ct.lineCap="round";const L=(a,b)=>{const p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);ct.beginPath();ct.moveTo(p[0],p[1]);ct.lineTo(q[0],q[1]);ct.stroke()};
-if(!sm(0,-1))L([x,y,H],[x+1,y,H]);if(!sm(-1,0))L([x,y,H],[x,y+1,H]);if(!sm(0,1))L([x,y+1,H],[x+1,y+1,H]);if(!sm(1,0))L([x+1,y,H],[x+1,y+1,H]);
+if(!K(0,-1))L([x,y,0],[x+1,y,0]);if(!K(-1,0))L([x,y,0],[x,y+1,0]);if(!sm(0,-1))L([x,y,H],[x+1,y,H]);if(!sm(-1,0))L([x,y,H],[x,y+1,H]);if(!sm(0,1))L([x,y+1,H],[x+1,y+1,H]);if(!sm(1,0))L([x+1,y,H],[x+1,y+1,H]);
 if(!S){L([x,y+1,0],[x+1,y+1,0]);if(!(sm(-1,0)&&!K(-1,1)))L([x,y+1,0],[x,y+1,H]);if(!E||!(sm(1,0)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
 if(!E){L([x+1,y,0],[x+1,y+1,0]);if(!(sm(0,-1)&&!K(1,-1)))L([x+1,y,0],[x+1,y,H]);if(S&&!(sm(0,1)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
 ct.restore()}};
