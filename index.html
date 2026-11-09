@@ -707,7 +707,17 @@ const FLDEF=[{id:"f0",n:"기본 바닥",p:0,c1:"#e6e1d6",c2:"#d8d2c4",pat:"check
 FDEF.forEach(f=>{f.p*=15});[...WDEF,...FLDEF].forEach(w=>{w.p*=15});
 {const BO={rug:{c1:"#d9d2c3",c2:"#ece6d9"},bed:{fr:"#d9d2c3",bl:"#c9ccd4",pl:"#ffffff",hb:.8},desk:{fr:"#b89a78",top:"#d2bb96"},chair:{fr:"#9a8a78",seat:"#c4b49c",back:"#c4b49c"},shelf:{fr:"#c4b49c"},plant:{k:"pot",pot:"#b8a58e"},lamp:{sh:"#f0e8d0"},sofa:{c:"#b8b0a4"},table:{fr:"#9a8a78",top:"#d9c9a8"},tv:{fr:"#5a5a62"},wardrobe:{c:"#c4b49c"}},bl=[];
 for(const t of Object.keys(BO)){const base=Math.min(...FDEF.filter(f=>f.t===t).map(f=>f.p));bl.push({id:"ba_"+t,t,n:"평범한 "+FTN[t],p:Math.max(10,Math.floor(base*.5/10)*10),o:BO[t]})}FDEF.unshift(...bl)}
-FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){rBox(R,x,y,1,1,0,2.4,o.c);const c=o.c;rPoly(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,.35],[x,y+1,.35]],shd(c,.7),.8);rPoly(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,.35],[x+1,y,.35]],shd(c,.58),.8);rPoly(R,[[x,y+1,2.4],[x+1,y+1,2.4],[x+1,y+1,2.22],[x,y+1,2.22]],shd(c,.82),.8)}};
+let RWALL=new Map();
+function rFill(R,pts,col){const c=R.c;c.beginPath();pts.forEach((q,i)=>{const p=rP(R,q[0],q[1],q[2]);i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])});c.closePath();c.fillStyle=col;c.fill()}
+FT.wall={w:1,d:1,walk:0,dr(R,x,y,w,d,o){const c=o.c,H=2.4,K=(a,b)=>RWALL.get((x+a)+","+(y+b)),sm=(a,b)=>K(a,b)===c,E=K(1,0),S=K(0,1),ct=R.c;ct.save();ct.globalAlpha*=.4;
+if(!S){rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,H],[x,y+1,H]],shd(c,.9));rFill(R,[[x,y+1,0],[x+1,y+1,0],[x+1,y+1,.35],[x,y+1,.35]],shd(c,.7));rFill(R,[[x,y+1,H],[x+1,y+1,H],[x+1,y+1,H-.18],[x,y+1,H-.18]],shd(c,.82))}
+if(!E){rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,H],[x+1,y,H]],shd(c,.75));rFill(R,[[x+1,y,0],[x+1,y+1,0],[x+1,y+1,.35],[x+1,y,.35]],shd(c,.58))}
+rFill(R,[[x,y,H],[x+1,y,H],[x+1,y+1,H],[x,y+1,H]],c);
+ct.globalAlpha=Math.min(1,ct.globalAlpha/.4*.6);ct.strokeStyle="#4a2c2a";ct.lineWidth=1.3*R.s;ct.lineCap="round";const L=(a,b)=>{const p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);ct.beginPath();ct.moveTo(p[0],p[1]);ct.lineTo(q[0],q[1]);ct.stroke()};
+if(!sm(0,-1))L([x,y,H],[x+1,y,H]);if(!sm(-1,0))L([x,y,H],[x,y+1,H]);if(!sm(0,1))L([x,y+1,H],[x+1,y+1,H]);if(!sm(1,0))L([x+1,y,H],[x+1,y+1,H]);
+if(!S){L([x,y+1,0],[x+1,y+1,0]);if(!(sm(-1,0)&&!K(-1,1)))L([x,y+1,0],[x,y+1,H]);if(!E||!(sm(1,0)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
+if(!E){L([x+1,y,0],[x+1,y+1,0]);if(!(sm(0,-1)&&!K(1,-1)))L([x+1,y,0],[x+1,y,H]);if(S&&!(sm(0,1)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
+ct.restore()}};
 FT.ledge={w:2,d:1,walk:0,dr(R,x,y,w,d,o){const hz=w>=d,L=hz?w:d,B=(a,b,c,e,z,h,col)=>hz?rBox(R,x+a,y+b,c,e,z,h,col):rBox(R,x+b,y+a,e,c,z,h,col),H=o.h,fr=o.fr;
 B(.06,.25,L-.12,.5,0,.07,fr);for(const a of[.06,L-.14])B(a,.25,.08,.5,0,H,fr);if(o.mid)B(L/2-.04,.25,.08,.5,0,H,fr);
 for(let t=1;t<o.n;t++)B(.06,.25,L-.12,.5,t*H/o.n,.06,fr);
@@ -802,7 +812,7 @@ if(o.pat==="dots")for(let i=0;i<L;i++)for(let j=0;j<4;j++)rDot(R,...(plane==="y"
 if(o.pat==="brick"){for(let j=1;j<8;j++)rLine(R,P(0,j*.4),P(L,j*.4),shd(o.c2,k),1.3);for(let j=0;j<8;j++)for(let i=0;i<L;i++)rLine(R,P(i+(j%2?.5:0)+.01,j*.4),P(i+(j%2?.5:0)+.01,j*.4+.4),shd(o.c2,k),1.3)}
 if(o.pat==="stars")for(let off=0;off<L;off+=8)for(const[a,z]of[[.7,2.6],[1.8,1.6],[2.9,2.8],[3.7,1.2],[4.6,2.4],[5.5,1.5],[6.4,2.8],[7.2,1.9],[2.2,.9],[5,.8]])if(a+off<L)rDot(R,...(plane==="y"?[a+off,0]:[0,a+off]),z,3.4,o.c2);
 rPoly(R,[P(0,0),P(L,0),P(L,RWH),P(0,RWH)],null,1.8)}
-function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;c.clearRect(0,0,cv.width,cv.height);RSH=1;
+function rDraw(r,pv){const R=pv?pv.R:rView(),c=R.c,cv=pv?pv.cv:RM.cv,W=WD[r.wp]||WD.w0,F=FLD[r.fl]||FLD.f0;RWALL=new Map();(r.f||[]).forEach(f=>{const q=FD[f[0]];if(q&&q.t==="wall")RWALL.set(f[1]+","+f[2],q.o.c)});c.clearRect(0,0,cv.width,cv.height);RSH=1;
 rWall(R,"x",W,.86);rWall(R,"y",W,1);
 rPoly(R,[[0,0,0],[RW,0,0],[RW,0,.35],[0,0,.35]],"#fffaf0",1.2);rPoly(R,[[0,0,0],[0,RD,0],[0,RD,.35],[0,0,.35]],"#f3ead8",1.2);
 rPoly(R,[[RW*.5-.9,0,1.15],[RW*.5+.9,0,1.15],[RW*.5+.9,0,2.55],[RW*.5-.9,0,2.55]],"#ffffff",1.8);rPoly(R,[[RW*.5-.75,0,1.28],[RW*.5+.75,0,1.28],[RW*.5+.75,0,2.42],[RW*.5-.75,0,2.42]],"#bfe6ff",1.2);rPoly(R,[[RW*.5-.04,0,1.28],[RW*.5+.04,0,1.28],[RW*.5+.04,0,2.42],[RW*.5-.04,0,2.42]],"#ffffff",0);
@@ -813,7 +823,7 @@ rPoly(R,[[0,RD,0],[RW,RD,0],[RW,0,0],[RW,0,-.35],[RW,RD,-.35],[0,RD,-.35]],shd(F
 if(pv&&pv.hl){const[a,b,w,d]=pv.hl;rPoly(R,[[a,b,.01],[a+w,b,.01],[a+w,b+d,.01],[a,b+d,.01]],"rgba(255,150,20,.55)",2.4)}
 if(!pv&&RM.ed&&RM.sel!=null&&r.f[RM.sel]){const f=r.f[RM.sel],[w,d]=rFoot(f);rPoly(R,[[f[1],f[2],.01],[f[1]+w,f[2],.01],[f[1]+w,f[2]+d,.01],[f[1],f[2]+d,.01]],"rgba(79,124,255,.35)",2)}
 const obj=r.f.map(f=>{const[w,d]=rFoot(f);if(fTy(f).orn){const sf=rSurf(r,f[1],f[2]),z=sf?sf.z:0,sk=sf?sf.f[1]+sf.f[2]+rFoot(sf.f)[0]+rFoot(sf.f)[1]-1:f[1]+f[2]+1;return{k:sk+.02+(f[1]+f[2])*.001,fn:()=>FT.orn.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o)}}return{k:fTy(f).walk?-99:f[1]+f[2]+w+d-1,fn:()=>fTy(f).dr(R,f[1],f[2],w,d,FD[f[0]].o)}});
-if(!pv)obj.push({k:RM.x+RM.y,fn:()=>rChar(R)});obj.sort((a,b)=>a.k-b.k).forEach(o=>o.fn())}
+if(!pv)obj.push({k:RM.x+RM.y,fn:()=>rChar(R)});obj.sort((a,b)=>a.k-b.k).forEach(o=>o.fn());RWALL=new Map()}
 function rChar(R){const c=R.c,p=rP(R,RM.x,RM.y,0),im=chImgOf(chKey()),bob=RM.mv?Math.abs(Math.sin(RM.t*10))*5:Math.sin(RM.t*2.4)*1.5;
 c.fillStyle="rgba(40,30,30,.22)";c.beginPath();c.ellipse(p[0],p[1],20*R.s/2*1.2,8*R.s/2*1.2,0,0,6.2832);c.fill();
 if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.save();c.translate(p[0],p[1]-bob);c.scale(RM.fx<0?-1:1,1);c.drawImage(im,-w/2,-h+4,w,h);c.restore()}}
