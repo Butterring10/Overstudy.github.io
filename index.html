@@ -1085,11 +1085,11 @@ if(VZ.rq){const h=P.find(x=>x.presence.s===VZ.rq.to);
 if(!h){VZ.rq=null;clearTimeout(VZ.rqT);VZ.msg="친구가 접속을 끊었어요.";visPres()}
 else if(h.presence.an&&h.presence.an.id===VZ.rq.id){const ok=h.presence.an.y,to=VZ.rq.to;VZ.rq=null;clearTimeout(VZ.rqT);visPres();if(ok){visGo(to);return}VZ.msg="친구가 이번에는 거절했어요."}}
 visUI()}
-function visBtnHTML(sid){const on=visPeers().some(p=>p.presence.s===sid),m=VZ.msg?`<p class="mu" style="margin:6px 0 0">${esc(VZ.msg)}</p>`:"";
+function visBtnHTML(sid){const W=sid==="teacher"?"선생님":"친구",Wg=sid==="teacher"?"선생님이":"친구가",on=visPeers().some(p=>p.presence.s===sid),m=VZ.msg?`<p class="mu" style="margin:6px 0 0">${esc(VZ.msg)}</p>`:"";
 if(!VZ.lob)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">${VZ.joining?"연결하는 중…":`연결이 끊겼어요. <a href="#" onclick="visInit();visUI();return false">다시 연결하기</a>`}</p>`;
-if(VZ.rq&&VZ.rq.to===sid)return `<p style="margin:0 0 8px"><b>💌 친구의 허락을 기다리는 중…</b></p><button class="g" style="width:100%" onclick="visCancel()">요청 취소</button>`;
-if(!on)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">친구가 접속해 있을 때 놀러갈 수 있어요.</p>${m}`;
-return `<button style="width:100%" ${VZ.rq?"disabled":""} onclick="visReq('${esc(sid)}')">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">친구가 허락하면 방에 들어갈 수 있어요.</p>${m}`}
+if(VZ.rq&&VZ.rq.to===sid)return `<p style="margin:0 0 8px"><b>💌 ${W}의 허락을 기다리는 중…</b></p><button class="g" style="width:100%" onclick="visCancel()">요청 취소</button>`;
+if(!on)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">${Wg} 접속해 있을 때 놀러갈 수 있어요.</p>${m}`;
+return `<button style="width:100%" ${VZ.rq?"disabled":""} onclick="visReq('${esc(sid)}')">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">${Wg} 허락하면 방에 들어갈 수 있어요.</p>${m}`}
 function visUI(){const e=document.getElementById("fvisit");if(e&&S.fsel)e.innerHTML=visBtnHTML(S.fsel)}
 function visReq(sid){if(!VZ.lob||VZ.rq)return;VZ.rq={to:sid,id:Math.random().toString(36).slice(2,10)};VZ.msg="";visPres();clearTimeout(VZ.rqT);
 VZ.rqT=setTimeout(()=>{if(VZ.rq&&VZ.rq.to===sid){VZ.rq=null;VZ.msg="친구가 응답하지 않았어요. 잠시 후 다시 해 보세요.";visPres();visUI()}},30000);visUI()}
@@ -1125,8 +1125,8 @@ function rCharO(R,o){const sv={x:RM.x,y:RM.y,dir:RM.dir,seat:RM.seat,sz:RM.sz,ho
 const c=R.c,p=rP(R,o.x,o.y,o.z);c.save();c.font=`800 ${Math.round(12*R.s)}px sans-serif`;c.textAlign="center";c.lineWidth=3.5*R.s/1.4;c.strokeStyle="rgba(255,255,255,.95)";c.fillStyle="#3b2a6b";const ty=p[1]-54*R.s;c.strokeText(o.n,p[0],ty);c.fillText(o.n,p[0],ty);c.restore()}
 async function tFriend(){if(S.visit)return tVisit();if(S.fsel)return tFriendOne(S.fsel);tb.innerHTML='<div class="card"><h2>👫 친구</h2><p class="mu">불러오는 중…</p></div>';
 let l=[];try{const q=await db.collection("students").where("cls","==",S.me.cls).get();l=q.docs.map(d=>d.data()).filter(x=>x.sid!==S.me.sid)}catch(e){}if(S.tab!=="friend"||S.fsel)return;S.flist=l;
-l.sort((a,b)=>String(a.name).localeCompare(String(b.name),"ko"));
-tb.innerHTML=`<div class="card"><h2>👫 친구</h2><p class="mu">친구를 누르면 캐릭터와 방을 볼 수 있어요.</p>${l.length?`<div class="fgrid">${l.map(x=>{const q=x.equip||{},bg=q.bg&&item(q.bg);return `<button class="g fcard" onclick="S.fsel='${esc(x.sid)}';tFriend()"><div class="fav" style="background:${bg?bg.e:"var(--bd)"}">${charHTML(x.char,q.hat,0,q.tool)}</div><b>${esc(x.name)}</b><small>⭐ ${(+x.points||0).toLocaleString("ko-KR")}</small></button>`}).join("")}</div>`:'<p class="mu">아직 같은 반 친구가 없어요.</p>'}</div>`}
+l.sort((a,b)=>(a.sid==="teacher"?0:1)-(b.sid==="teacher"?0:1)||String(a.name).localeCompare(String(b.name),"ko"));
+tb.innerHTML=`<div class="card"><h2>👫 친구</h2><p class="mu">친구를 누르면 캐릭터와 방을 볼 수 있어요.</p>${l.length?`<div class="fgrid">${l.map(x=>{const q=x.equip||{},bg=q.bg&&item(q.bg);return `<button class="g fcard" onclick="S.fsel='${esc(x.sid)}';tFriend()"><div class="fav" style="background:${bg?bg.e:"var(--bd)"}">${charHTML(x.char,q.hat,0,q.tool)}</div><b>${x.sid==="teacher"?"👩‍🏫 ":""}${esc(x.name)}</b><small>⭐ ${(+x.points||0).toLocaleString("ko-KR")}</small></button>`}).join("")}</div>`:'<p class="mu">아직 같은 반 친구가 없어요.</p>'}</div>`}
 function friendRoom(x){const sv=S.me,sw=RW,sd=RD;try{S.me={...x,fq:x.fq||{},items:x.items||[],room:x.room?JSON.parse(JSON.stringify(x.room)):null};const r=rCfg(),W=420,H=300,cv=document.createElement("canvas");cv.width=W*2;cv.height=H*2;const c=cv.getContext("2d");c.scale(2,2);
 const hh=(RW+RD)*RTH/2+.35*RTH,s2=Math.min((W-24)/((RW+RD)*RTW/2),(H-24)/(hh+RWH*RTH)),R={c,s:s2,ox:W/2-(RW-RD)*RTW/4*s2,oy:H/2-(hh-RWH*RTH)*s2/2};rDraw(r,{R,cv:{width:W,height:H}});return cv.toDataURL()}catch(e){return""}finally{S.me=sv;RW=sw;RD=sd}}
 async function tFriendOne(sid){let x=(S.flist||[]).find(t=>t.sid===sid);if(!x){try{const d=await db.doc("students/"+S.me.cls+"_"+sid).get();if(d.exists)x=d.data()}catch(e){}}
