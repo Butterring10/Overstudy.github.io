@@ -578,11 +578,11 @@ return `<div class="card"><h2>${esc(sel.name)} 토벌하기 문제 설정</h2><p
 <b style="font-size:14px">연산과 수</b><div>${QOPS.map((o,i)=>qOpCard(o,i,ops.includes(o),(c.opc&&c.opc[o])||qLegacy(o,nums))).join("")}</div>
 <b style="font-size:14px">출제 방식</b><div>${rd("basic","기본 문제만")}${rd("custom","맞춤 문제만")}${rd("mix","기본 + 맞춤 섞기")}</div>
 <div id="qmsg" class="err" style="min-height:22px"></div><button onclick="saveQ()">설정 저장</button></div>
-<div class="card"><h2>맞춤 문제 (교육과정·문제 파일)</h2><p class="mu">교육과정(성취기준·단원)이나 문제 파일을 넣으면 Claude가 학년·단원·난이도를 분석해서 그 범위에 맞는 새 문제를 만들어요. txt, csv, md, json 파일을 올리거나 내용을 붙여 넣어 주세요. Claude가 만들어 준 문제 파일(.json)을 올리면 분석 없이 그대로 가져와요. PDF·워드 파일은 내용을 복사해서 붙여 넣어 주세요.</p>
+<div class="card"><h2>맞춤 문제 (교육과정·문제 파일)</h2><p class="mu">교육과정(성취기준·단원)이나 문제 파일을 넣으면 Claude가 학년·단원·난이도를 분석해서 그 범위에 맞는 새 문제를 만들어요. txt, csv, md, json 파일을 올리거나 내용을 붙여 넣어 주세요. Claude가 만들어 준 문제 파일(.json)을 올리면 분석 없이 그대로 가져와요. PDF·워드 파일은 내용을 복사해서 붙여 넣어 주세요. 올릴 때마다 새 묶음으로 추가되고, 묶음별로 출제 여부를 고를 수 있어요.</p>
 <input type="file" id="qf" accept=".txt,.csv,.tsv,.md,.json,text/*" onchange="readQF(this)" style="padding:8px">
 <textarea id="qt" rows="6" placeholder="예: 5학년 수학 – 분수의 덧셈과 뺄셈, 약분과 통분 …"></textarea>
 <div id="qmsg2" class="err" style="min-height:22px"></div><button id="qgen" onclick="genQ()">분석해서 문제 만들기</button>
-${cu.length?`<div style="margin-top:14px"><p class="mu"><b>현재 맞춤 문제 ${cu.length}개</b>${c.summary?"<br>"+esc(c.summary):""}</p>${cu.slice(0,5).map(x=>`<div class="mu" style="padding:4px 0;border-top:1px solid var(--bd)">${esc(x.q)} → <b>${esc(x.a)}</b></div>`).join("")}${cu.length>5?`<p class="mu">… 외 ${cu.length-5}개</p>`:""}<button class="g" onclick="clrQ()" style="margin-top:8px">맞춤 문제 지우기</button></div>`:""}</div>`}
+${(()=>{const ss=qSets(c);if(!ss.length)return"";const onN=ss.filter(x=>x.on).reduce((a,x)=>a+x.qs.length,0);return `<div style="margin-top:14px"><p class="mu" style="margin:0 0 6px"><b>업로드한 문제 묶음 ${ss.length}개</b> · 출제 중 ${onN}문제<br>체크한 묶음의 문제만 섞어서 나와요.</p>${ss.map(x=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--bd)"><label style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;margin:0;cursor:pointer"><input type="checkbox" style="width:auto;margin:0" ${x.on?"checked":""} onchange="qSetOn('${x.id}',this.checked)"><span style="min-width:0"><b style="word-break:break-all">${esc(x.name)}</b><br><small class="mu">${x.qs.length}문제 · 예) ${esc((x.qs[0]||{}).q||"")}</small></span></label>${S.arm==="qd_"+x.id?`<button style="background:#e5484d;border-color:#e5484d;color:#fff;padding:6px 10px" onclick="qSetDel('${x.id}')">정말 삭제</button><button class="g" style="padding:6px 10px" onclick="S.arm=null;teacher()">취소</button>`:`<button class="g" style="padding:6px 10px" onclick="qSetDel('${x.id}')">삭제</button>`}</div>`).join("")}${onN?"":'<p class="err" style="margin:6px 0 0">체크한 묶음이 없어서 기본 문제가 나와요.</p>'}<button class="g" onclick="clrQ()" style="margin-top:8px">모든 묶음 지우기</button></div>`})()}</div>`}
 async function saveQ(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;
 const ops=QOPS.filter((o,i)=>document.getElementById("qo_"+i).checked),opc={};let bad="";
 QOPS.forEach((o,i)=>{const sd=k=>{const kk=QKS.filter(x=>document.getElementById(`q${k}k${x}_${i}`).checked);if(!kk.length&&ops.includes(o))bad=o;return{k:kk.length?kk:["i1"]}};opc[o]={a:sd("a"),b:sd("b")}});
@@ -591,7 +591,7 @@ if(!ops.length)return qMsg("qmsg","연산을 하나 이상 골라 주세요.",1)
 const src=(document.querySelector("input[name=qs]:checked")||{}).value||"basic",old=sel.qcfg||{},qcfg={...old,nums,ops,opc,src};
 try{await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg;qMsg("qmsg",src!=="basic"&&!(qcfg.custom&&qcfg.custom.length)?"저장했어요. 맞춤 문제가 아직 없어서 기본 문제가 나와요.":"저장했어요.")}catch(e){qMsg("qmsg","저장하지 못했어요.",1)}}
 function readQF(inp){const f=inp.files[0];if(!f)return;if(/\.(pdf|docx?|hwp|hwpx|pptx?)$/i.test(f.name))return qMsg("qmsg2","이 파일 형식은 읽을 수 없어요. 내용을 복사해서 아래에 붙여 넣어 주세요.",1);
-const r=new FileReader();r.onload=()=>{document.getElementById("qt").value=String(r.result).slice(0,60000);qMsg("qmsg2",f.name+" 내용을 불러왔어요.")};r.onerror=()=>qMsg("qmsg2","파일을 읽지 못했어요.",1);r.readAsText(f)}
+const r=new FileReader();r.onload=()=>{document.getElementById("qt").value=String(r.result).slice(0,60000);S.qfName=f.name.replace(/\.[^.]+$/,"");qMsg("qmsg2",f.name+" 내용을 불러왔어요.")};r.onerror=()=>qMsg("qmsg2","파일을 읽지 못했어요.",1);r.readAsText(f)}
 function cleanQ(x){if(!x||typeof x.q!=="string"||x.a==null)return null;const q=x.q.trim().slice(0,200),a=String(x.a).trim().slice(0,80);if(!q||!a)return null;
 let c=Array.isArray(x.c)?x.c.map(s=>String(s).trim().slice(0,60)).filter(Boolean).slice(0,5):[];if(c.length&&!c.includes(a))c=c.slice(0,4).concat([a]);return{q,a,c:c.length>=2?c:[]}}
 function qPrompt(t){return `당신은 초·중·고 수업용 퀴즈 출제 도우미입니다. 아래 [자료]는 교사가 입력한 교육과정(성취기준·단원 목록 등) 또는 문제 파일입니다.
@@ -601,19 +601,23 @@ function qPrompt(t){return `당신은 초·중·고 수업용 퀴즈 출제 도�
 규칙: 객관식이면 c에 보기 4개를 넣고 a는 c 안의 값과 똑같이 쓰세요. 보기 없이 풀 단답형은 c를 빼세요(정답이 숫자나 짧은 말 하나로 정해지는 문제만). 문제는 글자로만 표시되므로 그림·표·도형이 필요한 문제는 만들지 마세요. 수식은 1/2, ×, ÷ 같은 일반 문자로 쓰세요. 한국어로 쓰세요.
 [자료]
 ${t}`}
+function qSets(q){q=q||{};if(Array.isArray(q.sets))return q.sets.map(x=>({...x,qs:Array.isArray(x.qs)?x.qs:[]}));return q.custom&&q.custom.length?[{id:"s0",name:String(q.summary||"맞춤 문제").slice(0,40),qs:q.custom,on:true}]:[]}
+async function qSaveSets(sel,sets,src){const old=sel.qcfg||{},on=sets.filter(x=>x.on),custom=[].concat(...on.map(x=>x.qs)).slice(0,600);
+const qcfg={...old,sets,custom,summary:on.map(x=>x.name).join(", ").slice(0,300),src:src||old.src||"basic"};await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg}
+async function qAddSet(sel,name,qs){const sets=qSets(sel.qcfg);sets.push({id:"s"+Date.now().toString(36),name:String(name||("문제 묶음 "+(sets.length+1))).slice(0,40),qs,on:true});const o=sel.qcfg||{};await qSaveSets(sel,sets,o.src&&o.src!=="basic"?o.src:"custom");S.qfName=""}
+async function qSetOn(id,v){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;const sets=qSets(sel.qcfg);const x=sets.find(z=>z.id===id);if(!x)return;x.on=!!v;try{await qSaveSets(sel,sets)}catch(e){qMsg("qmsg2","저장하지 못했어요.",1)}teacher()}
+async function qSetDel(id){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;if(S.arm!=="qd_"+id){S.arm="qd_"+id;return teacher()}S.arm=null;const sets=qSets(sel.qcfg).filter(z=>z.id!==id);try{await qSaveSets(sel,sets,sets.some(z=>z.on)?undefined:"basic")}catch(e){qMsg("qmsg2","지우지 못했어요.",1)}teacher()}
 async function genQ(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;const txt=document.getElementById("qt").value.trim();
 if(txt.length<8)return qMsg("qmsg2","교육과정이나 문제 내용을 넣어 주세요.",1);
 {let J=null;try{J=JSON.parse(txt)}catch(e){}const ar=J&&(Array.isArray(J)?J:Array.isArray(J.questions)?J.questions:null);if(ar){const qs=ar.map(cleanQ).filter(Boolean).slice(0,300);if(!qs.length)return qMsg("qmsg2","문제 파일에서 문제를 찾지 못했어요.",1);
-const old=sel.qcfg||{},qcfg={...old,custom:qs,summary:String((J&&J.summary)||"파일에서 가져온 문제").slice(0,300),src:old.src&&old.src!=="basic"?old.src:"custom"};
-try{await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg;teacher();qMsg("qmsg2","✅ 문제 "+qs.length+"개를 가져왔어요.")}catch(e){qMsg("qmsg2","저장하지 못했어요. 다시 시도해 주세요.",1)}return}}
+try{await qAddSet(sel,S.qfName||(J&&J.summary)||"파일에서 가져온 문제",qs);teacher();qMsg("qmsg2","✅ 문제 "+qs.length+"개를 새 묶음으로 추가했어요.")}catch(e){qMsg("qmsg2","저장하지 못했어요. 다시 시도해 주세요.",1)}return}}
 const btn=document.getElementById("qgen");btn.disabled=true;qMsg("qmsg2","분석하는 중이에요. 잠시만 기다려 주세요…");
 try{const sample=await claude.use("sample");if(!sample)throw{code:"none"};
 const r=await sample.json(qPrompt(txt.slice(0,12000)),{cache:false}),qs=((r&&r.questions)||[]).map(cleanQ).filter(Boolean).slice(0,40);
 if(qs.length<3)throw{code:"few"};
-const old=sel.qcfg||{},qcfg={...old,custom:qs,summary:String((r&&r.summary)||"").slice(0,300),src:old.src&&old.src!=="basic"?old.src:"custom"};
-await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg;teacher()}
+await qAddSet(sel,S.qfName||String((r&&r.summary)||"").slice(0,40)||null,qs);teacher()}
 catch(e){const m=e&&e.code==="none"?"이 기능(AI 문제 만들기)은 이 사이트에서는 아직 쓸 수 없어요.":e&&e.code==="not_granted"?"사용 권한을 허용해야 문제를 만들 수 있어요.":e&&e.code==="rate_limited"?"잠시 후에 다시 시도해 주세요.":"문제를 만들지 못했어요. 내용을 조금 더 자세히 넣고 다시 시도해 주세요.";qMsg("qmsg2",m,1);btn.disabled=false}}
-async function clrQ(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;const qcfg={...(sel.qcfg||{}),custom:[],summary:"",src:"basic"};
+async function clrQ(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;const qcfg={...(sel.qcfg||{}),sets:[],custom:[],summary:"",src:"basic"};
 try{await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg;teacher()}catch(e){qMsg("qmsg2","지우지 못했어요.",1)}}
 // ===== 학습 탭: 교사가 넣은 맞춤 문제 반복 학습 =====
 let SD=null;
