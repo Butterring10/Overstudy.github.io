@@ -1396,7 +1396,7 @@ const SPG=24,SPAWN=[0,16,34,52,70,88,106],OLIFE=100,KT=48,KW=12,KH=8,STL={raw:""
 const tokHTML=(t,big)=>{const[i,st]=t.split(":");return `<span class="tg tg-${st}${big?" big":""}"><b>${ING[i].e}</b><i>${TGL[st]}</i></span>`};
 let CK=null,K=null;
 const keyOf=a=>a.slice().sort().join("|"),tokOf=it=>it.id+":"+it.st,pan_=()=>S.me.pantry||(S.me.pantry={}),stIdx=()=>csOf(curCat());
-function needOf(si,n){const st=stg(si),r={},NN=n||st.total;for(const d of st.menus){const c={};for(const t of DISH[d].t){const id=t.split(":")[0];c[id]=(c[id]||0)+1}for(const id in c)r[id]=Math.max(r[id]||0,c[id]*NN)}const mu=si>=3?2:si===2?1.5:1;for(const id in r)r[id]=Math.ceil(r[id]*mu);return r}
+function needOf(si,n){const st=stg(si),r={},NN=n||st.total;for(const d of st.menus){const c={};for(const t of DISH[d].t){const id=t.split(":")[0];c[id]=(c[id]||0)+1}for(const id in c)r[id]=Math.max(r[id]||0,c[id]*NN)}const mu=si>=3?2:si===2?1.5:1;for(const id in r)r[id]=Math.ceil(r[id]*mu*1.5);return r}
 async function saveMe(){const m=S.me,ref=db.doc("students/"+m.cls+"_"+m.sid),d={coins:m.coins,points:m.points,gems:m.gems||0,pantry:m.pantry||{},cookStage:m.cookStage||0,cookCats:m.cookCats||{},plans:m.plans||{},study:m.study||{},room:m.room||null,fq:m.fq||{}};let err="";
 try{await ref.update(d)}catch(e){err=String(e&&e.message||e);try{await ref.set(JSON.parse(JSON.stringify(m)));err=""}catch(e2){err=String(e2&&e2.message||e2)}}
 if(!err){try{const g=await ref.get(),v=g.exists&&g.data(),pa=(v&&v.pantry)||{},mp=m.pantry||{},same=v&&v.coins===m.coins&&[...new Set([...Object.keys(pa),...Object.keys(mp)])].every(k=>(pa[k]||0)===(mp[k]||0));if(!same)console.warn("saveMe: 저장 확인 값이 달라요",v)}catch(e){}}
