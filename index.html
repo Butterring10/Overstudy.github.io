@@ -972,6 +972,8 @@ function rGhOk(){const G=RM&&RM.gh;if(!G)return;const r=rCfg();RM.gh=null;
 if(G.k==="mv"){const f=r.f[RM.sel],gr=G.rot!=null?G.rot:f&&f[3];if(f&&rFits(r,f[0],G.x,G.y,gr,RM.sel)){f[3]=gr;const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
 else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,G.rot||0,-1)){r.f.push([RM.pick,G.x,G.y,G.rot||0]);if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
 const isoBefore=(a,b)=>a[1]<=b[0]+.02||a[3]<=b[2]+.02||a[5]<=b[4]+.05;
+function rSortAll(fo,chs){if(!chs.length)return isoSort(fo);const o=isoSort([...fo,...chs]);let ok=true;const F=o.filter(x=>!x.c);for(let i=0;i<F.length&&ok;i++)for(let j=i+1;j<F.length;j++){const A=F[i].b,B=F[j].b;if(isoBefore(B,A)&&!isoBefore(A,B)){ok=false;break}}if(ok)return o;const r=isoSort(fo);chs.forEach(ch=>rInsCh(r,ch));return r}
+function rInsCh(ord,ch){const n=ord.length,mb=ord.map(o=>{const a=isoBefore(o.b,ch.b),b=isoBefore(ch.b,o.b);return a&&!b?1:b&&!a?-1:a&&b&&o.w?.5:0});let best=0,bv=1e9;for(let p=0;p<=n;p++){let v=0;for(let k=0;k<n;k++){const m=mb[k];if(k<p&&m<0)v+=1;else if(k>=p&&m>0)v+=m}if(v<bv){bv=v;best=p}}ord.splice(best,0,ch)}
 function isoSort(L){const n=L.length,pre=L.map(()=>[]);for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(i!==j){const bj=L[j].b,bi=L[i].b,ji=isoBefore(bj,bi),ij=isoBefore(bi,bj);if(ji&&!ij)pre[i].push(j);else if(ji&&ij){if(L[i].c&&L[j].w)pre[i].push(j)}else if(!ji&&!ij){const kj=(bj[0]+bj[1]+bj[2]+bj[3])/2,ki=(bi[0]+bi[1]+bi[2]+bi[3])/2;if(kj<ki-1e-6||(Math.abs(kj-ki)<=1e-6&&(bj[4]+bj[5])<(bi[4]+bi[5])-1e-6))pre[i].push(j)}}
 const done=new Array(n).fill(false),out=[];for(let k=0;k<n;k++){let pick=-1;for(let i=0;i<n;i++)if(!done[i]&&pre[i].every(j=>done[j])){pick=i;break}if(pick<0)pick=done.indexOf(false);done[pick]=true;out.push(L[pick])}return out}
 let RXF=null;
@@ -1021,10 +1023,10 @@ if(t.wl){const od=f[3]%2,a=od?f[2]:f[1];fn=()=>wlDraw(R,od?"x":"y",a,a+t.w,FD[f[
 if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>t.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i});return}
 fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,t===FT.door?{...FD[f[0]].o,op:f[4]?1:0,rt:(f[3]||0)%2}:(t===FT.bed||t===FT.bed2)&&f[4]?{...FD[f[0]].o,brk:1}:FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
 const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i,w:t===FT.wall||t===FT.door};(t.walk?ws:fo).push(o)});
-const sF=!pv&&RM&&RM.seat?r.f[RM.seat.i]:null,sEmb=sF&&(sF[3]||0)%4!==0&&fTy(sF)!==FT.wall,late=[];
-if(!pv&&!sEmb){const ch={b:[RM.x-.08,RM.x+.08,RM.y-.08,RM.y+.08,0,2],fn:()=>rChar(R),c:1},si=RM.seat?fo.find(o=>o.i===RM.seat.i):null;if(si)late.push([ch,si]);else fo.push(ch)}
-if(!pv)visOthers().forEach(o=>{const ch={b:[o.x-.08,o.x+.08,o.y-.08,o.y+.08,0,2],fn:()=>rCharO(R,o),c:1},si=o.z>0?fo.find(q=>q.f&&SEATZ[FD[q.f[0]].t]!=null&&(()=>{const[w,d]=rFoot(q.f);return o.x>=q.f[1]&&o.x<=q.f[1]+w&&o.y>=q.f[2]&&o.y<=q.f[2]+d})()):null;if(si)late.push([ch,si]);else fo.push(ch)});
-const ord=isoSort(fo);late.forEach(([ch,si])=>ord.splice(ord.indexOf(si)+1,0,ch));
+const sF=!pv&&RM&&RM.seat?r.f[RM.seat.i]:null,sEmb=sF&&(sF[3]||0)%4!==0&&fTy(sF)!==FT.wall,late=[],chs=[];
+if(!pv&&!sEmb){const ch={b:[RM.x-.08,RM.x+.08,RM.y-.08,RM.y+.08,0,2],fn:()=>rChar(R),c:1},si=RM.seat?fo.find(o=>o.i===RM.seat.i):null;if(si)late.push([ch,si]);else chs.push(ch)}
+if(!pv)visOthers().forEach(o=>{const ch={b:[o.x-.08,o.x+.08,o.y-.08,o.y+.08,0,2],fn:()=>rCharO(R,o),c:1},si=o.z>0?fo.find(q=>q.f&&SEATZ[FD[q.f[0]].t]!=null&&(()=>{const[w,d]=rFoot(q.f);return o.x>=q.f[1]&&o.x<=q.f[1]+w&&o.y>=q.f[2]&&o.y<=q.f[2]+d})()):null;if(si)late.push([ch,si]);else chs.push(ch)});
+const ord=rSortAll(fo,chs);late.forEach(([ch,si])=>ord.splice(ord.indexOf(si)+1,0,ch));
 const seq=[];wls.forEach(o=>seq.push(o));ws.sort((a,b)=>a.i-b.i).forEach(o=>seq.push(o));ord.forEach(o=>{seq.push(o);if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>seq.push(q))});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>seq.push(q));RSEAT=sEmb?{f:sF}:null;try{seq.forEach(o=>o.fn())}finally{RSEAT=null}if(!pv&&RM)RM.hit={R,seq:seq.filter(o=>o.i!=null&&!gi.includes(o.i)&&o.i<r.f.length),W:cv.width,H:cv.height,rw:new Map(RWALL)};RWALL=new Map()}
 const SEATZ={chair:.48,sofa:.5,lsofa:.32,bench:.5,bed:.56,bed2:.62};
 function rChar(R){const c=R.c,H=RM.hop,ht=H?Math.min(1,(RM.t-H.t0)/H.d):1;if(H&&ht>=1)RM.hop=null;const e=ht<1?(1-Math.cos(Math.PI*ht))/2:1,hx=ht<1?H.x0+(RM.x-H.x0)*e:RM.x,hy=ht<1?H.y0+(RM.y-H.y0)*e:RM.y,z=(ht<1?H.z0+((RM.seat?RM.sz:0)-H.z0)*e+Math.sin(Math.PI*ht)*.75:(RM.seat?RM.sz:0)),p=rP(R,hx,hy,z),[cid,hid0,tid0]=String(RCK||chKeyNT()).split("|"),ch=CHR[(+String(cid).slice(1))-1];
@@ -2156,7 +2158,9 @@ q=`${a}/${b} ${op} ${c2}/${d}`;ans=fF(n,dd);const pr=ans.includes("/")?ans.split
 gen=()=>{const[N,D]=pr;return fF(...pk([[N+1,D],[Math.max(1,N-1),D],[N,D+1],[N+rnI(1,3),D+rnI(0,2)],[N*2+1,D*2]]))};fb=()=>fF(rnI(1,9),rnI(2,9)+rnI(0,3))}
 return mcq(q,ans,gen,fb)}
 function customQ(x){const ans=String(x.a),c=Array.isArray(x.c)?x.c.map(String):[];let opts=null;if(c.length>=2){const s=new Set(c);s.add(ans);opts=shuf([...s]).slice(0,5);if(!opts.includes(ans)){opts[0]=ans;opts=shuf(opts)}}return fixOpts({q:String(x.q),ans,opts})}
-function mkQ(){const c=qcfg(),cu=c.custom;let u=false;if(c.src==="custom"&&cu.length)u=true;else if(c.src==="mix"&&cu.length)u=Math.random()<.5;return u?customQ(pk(cu)):basicQ(c)}
+const qVal=x=>{const t=String(x).replace(/[\s,]/g,"").replace(/[－−–]/g,"-");if(/^-?\d+(\.\d+)?$/.test(t))return Number(t);const m=t.match(/^(-?\d+)\/(\d+)$/);return m&&+m[2]?m[1]/m[2]:NaN};
+function mkQ(){let q;for(let k=0;k<30;k++){q=mkQ0();if(!(qVal(q.ans)<0))break}if(q.opts){const o=q.opts.filter(v=>!(qVal(v)<0)),n=q.opts.length;if(o.length<n){q.opts=o;fixOpts(q,n)}}return q}
+function mkQ0(){const c=qcfg(),cu=c.custom;let u=false;if(c.src==="custom"&&cu.length)u=true;else if(c.src==="mix"&&cu.length)u=Math.random()<.5;return u?customQ(pk(cu)):basicQ(c)}
 function same(u,a){const n=s=>String(s).replace(/[\s,]/g,"").replace(/[－−–]/g,"-").replace(/[．。]/g,".").toLowerCase(),x=n(u),y=n(a);if(x===y)return true;
 const v=s=>{if(/^-?\d+(\.\d+)?$/.test(s))return Number(s);const m=s.match(/^(-?\d+)\/(\d+)$/);return m&&+m[2]?m[1]/m[2]:NaN},p=v(x),r=v(y);return !isNaN(p)&&!isNaN(r)&&Math.abs(p-r)<1e-9}
 function fixOpts(q,n){if(!q||!q.opts)return q;const ans=String(q.ans),out=[ans];for(const o of q.opts)if(!out.some(x=>same(x,o)))out.push(String(o));n=n||q.opts.length;
