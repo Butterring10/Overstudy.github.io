@@ -1580,7 +1580,7 @@ if(tg.t==="sink"&&bh&&bh.k==="plate")kDots(cx,cy,5,["#cfe9ff","#fff"],30)}
 function kPeople(){const o=[];if(K.ext&&K.xsv){const v=K.xsv;o.push({x:v.x,y:v.y,get h(){return v.hold},set h(z){v.hold=z},pop(){v.hpop=.3}})}
 if(K.pl)for(const p of K.pl){if(p.left||p.on===false||p===K.xp)continue;if(typeof p.x!=="number")continue;o.push({x:p.x,y:p.y,get h(){return p.hold},set h(z){p.hold=z},pop(){p.hpop=.3}})}return o}
 function kThrow(){if(!K||K.over)return;if(isCoop()&&!K.ext&&(K.lq||K.pz))return;if(!isCoop()&&(K.pause||K.pz))return;if(K.co==="guest"&&!K.ext)return coThrow();
-const h=K.hold;if(!h)return kmsg("던질 물건을 먼저 들어요");const hz=Math.abs(K.fx)>=Math.abs(K.fy),dx=hz?Math.sign(K.fx):0,dy=hz?0:Math.sign(K.fy);if(!dx&&!dy)return;
+const h=K.hold;if(!h)return kmsg("던질 물건을 먼저 들어요");if(h.k==="plate")return kmsg("접시는 던질 수 없어요");const hz=Math.abs(K.fx)>=Math.abs(K.fy),dx=hz?Math.sign(K.fx):0,dy=hz?0:Math.sign(K.fy);if(!dx&&!dy)return;
 const sx=Math.floor(K.x/KT),sy=Math.floor(K.y/KT),ppl=kPeople(),x0=K.x,y0=K.y-10;
 for(let i=1;i<=5;i++){const tx=sx+dx*i,ty=sy+dy*i,cx=tx*KT+KT/2,cy=ty*KT+KT/2;
 const fr=ppl.find(q=>Math.floor(q.x/KT)===tx&&Math.floor(q.y/KT)===ty);
