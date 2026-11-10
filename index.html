@@ -1073,9 +1073,9 @@ let VZ={lob:null,cls:null,joining:false,rq:null,rqT:0,an:null,seen:{},ask:null,v
 const visNm=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"");
 async function visInit(){const m=S.me;if(!m||!m.sid||VZ.joining)return;if(VZ.lob&&VZ.cls===m.cls&&VZ.sid===m.sid)return;if(VZ.lob)visQuit();VZ.joining=true;
 try{ROOM=ROOM||await Promise.race([claude.use("room"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){ROOM=null}
-try{if(ROOM){const l=await ROOM.join("vis"+visNm(m.cls));if(!S.me||S.me.sid!==m.sid||S.view!=="class"){l.leave().catch(()=>{})}else{VZ.lob=l;VZ.cls=m.cls;VZ.sid=m.sid;l.onPeers(()=>visLob());visPres()}}}catch(e){}
+try{if(ROOM){const l=await ROOM.join("vis"+visNm(m.cls));if(!S.me||S.me.sid!==m.sid||S.view!=="class"){l.leave().catch(()=>{})}else{VZ.lob=l;VZ.cls=m.cls;VZ.sid=m.sid;l.onPeers(()=>visLob());visPres();clearInterval(VZ.poll);VZ.poll=setInterval(()=>{if(VZ.lob===l)visLob();else clearInterval(VZ.poll)},1500)}}}catch(e){}
 VZ.joining=false;visUI()}
-function visQuit(){const l=VZ.lob,g=VZ.vr;clearTimeout(VZ.rqT);VZ={lob:null,cls:null,joining:false,rq:null,rqT:0,an:null,seen:{},ask:null,vr:null,role:null,msg:"",pos:{},lt:0,ls:"",gl:{}};S.visit=null;if(l)l.leave().catch(()=>{});if(g)g.leave().catch(()=>{});const a=document.getElementById("vask");if(a)a.remove()}
+function visQuit(){const l=VZ.lob,g=VZ.vr;clearTimeout(VZ.rqT);clearInterval(VZ.poll);VZ={lob:null,cls:null,joining:false,rq:null,rqT:0,an:null,seen:{},ask:null,vr:null,role:null,msg:"",pos:{},lt:0,ls:"",gl:{}};S.visit=null;if(l)l.leave().catch(()=>{});if(g)g.leave().catch(()=>{});const a=document.getElementById("vask");if(a)a.remove()}
 function visPres(){if(!VZ.lob||!S.me)return;Promise.resolve(VZ.lob.presence({s:S.me.sid,n:String(S.me.name||"").slice(0,20),rq:VZ.rq,an:VZ.an})).catch(()=>{})}
 const visPeers=()=>{try{return VZ.lob?VZ.lob.peers().filter(p=>!p.sameTab&&p.presence&&p.presence.s):[]}catch(e){return[]}};
 function visLob(){if(!VZ.lob||!S.me)return;const P=visPeers(),me=S.me.sid;
@@ -1094,9 +1094,10 @@ function visUI(){const e=document.getElementById("fvisit");if(e&&S.fsel)e.innerH
 function visReq(sid){if(!VZ.lob||VZ.rq)return;VZ.rq={to:sid,id:Math.random().toString(36).slice(2,10)};VZ.msg="";visPres();clearTimeout(VZ.rqT);
 VZ.rqT=setTimeout(()=>{if(VZ.rq&&VZ.rq.to===sid){VZ.rq=null;VZ.msg="친구가 응답하지 않았어요. 잠시 후 다시 해 보세요.";visPres();visUI()}},30000);visUI()}
 function visCancel(){VZ.rq=null;clearTimeout(VZ.rqT);visPres();visUI()}
-function visAskOpen(p){const rq=p.presence.rq;VZ.ask={id:rq.id,n:String(p.presence.n||"친구").slice(0,20),s:p.presence.s};const el=document.createElement("div");el.id="vask";el.className="sndp";
-el.innerHTML=`<div class="sndc" style="text-align:center"><div style="font-size:40px">🏠</div><p style="margin:6px 0 16px;font-size:16px;line-height:1.5"><b>${esc(VZ.ask.n)}</b> 친구가<br>내 방에 놀러오고 싶어해요!</p><div class="row" style="gap:8px"><button class="g" style="flex:1" onclick="visAns(0)">거절</button><button style="flex:1" onclick="visAns(1)">허락</button></div></div>`;document.body.appendChild(el);try{sfx.quiz&&sfx.quiz()}catch(e){}}
-function visAskClose(gone){const a=VZ.ask;if(a)VZ.seen[a.id]=1;VZ.ask=null;const e=document.getElementById("vask");if(e)e.remove();if(gone)visLob()}
+function visAskOpen(p){const rq=p.presence.rq;VZ.ask={id:rq.id,n:String(p.presence.n||"친구").slice(0,20),s:p.presence.s};{const o=document.getElementById("vask");if(o)o.remove()}const el=document.createElement("div");el.id="vask";el.className="sndp";el.style.zIndex=200;
+el.innerHTML=`<div class="sndc" style="text-align:center"><div style="font-size:40px">🏠</div><p style="margin:6px 0 16px;font-size:16px;line-height:1.5"><b>${esc(VZ.ask.n)}</b> ${VZ.ask.s==="teacher"?"":"친구가"}<br>내 방에 놀러오고 싶어해요!</p><div class="row" style="gap:8px"><button class="g" style="flex:1" onclick="visAns(0)">거절</button><button style="flex:1" onclick="visAns(1)">허락</button></div></div>`;document.body.appendChild(el);try{aInit();sfx.quiz&&sfx.quiz()}catch(e){}try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(e){}visTitle(1)}
+function visTitle(on){clearInterval(VZ.tt);if(VZ.t0==null)VZ.t0=document.title;if(!on){document.title=VZ.t0;return}let k=0;VZ.tt=setInterval(()=>{if(!VZ.ask){clearInterval(VZ.tt);document.title=VZ.t0;return}document.title=(k++%2)?VZ.t0:"🏠 놀러가기 요청!"},800)}
+function visAskClose(gone){const a=VZ.ask;if(a)VZ.seen[a.id]=1;VZ.ask=null;visTitle(0);const e=document.getElementById("vask");if(e)e.remove();if(gone)visLob()}
 function visAns(y){const a=VZ.ask;if(!a)return;VZ.an={id:a.id,y:y?1:0};visAskClose();visPres();if(y)visHostJoin();setTimeout(()=>visLob(),50)}
 async function visHostJoin(){if(VZ.vr&&VZ.role==="host")return;if(VZ.vr){try{VZ.vr.leave()}catch(e){}VZ.vr=null}
 try{const g=await ROOM.join("vr"+visNm(S.me.cls)+"-"+visNm(S.me.sid));VZ.vr=g;VZ.role="host";VZ.gl={};g.onPeers(visVrChange);VZ.ls="";visSync(1)}catch(e){}}
