@@ -578,7 +578,7 @@ return `<div class="card"><h2>${esc(sel.name)} 토벌하기 문제 설정</h2><p
 <b style="font-size:14px">연산과 수</b><div>${QOPS.map((o,i)=>qOpCard(o,i,ops.includes(o),(c.opc&&c.opc[o])||qLegacy(o,nums))).join("")}</div>
 <b style="font-size:14px">출제 방식</b><div>${rd("basic","기본 문제만")}${rd("custom","맞춤 문제만")}${rd("mix","기본 + 맞춤 섞기")}</div>
 <div id="qmsg" class="err" style="min-height:22px"></div><button onclick="saveQ()">설정 저장</button></div>
-<div class="card"><h2>맞춤 문제 (교육과정·문제 파일)</h2><p class="mu">교육과정(성취기준·단원)이나 문제 파일을 넣으면 Claude가 학년·단원·난이도를 분석해서 그 범위에 맞는 새 문제를 만들어요. txt, csv, md, json 파일을 올리거나 내용을 붙여 넣어 주세요. PDF·워드 파일은 내용을 복사해서 붙여 넣어 주세요.</p>
+<div class="card"><h2>맞춤 문제 (교육과정·문제 파일)</h2><p class="mu">교육과정(성취기준·단원)이나 문제 파일을 넣으면 Claude가 학년·단원·난이도를 분석해서 그 범위에 맞는 새 문제를 만들어요. txt, csv, md, json 파일을 올리거나 내용을 붙여 넣어 주세요. Claude가 만들어 준 문제 파일(.json)을 올리면 분석 없이 그대로 가져와요. PDF·워드 파일은 내용을 복사해서 붙여 넣어 주세요.</p>
 <input type="file" id="qf" accept=".txt,.csv,.tsv,.md,.json,text/*" onchange="readQF(this)" style="padding:8px">
 <textarea id="qt" rows="6" placeholder="예: 5학년 수학 – 분수의 덧셈과 뺄셈, 약분과 통분 …"></textarea>
 <div id="qmsg2" class="err" style="min-height:22px"></div><button id="qgen" onclick="genQ()">분석해서 문제 만들기</button>
@@ -603,6 +603,9 @@ function qPrompt(t){return `당신은 초·중·고 수업용 퀴즈 출제 도�
 ${t}`}
 async function genQ(){const sel=S.tcls.find(c=>c.code===S.tsel);if(!sel)return;const txt=document.getElementById("qt").value.trim();
 if(txt.length<8)return qMsg("qmsg2","교육과정이나 문제 내용을 넣어 주세요.",1);
+{let J=null;try{J=JSON.parse(txt)}catch(e){}const ar=J&&(Array.isArray(J)?J:Array.isArray(J.questions)?J.questions:null);if(ar){const qs=ar.map(cleanQ).filter(Boolean).slice(0,300);if(!qs.length)return qMsg("qmsg2","문제 파일에서 문제를 찾지 못했어요.",1);
+const old=sel.qcfg||{},qcfg={...old,custom:qs,summary:String((J&&J.summary)||"파일에서 가져온 문제").slice(0,300),src:old.src&&old.src!=="basic"?old.src:"custom"};
+try{await db.doc("classes/"+sel.code).update({qcfg});sel.qcfg=qcfg;teacher();qMsg("qmsg2","✅ 문제 "+qs.length+"개를 가져왔어요.")}catch(e){qMsg("qmsg2","저장하지 못했어요. 다시 시도해 주세요.",1)}return}}
 const btn=document.getElementById("qgen");btn.disabled=true;qMsg("qmsg2","분석하는 중이에요. 잠시만 기다려 주세요…");
 try{const sample=await claude.use("sample");if(!sample)throw{code:"none"};
 const r=await sample.json(qPrompt(txt.slice(0,12000)),{cache:false}),qs=((r&&r.questions)||[]).map(cleanQ).filter(Boolean).slice(0,40);
