@@ -946,7 +946,7 @@ function floorCol(o,x,y){return o.pat==="plank"?(y%2?o.c1:o.c2):o.pat==="plain"?
 function rFloorThumb(id){if(rWT[id])return rWT[id];const o=FLD[id],cv=document.createElement("canvas");cv.width=cv.height=192;const c=cv.getContext("2d"),R={c,s:1.24,ox:96,oy:44};for(let x=0;x<3;x++)for(let y=0;y<3;y++)rPoly(R,[[x,y,0],[x+1,y,0],[x+1,y+1,0],[x,y+1,0]],floorCol(o,x,y),.6);rPoly(R,[[0,3,0],[3,3,0],[3,0,0],[3,0,-.3],[3,3,-.3],[0,3,-.3]],shd(o.c1,.7),1.2);return rWT[id]=cv.toDataURL()}
 // ---- 화면 ----
 let RM=null;
-function tRoom(){const r=rCfg(),ed=RM&&RM.ed,m=S.me;let pal="";
+function tRoom(){bgmStart("room");const r=rCfg(),ed=RM&&RM.ed,m=S.me;let pal="";
 if(ed){const have0=FDEF.filter(f=>fqOf(f.id)>0),cty=f=>FT[f.t].cat||f.t,cts=Object.keys(FTN).filter(k=>have0.some(f=>cty(f)===k)),pt=cts.includes(RM.pty)?RM.pty:"all",have=pt==="all"?have0:have0.filter(f=>cty(f)===pt);
 pal=`<p class="mu" style="margin:8px 0 4px">${RM.sel!=null?"옮길 칸을 누르세요.":RM.pick?`<b>${FD[RM.pick].n}</b>을(를) 놓을 칸을 눌러요.`:"가구를 골라 바닥을 누르면 놓여요. 놓인 가구를 누르면 옮기거나 돌릴 수 있어요."}</p>
 ${RM.sel==null&&r.f.length?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px"><button class="g" style="${RM.clr?"background:#e5484d;color:#fff;border-color:#e5484d":""}" onclick="rClearAll()">${RM.clr?"정말 모두 넣어 둘까요?":"📦 모두 넣어 두기"}</button>${RM.clr?`<button class="g" onclick="RM.clr=0;tRoom()">취소</button>`:""}</div>`:""}
@@ -1116,7 +1116,7 @@ const sv=S.me,sw=RW,sd=RD,svR=RM;let r;try{RM=null;S.me={...x,fq:x.fq||{},items:
 if(VZ.vr){const o=VZ.vr;VZ.vr=null;VZ.role=null;o.leave().catch(()=>{})}
 let g;try{g=await ROOM.join("vr"+visNm(S.me.cls)+"-"+visNm(sid))}catch(e){VZ.msg="친구 방에 들어가지 못했어요.";return visUI()}
 VZ.vr=g;VZ.role="guest";VZ.pos={};VZ.ls="";S.visit={sid,n:String(x.name||"친구"),r};if(S.tab!=="friend"){S.fsel=sid;goTab("friend")}else tVisit()}
-function tVisit(){const v=S.visit;if(!v)return tFriend();const r=v.r;
+function tVisit(){const v=S.visit;if(!v)return tFriend();bgmStart("room");const r=v.r;
 tb.innerHTML=`<div class="card" style="padding:10px"><div class="row" style="margin-bottom:6px"><b>🏠 ${esc(v.n)}의 방에 놀러왔어요</b><button class="g" onclick="visLeave()">← 돌아가기</button></div>
 <div class="rmw"><canvas id="roomc" width="1120" height="760"></canvas><div id="rmsg" class="rmsg"></div></div><p class="mu" style="margin:8px 0 0">친구의 방은 구경만 할 수 있어요. 의자·소파·침대를 누르면 앉을 수 있어요.</p></div>`;
 const cv=document.getElementById("roomc");if(!RM||!RM.vis||!RM.run){const run=!!(RM&&RM.run);RW=r.w;RD=r.d;RM={ed:false,x:RW/2+.5,y:RD-1.5,fx:1,hold:null,keys:{},t:0,run:true,sel:null,pick:null,vis:v};if(!run)requestAnimationFrame(rLoop)}
@@ -1130,7 +1130,7 @@ return ps.map(p=>{const q=p.presence,o=VZ.pos[p.peer]||(VZ.pos[p.peer]={x:+q.x||
 let RCK="";
 function rCharO(R,o){const sv={x:RM.x,y:RM.y,dir:RM.dir,seat:RM.seat,sz:RM.sz,hop:RM.hop,mv:RM.mv};try{RM.x=o.x;RM.y=o.y;RM.dir=o.d;RM.seat=o.z>0?{i:-1}:null;RM.sz=o.z;RM.hop=null;RM.mv=o.mv&&!(o.z>0);RCK=String(o.ck||"c1").split("|").slice(0,2).join("|");rChar(R)}finally{RCK="";Object.assign(RM,sv)}
 const c=R.c,p=rP(R,o.x,o.y,o.z);c.save();c.font=`800 ${Math.round(12*R.s)}px sans-serif`;c.textAlign="center";c.lineWidth=3.5*R.s/1.4;c.strokeStyle="rgba(255,255,255,.95)";c.fillStyle="#3b2a6b";const ty=p[1]-54*R.s;c.strokeText(o.n,p[0],ty);c.fillText(o.n,p[0],ty);c.restore()}
-async function tFriend(){if(S.visit)return tVisit();if(S.fsel)return tFriendOne(S.fsel);tb.innerHTML='<div class="card"><h2>👫 친구</h2><p class="mu">불러오는 중…</p></div>';
+async function tFriend(){if(S.visit)return tVisit();bgmOff(["room"]);if(S.fsel)return tFriendOne(S.fsel);tb.innerHTML='<div class="card"><h2>👫 친구</h2><p class="mu">불러오는 중…</p></div>';
 let l=[];try{const q=await db.collection("students").where("cls","==",S.me.cls).get();l=q.docs.map(d=>d.data()).filter(x=>x.sid!==S.me.sid)}catch(e){}if(S.tab!=="friend"||S.fsel)return;S.flist=l;
 l.sort((a,b)=>(a.sid==="teacher"?0:1)-(b.sid==="teacher"?0:1)||String(a.name).localeCompare(String(b.name),"ko"));
 tb.innerHTML=`<div class="card"><h2>👫 친구</h2><p class="mu">친구를 누르면 캐릭터와 방을 볼 수 있어요.</p>${l.length?`<div class="fgrid">${l.map(x=>{const q=x.equip||{},bg=q.bg&&item(q.bg);return `<button class="g fcard" onclick="S.fsel='${esc(x.sid)}';tFriend()"><div class="fav" style="background:${bg?bg.e:"var(--bd)"}">${charHTML(x.char,q.hat,0,q.tool)}</div><b>${x.sid==="teacher"?"👩‍🏫 ":""}${esc(x.name)}</b><small>⭐ ${(+x.points||0).toLocaleString("ko-KR")}</small></button>`}).join("")}</div>`:'<p class="mu">아직 같은 반 친구가 없어요.</p>'}</div>`}
@@ -1884,9 +1884,9 @@ const BMEL=[[[0,74,4],[4,69,2],[6,74,2],[8,77,4],[12,76,2],[14,74,2]],[[0,77,6],
 [[0,74,4],[4,69,2],[6,74,2],[8,77,4],[12,79,2],[14,81,2]],[[0,82,6],[6,81,2],[8,79,4],[12,77,4]],[[0,79,4],[4,77,2],[6,74,2],[8,70,4],[12,74,4]],[[0,73,8],[8,76,4],[12,69,4]],
 [[0,74,2],[2,77,2],[4,82,8],[12,81,4]],[[0,79,4],[4,76,4],[8,84,8]],[[0,81,6],[6,77,2],[8,74,4],[12,77,4]],[[0,81,12]],
 [[0,82,4],[4,81,4],[8,79,4],[12,77,4]],[[0,76,4],[4,79,4],[8,84,8]],[[0,85,8],[8,81,8]],[[0,81,12]]];
-function bgmStart(md){const A=SND,c=aInit();if(!c)return;md=md||'cook';if(A.bgOn&&A.mode===md)return;A.mode=md;A.bgOn=true;A.bs=0;A.bt=c.currentTime+.2;A.bpm=md==='weed'?82:md==='mon'?150:md==='duel'?140:(K&&K.th&&K.th.bpm)||124;clearInterval(A.bti);A.bti=setInterval(bgmTick,30)}
+function bgmStart(md){const A=SND,c=aInit();if(!c)return;md=md||'cook';if(A.bgOn&&A.mode===md)return;A.mode=md;A.bgOn=true;A.bs=0;A.bt=c.currentTime+.2;A.bpm=md==='room'?72:md==='weed'?82:md==='mon'?150:md==='duel'?140:(K&&K.th&&K.th.bpm)||124;clearInterval(A.bti);A.bti=setInterval(bgmTick,30)}
 function bgmStop(){const A=SND;A.bgOn=false;clearInterval(A.bti);A.bti=null}
-function bgmTick(){const A=SND,c=A.ctx;if(!c||!A.bgOn)return;const sd=60/A.bpm/4;if(A.bt<c.currentTime-.2)A.bt=c.currentTime+.05;while(A.bt<c.currentTime+.2){(A.mode==='weed'?bgmStepW:A.mode==='mon'?bgmStepM:A.mode==='duel'?bgmStepD:bgmStep)(A.bs%256,A.bt,sd);A.bs++;A.bt+=sd}}
+function bgmTick(){const A=SND,c=A.ctx;if(!c||!A.bgOn)return;const sd=60/A.bpm/4;if(A.bt<c.currentTime-.2)A.bt=c.currentTime+.05;while(A.bt<c.currentTime+.2){(A.mode==='room'?bgmStepR:A.mode==='weed'?bgmStepW:A.mode==='mon'?bgmStepM:A.mode==='duel'?bgmStepD:bgmStep)(A.bs%256,A.bt,sd);A.bs++;A.bt+=sd}}
 function bgmStep(s,t,sd){const A=SND;if(A.vol.bgm<=0)return;const B=A.bg,bar=Math.floor(s/16),p=s%16,ch=BCH[BPROG[bar]],secB=bar>=8;
 if(p===0){for(const m of ch.n)for(const dt of[-9,9])aT({w:"sawtooth",f:mf(m),det:dt,t,d:sd*16,v:.026,a:.3,hold:1,sl:.9,r:.4,lp:1300,dst:B,rv:1});aT({w:"sawtooth",f:mf(ch.r+12),t,d:sd*16,v:.035,a:.25,hold:1,r:.35,lp:600,dst:B,rv:1});if(bar%8===0)aN({ft:"highpass",f:5000,t,d:1.8,v:.1,dst:B,rv:1})}
 if(p===0||(p===8&&secB)||(p===10&&bar%2===1)){const f=mf(ch.r+12);aT({f:f*1.35,f2:f,sd:.06,t,d:.9,v:p===0?.36:.22,dst:B,rv:1});aN({ft:"lowpass",f:500,t,d:.12,v:.14,dst:B})}
@@ -1934,6 +1934,19 @@ if(p%2===0)aN({ft:"highpass",f:7000,t,d:.035,v:.018,dst:B});
 if(bar%4===3&&p>=12){const f=mf(ch.r+12);aT({f:f*1.3,f2:f,sd:.04,t,d:.2,v:.1+.05*(p-12),dst:B,rv:1})}
 for(const n of DMEL[bar])if(n[0]===p){const f=mf(n[1]),d=Math.max(sd*n[2]-.03,.1);aT({w:"sawtooth",f,t,d,v:.066,a:.02,hold:1,sl:.8,r:.12,lp:950,lp2:2600,vib:4.5,dst:B,rv:1});aT({w:"square",f:f/2,t,d,v:.018,a:.02,hold:1,r:.12,lp:1200,dst:B})}}
 function bgmOff(ms){if(SND.bgOn&&ms.includes(SND.mode))bgmStop()}
+// 방꾸미기 BGM: C장조, 제초와 같은 악기 구성으로 더 느리고 잔잔하게
+const RCH={C:{r:36,n:[52,55,60]},Am:{r:45,n:[52,57,60]},F:{r:41,n:[53,57,60]},G:{r:43,n:[50,55,59]},Em:{r:40,n:[52,55,59]}};
+const RPROG=["C","G","Am","Em","F","C","F","G","C","G","Am","Em","F","G","C","C"];
+const RMEL=[[[0,76,4],[4,79,4],[8,84,6],[14,83,2]],[[0,79,8],[8,74,4],[12,76,4]],[[0,72,4],[4,76,4],[8,81,8]],[[0,79,6],[6,76,2],[8,71,8]],[[0,72,4],[4,77,4],[8,81,4],[12,79,4]],[[0,76,8],[8,72,8]],[[0,74,4],[4,77,4],[8,81,6],[14,79,2]],[[0,79,12]],[[0,84,4],[4,83,2],[6,79,2],[8,76,8]],[[0,74,4],[4,79,4],[8,83,8]],[[0,81,4],[4,79,4],[8,76,4],[12,72,4]],[[0,71,8],[8,76,8]],[[0,77,4],[4,81,4],[8,84,8]],[[0,83,4],[4,81,2],[6,79,2],[8,74,8]],[[0,76,4],[4,74,4],[8,72,8]],[[0,72,12]]];
+function bgmStepR(s,t,sd){const A=SND;if(A.vol.bgm<=0)return;const B=A.bg,bar=Math.floor(s/16)%16,p=s%16,ch=RCH[RPROG[bar]],secB=bar>=8;
+if(p===0){for(const m of ch.n)for(const dt of[-6,6])aT({w:"sawtooth",f:mf(m),det:dt,t,d:sd*16,v:.015,a:1.1,hold:1,sl:.9,r:1.1,lp:700,dst:B,rv:1});aT({w:"sawtooth",f:mf(ch.r+12),t,d:sd*16,v:.018,a:.9,hold:1,r:1,lp:380,dst:B,rv:1})}
+if(p===0||p===8)aT({w:"triangle",f:mf(ch.r),t,d:sd*(p===0?7:6),v:.11,a:.03,dst:B});
+if(p%2===0){const pat=[0,1,2,1,2,1,0,1],m=ch.n[pat[p/2]]+12;aT({w:"sawtooth",f:mf(m),t,d:sd*2.2,v:secB?.017:.014,a:.015,lp:950,lp2:340,dst:B,rv:1})}
+if(p%4===2)aT({w:"triangle",f:mf(ch.n[(p/2+bar)%3]+24),t,d:sd*1.5,v:.016,a:.005,dst:B,rv:1});
+if(p===0&&bar%2===0)aT({f:mf(ch.r+24)*1.25,f2:mf(ch.r+24),sd:.1,t,d:1.6,v:.06,dst:B,rv:1});
+if(p%4===2)aN({ft:"highpass",f:7000,t,d:.04,v:.008,dst:B});
+for(const n of RMEL[bar])if(n[0]===p){const f=mf(n[1]),d=Math.max(sd*n[2]-.05,.25);aT({w:"sawtooth",f,t,d,v:.034,a:.12,hold:1,sl:.75,r:.5,lp:650,lp2:1300,vib:2.5,dst:B,rv:1});aT({w:"triangle",f:f*2,t,d,v:.01,a:.12,hold:1,r:.45,dst:B,rv:1})}
+if(secB&&p%8===4)aT({f:mf(ch.n[(bar+p/4)%3]+24),t,d:1.2,v:.018,dst:B,rv:1})}
 // 제초 BGM: F장조, 같은 악기 구성(현악 패드·아르페지오·베이스·멜로디)으로 부드럽게
 const WCH={F:{r:41,n:[53,57,60]},C:{r:36,n:[52,55,60]},Dm:{r:38,n:[50,53,57]},Bb:{r:34,n:[50,53,58]},Gm:{r:43,n:[50,55,58]},Am:{r:45,n:[52,57,60]}};
 const WPROG=["F","C","Dm","Bb","F","C","Bb","C","Dm","Am","Bb","F","Gm","C","F","F"];
@@ -2351,7 +2364,7 @@ tb.innerHTML=`<div id="duroot"><div class="card arena" id="duarena">${G.rv?`<div
 G.pop=null;const a=document.getElementById("dua");if(a)a.focus()}
 function duGiveUp(){const G=DU&&DU.G;if(!G)return;if(!G.arm){G.arm=1;duDraw();return}duExit()}
 
-function goTab(k){if(S.visit&&k!=="friend")visLeave(1);if(DU)duQuit();if(k!=="friend")S.fsel=null;if(CO&&!(B&&document.getElementById("barena")))coQuitAll();if(B&&document.getElementById("barena")&&["ask","pick","anim","dying"].includes(B.st))return leaveAsk(k);bgmOff(['mon','duel']);S.tab=k;render();coinSync(true)}
+function goTab(k){if(S.visit&&k!=="friend")visLeave(1);if(DU)duQuit();if(k!=="friend")S.fsel=null;if(CO&&!(B&&document.getElementById("barena")))coQuitAll();if(B&&document.getElementById("barena")&&["ask","pick","anim","dying"].includes(B.st))return leaveAsk(k);bgmOff(['mon','duel']);if(k!=='room')bgmOff(['room']);S.tab=k;render();coinSync(true)}
 function leaveAsk(k){if(document.getElementById("lvp"))return;const el=document.createElement("div");el.id="lvp";el.className="sndp";el.innerHTML=`<div class="sndc" style="text-align:center"><div style="font-size:40px">🌀</div><p style="margin:6px 0 16px;font-size:16px;line-height:1.5"><b>이탈하시겠습니까?</b><br>이탈 시 순간이동 비용 5원을 지불합니다</p><div class="row" style="gap:8px"><button class="g" style="flex:1" onclick="document.getElementById('lvp').remove()">취소</button><button style="flex:1" onclick="leaveGo('${k}')">확인</button></div></div>`;document.body.appendChild(el)}
 async function leaveGo(k){bgmOff(['mon','duel']);const el=document.getElementById("lvp");if(el)el.remove();B=null;S.me.coins=Math.max(0,(S.me.coins||0)-5);S.tab=k;render();try{await db.doc("students/"+S.me.cls+"_"+S.me.sid).update({coins:S.me.coins})}catch(e){}}
 async function endB(w){B.st=w?"win":"lose";const p=w?5:1,cn=w?30:2;B.res=`점수 +${p}${cn?`, 원 +${cn}`:""}`;S.me.points+=p;S.me.coins+=cn;drawB();
