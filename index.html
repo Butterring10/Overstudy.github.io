@@ -1071,7 +1071,7 @@ if(hexOk(ct.bg)){document.body.style.background=ct.bg;document.documentElement.s
 // ===== 친구 방 놀러가기 (허락을 받아야 입장) =====
 let VZ={lob:null,cls:null,joining:false,rq:null,rqT:0,an:null,seen:{},ask:null,vr:null,role:null,msg:"",pos:{},lt:0,ls:"",gl:{}};
 const visNm=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"");
-async function visInit(){const m=S.me;if(!m||S.isT||!m.sid||VZ.joining)return;if(VZ.lob&&VZ.cls===m.cls&&VZ.sid===m.sid)return;if(VZ.lob)visQuit();VZ.joining=true;
+async function visInit(){const m=S.me;if(!m||!m.sid||VZ.joining)return;if(VZ.lob&&VZ.cls===m.cls&&VZ.sid===m.sid)return;if(VZ.lob)visQuit();VZ.joining=true;
 try{ROOM=ROOM||await Promise.race([claude.use("room"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){ROOM=null}
 try{if(ROOM){const l=await ROOM.join("vis"+visNm(m.cls));if(!S.me||S.me.sid!==m.sid||S.view!=="class"){l.leave().catch(()=>{})}else{VZ.lob=l;VZ.cls=m.cls;VZ.sid=m.sid;l.onPeers(()=>visLob());visPres()}}}catch(e){}
 VZ.joining=false;visUI()}
@@ -1086,7 +1086,7 @@ if(!h){VZ.rq=null;clearTimeout(VZ.rqT);VZ.msg="친구가 접속을 끊었어요.
 else if(h.presence.an&&h.presence.an.id===VZ.rq.id){const ok=h.presence.an.y,to=VZ.rq.to;VZ.rq=null;clearTimeout(VZ.rqT);visPres();if(ok){visGo(to);return}VZ.msg="친구가 이번에는 거절했어요."}}
 visUI()}
 function visBtnHTML(sid){const on=visPeers().some(p=>p.presence.s===sid),m=VZ.msg?`<p class="mu" style="margin:6px 0 0">${esc(VZ.msg)}</p>`:"";
-if(!VZ.lob)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">${VZ.joining?"연결하는 중…":"지금은 실시간 연결을 할 수 없어요."}</p>`;
+if(!VZ.lob)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">${VZ.joining?"연결하는 중…":`연결이 끊겼어요. <a href="#" onclick="visInit();visUI();return false">다시 연결하기</a>`}</p>`;
 if(VZ.rq&&VZ.rq.to===sid)return `<p style="margin:0 0 8px"><b>💌 친구의 허락을 기다리는 중…</b></p><button class="g" style="width:100%" onclick="visCancel()">요청 취소</button>`;
 if(!on)return `<button disabled style="width:100%">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">친구가 접속해 있을 때 놀러갈 수 있어요.</p>${m}`;
 return `<button style="width:100%" ${VZ.rq?"disabled":""} onclick="visReq('${esc(sid)}')">🏠 놀러가기</button><p class="mu" style="margin:6px 0 0">친구가 허락하면 방에 들어갈 수 있어요.</p>${m}`}
