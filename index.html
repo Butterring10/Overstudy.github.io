@@ -2272,17 +2272,97 @@ let DU=null;const DU_HP=5,DU_QT=30,DU_PT=15;
 function battleMenu(){duQuit();B=null;bgmOff(['mon','duel']);const k=Object.keys(MON.normal)[0],mi=MON.normal[k];
 tb.innerHTML=`<div class="card"><h2>⚔️ 토벌하기</h2><p class="mu">무엇을 할까요?</p><div class="grid" style="grid-template-columns:1fr 1fr"><button class="ckbig" onclick="startBattle()"><span><img alt="" src="${mi.src}" style="height:48px;width:auto"></span>몬스터 토벌<small>몬스터와 싸워요</small></button><button class="ckbig" onclick="duEnter()"><span>${modeImg(1)}</span>대결하기<small>반 친구와 1:1 대결</small></button></div></div><button class="g" onclick="tGame()">← 게임 목록</button>`}
 const chH=(k,fl)=>{const[cid,hid,tid]=String(k||"").split("|");return `<span style="display:inline-block${fl?";transform:scaleX(-1)":""}">${CHARS.find(x=>x.id===cid)?charHTML(cid,hid||"",0,tid||""):"🧑"}</span>`};
-function duQuit(){const d=DU;if(!d)return;DU=null;["tq","tp","ti","ta","rt","tw"].forEach(k=>{clearTimeout(d[k]);clearInterval(d[k])});try{d.un&&d.un()}catch(e){}try{d.ung&&d.ung()}catch(e){}if(d.g)d.g.leave().catch(()=>{});if(d.lob)d.lob.leave().catch(()=>{})}
+function duQuit(){const d=DU;if(!d)return;tmQuit();DU=null;["tq","tp","ti","ta","rt","tw"].forEach(k=>{clearTimeout(d[k]);clearInterval(d[k])});try{d.un&&d.un()}catch(e){}try{d.ung&&d.ung()}catch(e){}if(d.g)d.g.leave().catch(()=>{});if(d.lob)d.lob.leave().catch(()=>{})}
 function duExit(){duQuit();battleMenu()}
+// ===== 2:2 팀 대결 (방장이 진행, 나머지는 위치·답·행동만 보냄) =====
+let TM=null;const TM_HP=5;
+const tmPeers=()=>{try{return TM&&TM.g?TM.g.peers().filter(p=>p.presence&&p.presence.n):[]}catch(e){return[]}};
+const tmHostP=()=>tmPeers().find(p=>p.presence.H);
+function tmQuit(){const t=TM;if(!t)return;TM=null;["tq","tp","ta","tn"].forEach(k=>{clearTimeout(t[k]);clearInterval(t[k])});try{t.un&&t.un()}catch(e){}if(t.g)t.g.leave().catch(()=>{});if(DU)duPres()}
+function tmBack(){tmQuit();if(DU)duDraw()}
+async function tmJoin(id,host){const d=DU;if(!d||d.g||TM||d.joining)return;if(!host){const p=duPeers().find(x=>x.presence.tr&&x.presence.tr.id===id);if(!p||p.presence.tr.c>=4){d.msg="방이 가득 찼거나 없어졌어요.";return duDraw()}}
+d.joining=true;let g;try{g=await ROOM.join(id)}catch(e){d.joining=false;d.msg="팀 대결방에 들어가지 못했어요.";return duDraw()}d.joining=false;if(DU!==d){g.leave().catch(()=>{});return}
+TM={id,g,host,me:myPeer(g),want:null,an:null,a:null,r:0,H:null,v:{log:"",fx:{},pop:null,hp:null},anim:false,seenR:0};
+if(host){TM.H={st:"lobby",tm:{},nm:{},r:0,ph:"",hp:{},ord:[],rs:null,q:null}}
+TM.un=g.onPeers(()=>tmChange());tmPres();duPres();tmDraw();clearInterval(TM.tn);TM.tn=setInterval(()=>{if(TM){if(TM.host)tmHostStep();tmChange(1)}},1000)}
+function tmCreate(){if(!DU||DU.g||TM)return;tmJoin(("tm"+visNm(S.me.cls)+"-"+Math.random().toString(36).slice(2,8)).slice(0,40),true)}
+function tmPres(){const t=TM;if(!t)return;const o={n:String(S.me.name||"").slice(0,20),ch:chKey(),w:t.want,r:t.r,an:t.an,a:t.a};if(t.host)o.H=t.H;Promise.resolve(t.g.presence(o)).catch(()=>{})}
+function tmWant(w){const t=TM;if(!t||(t.H&&t.H.st&&t.H.st!=="lobby"))return;t.want=w;tmPres();if(t.host)tmHostStep();tmDraw()}
+// ---- 방장 진행 ----
+function tmAlive(H,team){return Object.keys(H.tm).filter(p=>H.tm[p]===team&&H.hp[p]>0)}
+function tmMine(){const t=TM;return{peer:t.me,r:t.r,an:t.an,a:t.a,w:t.want,n:S.me.name,ch:chKey()}}
+function tmAll(){const t=TM,L=tmPeers().filter(p=>!p.sameTab).map(p=>({peer:p.peer,...p.presence}));L.push(tmMine());return L}
+function tmHostStep(){const t=TM;if(!t||!t.host)return;const H=t.H,L=tmAll(),by={};L.forEach(x=>by[x.peer]=x);
+if(H.st==="lobby"){const nm={};L.forEach(x=>nm[x.peer]={n:String(x.n||"").slice(0,20),ch:x.ch||""});if(JSON.stringify(nm)!==JSON.stringify(H.nm)){H.nm=nm;tmPres()}if(t.lc!==L.length){t.lc=L.length;duPres()}return}
+if(H.st!=="play"||t.anim)return;
+for(const p of Object.keys(H.tm))if(!by[p]&&H.hp[p]>0){H.hp[p]=0}
+const win=["A","B"].find(T=>!tmAlive(H,T==="A"?"B":"A").length);if(win&&H.ph!=="rs")return tmEnd(win);
+const alive=Object.keys(H.tm).filter(p=>H.hp[p]>0);
+if(H.ph==="q"){const got=alive.every(p=>by[p]&&by[p].r===H.r&&by[p].an)||Date.now()-H.t0>DU_QT*1000+1500;if(!got)return;
+const an=p=>(by[p]&&by[p].r===H.r&&by[p].an)||{ok:false,t:DU_QT*1000};if(alive.every(p=>!an(p).ok)){H.ph="rs";H.rs={ev:[{a:"skip"}],hp:{...H.hp}};tmPres();return tmPlay()}
+H.ord=alive.slice().sort((x,y)=>((an(x).ok?0:1e7)+an(x).t)-((an(y).ok?0:1e7)+an(y).t));H.ph="pick";H.tp0=Date.now();t.pt0=Date.now();tmPres();return tmDraw()}
+if(H.ph==="pick"){const got=alive.every(p=>by[p]&&by[p].r===H.r&&by[p].a)||Date.now()-H.tp0>DU_PT*1000+1500;if(!got)return;
+const act=p=>(by[p]&&by[p].r===H.r&&by[p].a)||{k:"def"},hp={...H.hp},ev=[];let end=null;
+for(const p of H.ord){if(end)break;if(hp[p]<=0)continue;const a=act(p);if(a.k!=="atk"){ev.push({k:p,a:"def"});continue}
+const en=H.tm[p]==="A"?"B":"A",cand=Object.keys(H.tm).filter(x=>H.tm[x]===en&&hp[x]>0);if(!cand.length)break;const tg=cand.includes(a.tg)?a.tg:cand.sort((x,y)=>hp[x]-hp[y])[0];
+const cr=Math.random()<CRIT,df=act(tg).k!=="atk",dm=(df?.5:1)*(cr?2:1);hp[tg]=Math.max(0,hp[tg]-dm);ev.push({k:p,a:"atk",t:tg,dm,cr,df,ko:hp[tg]<=0});
+if(!Object.keys(H.tm).some(x=>H.tm[x]===en&&hp[x]>0))end=H.tm[p]}
+H.ph="rs";H.rs={ev,hp,end};tmPres();tmPlay()}}
+function tmStart(){const t=TM;if(!t||!t.host)return;const H=t.H,L=tmAll(),A=L.filter(x=>x.w==="A"),B=L.filter(x=>x.w==="B");if(L.length!==4||A.length!==2||B.length!==2)return;
+H.st="play";t.lc=-1;duPres();H.tm={};H.hp={};L.forEach(x=>{H.tm[x.peer]=x.w;H.hp[x.peer]=TM_HP;H.nm[x.peer]={n:String(x.n||"").slice(0,20),ch:x.ch||""}});H.r=0;tmRound()}
+function tmRound(){const t=TM,H=t.H;H.r++;H.q=mkQ();H.ph="q";H.t0=Date.now();H.rs=null;H.ord=[];tmPres();tmLocalRound()}
+function tmEnd(win){const t=TM,H=t.H;H.st="end";H.win=win;H.ph="end";tmPres();tmFinish()}
+// ---- 모두: 상태 받기 ----
+function tmChange(tick){const t=TM;if(!t)return;
+if(!t.host){const hp=tmHostP();if(!hp){if(t.H&&t.H.st!=="end"&&!t.done){t.done=1;t.H={...t.H,st:"end",ph:"end",gone:1};tmDraw()}else if(!t.H){t.wait=(t.wait||0)+1;if(t.wait>12){t.H={st:"end",ph:"end",gone:1};tmDraw()}}return}
+const H=hp.presence.H;if(!H)return;const prev=t.H;t.H=H;t.hpeer=hp.peer;
+if(H.st==="play"&&H.r!==t.r&&H.ph==="q"&&!t.anim){tmLocalRound();return}
+if(H.st==="play"&&H.ph==="pick"&&prev&&prev.ph!=="pick")t.pt0=Date.now();
+if(H.st==="play"&&H.ph==="rs"&&H.rs&&t.seenR!==H.r&&!t.anim){tmPlay();return}
+if(H.st==="end"&&!t.paid){tmFinish();return}
+tmMaybe();return}
+tmHostStep();tmMaybe()}
+function tmSig(){const t=TM,H=t.H||{};let x=[H.st,H.ph,H.r,JSON.stringify(H.nm||{}),!!t.an,!!t.a,t.want,JSON.stringify(H.hp||{})];if(H.st==="lobby"||!H.st){const L=t.host?tmAll():tmPeers().map(p=>({peer:p.peer,...p.presence}));x.push(L.map(p=>p.peer+(p.w||"")+(p.n||"")).sort().join())}return x.join("|")}
+function tmMaybe(){const t=TM;if(!t||t.anim)return;const g=tmSig();if(g!==t.sig)tmDraw();else{const e=document.getElementById("tmt"),H=t.H;if(e&&H){const lim=H.ph==="q"?DU_QT*1000-(Date.now()-(t.qt0||0)):DU_PT*1000-(Date.now()-(t.pt0||0));e.textContent=Math.max(0,Math.ceil(lim/1000))+"초"}}}
+function tmLocalRound(){const t=TM,H=t.H;t.r=H.r;t.an=null;t.a=null;t.sel=null;t.v={log:`${H.r}번째 문제! 빨리 맞힐수록 먼저 움직여요.`,fx:{},pop:null,hp:null};t.qt0=Date.now();tmPres();tmDraw();
+clearTimeout(t.tq);t.tq=setTimeout(()=>{if(TM===t&&!t.an&&t.H.ph==="q"&&t.H.r===t.r)tmAnsV(null)},DU_QT*1000)}
+function tmAnsI(i){const t=TM;if(!t||t.an||!t.H||t.H.ph!=="q")return;tmAnsV(t.H.q.opts[i])}
+function tmAnsT(){const e=document.getElementById("tma");const v=e&&e.value.trim();if(v)tmAnsV(v)}
+function tmAnsV(v){const t=TM;if(!t||t.an)return;const H=t.H;t.an={ok:v!=null&&same(v,H.q.ans),t:v==null?DU_QT*1000:Date.now()-t.qt0};t.v.log=t.an.ok?"정답! 친구들을 기다려요…":`오답! (정답 ${H.q.ans})`;tmPres();if(t.host)tmHostStep();tmDraw()}
+function tmPick(k,tg){const t=TM;if(!t||t.a||!t.H||t.H.ph!=="pick"||!(t.H.hp[t.me]>0))return;t.a={k:k==="atk"?"atk":"def",tg:tg||null};tmPres();if(t.host)tmHostStep();tmDraw()}
+function tmPlay(){const t=TM,H=t.H,rs=H.rs;if(!rs||t.anim)return;t.anim=true;t.seenR=H.r;const nm=p=>(H.nm[p]||{}).n||"친구",hp={...(t.v.hp||H.hp)};t.v.hp=hp;const q=[];
+if(rs.ev.length===1&&rs.ev[0].a==="skip")q.push([1400,()=>{t.v.log="😵 모두 틀렸어요! 다음 문제로 넘어가요."}]);
+rs.ev.forEach(e=>{if(e.a==="def")q.push([650,()=>{t.v.fx={[e.k]:"du-def"};t.v.pop=null;t.v.log=`🛡️ ${nm(e.k)} 방어 자세!`}]);
+else if(e.a==="atk"){q.push([750,()=>{t.v.fx={[e.k]:"du-atk"};t.v.pop=null;t.v.log=`⚔️ ${nm(e.k)} → ${nm(e.t)} 공격!`;try{sfx.pick()}catch(x){}}]);
+q.push([300,()=>{hp[e.t]=Math.max(0,hp[e.t]-e.dm);t.v.fx={[e.t]:"phit"};t.v.pop={p:e.t,t:(e.cr?"CRIT! ":"")+"-"+e.dm};t.v.log=(e.cr?"💥 크리티컬! ":"")+(e.df?`${nm(e.t)}이(가) 막았어요`:`${nm(e.t)}에게 명중!`)+` (-${e.dm})`+(e.ko?` · ${nm(e.t)} 쓰러짐!`:"")}])}});
+q.push([900,()=>{t.v.fx={};t.v.pop=null;t.v.hp=null;t.anim=false;if(t.host){H.hp={...rs.hp};if(rs.end)tmEnd(rs.end);else tmRound()}else{t.v.log="다음 문제를 기다려요…";tmChange()}}]);
+let tt=0;q.forEach(([dl,fn])=>{tt+=dl;setTimeout(()=>{if(TM!==t)return;fn();tmDraw()},tt)})}
+async function tmFinish(){const t=TM;if(!t||t.paid)return;t.paid=1;const H=t.H,my=H.tm[t.me];if(!my){return tmDraw()}const win=H.win===my,cn=win?40:15,pt=win?3:1;t.v.log=win?"🏆 우리 팀이 이겼어요!":"상대 팀이 이겼어요.";t.res=`🪙 ${cn}원, ⭐ ${pt}점을 받았어요!`;S.me.coins=(S.me.coins||0)+cn;S.me.points=(S.me.points||0)+pt;tmDraw();
+try{await db.doc("students/"+S.me.cls+"_"+S.me.sid).update({points:S.me.points,coins:S.me.coins})}catch(e){}}
+// ---- 화면 ----
+function tmDraw(){const t=TM;if(!t||!DU)return;t.sig=tmSig();const H=t.H||{st:"lobby",nm:{},tm:{}},el=tb;if(!el)return;
+if(H.st==="lobby"){const L=t.host?tmAll():tmPeers().map(p=>({peer:p.peer,...p.presence})),A=L.filter(x=>x.w==="A"),B=L.filter(x=>x.w==="B"),N=L.filter(x=>!x.w),row=x=>`<div class="row" style="gap:6px;padding:4px 0;justify-content:flex-start"><span style="font-size:26px;line-height:1">${chH(x.ch)}</span><b>${esc(x.n||"")}</b>${x.peer===t.me?' <small class="mu">(나)</small>':""}</div>`,col=(T,l,c)=>`<div style="flex:1;border:2px solid ${c};border-radius:12px;padding:8px;min-width:0"><b style="color:${c}">${T}팀 ${l.length}/2</b>${l.map(row).join("")||'<p class="mu" style="margin:6px 0">비어 있어요</p>'}<button style="width:100%;margin-top:6px" ${t.want===T||l.length>=2?"disabled":""} onclick="tmWant('${T}')">${t.want===T?"✔ 이 팀":"이 팀 하기"}</button></div>`;
+const ok=L.length===4&&A.length===2&&B.length===2;
+el.innerHTML=`<div id="duroot"><div class="card"><h2>👥 2:2 팀 대결방</h2><p class="mu" style="margin:0 0 8px">4명이 모이면 팀을 골라요. 모두 문제를 풀고, 빨리 맞힌 순서대로 상대 팀을 공격하거나 방어해요. 상대 팀 두 명을 모두 쓰러뜨리면 승리!<br>승리 🪙40원·⭐3점 / 패배 🪙15원·⭐1점</p><p class="mu" style="margin:0 0 8px">참가 ${L.length}/4명</p><div class="row" style="gap:8px;align-items:stretch">${col("A",A,"#e5484d")}${col("B",B,"#3a7be0")}</div>${N.length?`<p class="mu" style="margin:8px 0 0">팀 고르는 중: ${N.map(x=>esc(x.n||"")).join(", ")}</p>`:""}
+${t.host?`<button style="width:100%;margin-top:10px" ${ok?"":"disabled"} onclick="tmStart()">${ok?"⚔️ 대결 시작!":"4명이 2명씩 팀을 고르면 시작할 수 있어요"}</button>`:'<p class="mu" style="margin:10px 0 0;text-align:center">방장이 시작하길 기다려요…</p>'}</div><button class="g" onclick="tmBack()">← 나가기</button></div>`;return}
+const nm=p=>(H.nm[p]||{}).n||"친구",hp=t.v.hp||H.hp||{},me=t.me,myT=(H.tm||{})[me],alive=p=>(hp[p]||0)>0;
+const side=T=>Object.keys(H.tm).filter(p=>H.tm[p]===T).map(p=>`<div style="text-align:center;position:relative;flex:1;min-width:0${alive(p)?"":";opacity:.4;filter:grayscale(1)"}">${t.v.pop&&t.v.pop.p===p?`<span class="pp${/CRIT/.test(t.v.pop.t)?" cr":""}" style="color:#e5484d">${t.v.pop.t}</span>`:""}<div class="${t.v.fx[p]||""}" style="font-size:44px;line-height:1">${chH((H.nm[p]||{}).ch,T==="B")}</div><b style="font-size:13px">${esc(nm(p))}${p===me?" (나)":""}</b><div style="font-size:12px">${hearts(hp[p]||0,TM_HP,T==="A"?"❤️":"💙")}</div></div>`).join("");
+let body="";
+if(H.st==="end"){body=H.gone?`<h2>대결 종료</h2><p class="mu">방장이 나가서 대결이 끝났어요.</p>`:`<h2>${H.win===myT?"🎉 우리 팀 승리!":"😢 우리 팀 패배"}</h2><p class="mu">${esc(t.res||"")}</p>`;body+=`<button onclick="tmBack()">대결 목록으로</button> <button class="g" onclick="duExit()">토벌 메뉴</button>`}
+else if(H.ph==="q"){body=t.an?`<p style="text-align:center;margin:10px 0">${t.an.ok?"✅ 정답!":"❌ 오답!"} 친구들을 기다려요…</p>`:!alive(me)?'<p class="mu" style="text-align:center">쓰러져서 이번 판은 구경해요 👀</p>':`<p class="mu" style="text-align:center;margin:0">남은 시간 <b id="tmt">${DU_QT}초</b></p><h2 style="text-align:center;font-size:24px;line-height:1.4">${esc(H.q.q)}</h2>`+(H.q.opts?`<div class="grid" style="grid-template-columns:1fr 1fr">${H.q.opts.map((o,i)=>`<button onclick="tmAnsI(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<div class="row" style="gap:8px"><input id="tma" autocomplete="off" style="margin:0;font-size:18px" onkeydown="if(event.key==='Enter')tmAnsT()"><button onclick="tmAnsT()" style="white-space:nowrap">확인</button></div>`)}
+else if(H.ph==="pick"){const k=H.ord.indexOf(me);body=!alive(me)?'<p class="mu" style="text-align:center">쓰러져서 구경 중이에요 👀</p>':t.a?`<p style="text-align:center;margin:10px 0">${t.a.k==="atk"?"⚔️ "+esc(nm(t.a.tg))+" 공격":"🛡️ 방어"} 선택! 친구들을 기다려요…</p>`:
+`<h2 style="text-align:center">${k>=0?(k+1)+"번째로 움직여요":"마지막에 움직여요"}</h2><p class="mu" style="text-align:center;margin:0 0 8px">남은 시간 <b id="tmt">${DU_PT}초</b> (안 고르면 방어)</p><div class="grid" style="grid-template-columns:1fr 1fr">${Object.keys(H.tm).filter(p=>H.tm[p]!==myT&&alive(p)).map(p=>`<button onclick="tmPick('atk','${p}')">⚔️ ${esc(nm(p))} 공격</button>`).join("")}<button class="g" style="grid-column:1/-1" onclick="tmPick('def')">🛡️ 방어</button></div>`}
+else body=`<p class="mu" style="text-align:center;margin:14px 0">…</p>`;
+el.innerHTML=`<div id="duroot"><div class="card arena" id="tmL"><div class="row" style="gap:4px;align-items:flex-end"><div style="display:flex;flex:1;gap:2px">${side("A")}</div><b style="font-size:18px">VS</b><div style="display:flex;flex:1;gap:2px">${side("B")}</div></div><p style="text-align:center;margin:10px 0 0;min-height:22px">${esc(t.v.log||"")}</p></div><div class="card">${body}</div>${H.st==="end"?"":`<button class="g" onclick="if(confirm('대결에서 나갈까요? 나가면 쓰러진 것으로 처리돼요.'))tmBack()">← 나가기</button>`}</div>`}
 async function duEnter(){duQuit();aInit();bgmStart('duel');DU={st:"conn",inv:null,acc:null,msg:""};duDraw();const d=DU;
 try{ROOM=ROOM||await Promise.race([claude.use("room"),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){ROOM=null}
 if(DU!==d)return;if(!ROOM){d.st="none";return duDraw()}
 try{d.lob=await ROOM.join("dul"+String(S.me.cls).toLowerCase().replace(/[^a-z0-9]/g,""))}catch(e){if(DU!==d)return;d.st="none";return duDraw()}
 if(DU!==d){d.lob.leave().catch(()=>{});return}
 d.st="ok";d.me=myPeer(d.lob);d.un=d.lob.onPeers(()=>duLobChange());duPres();duDraw()}
-function duPres(){const d=DU;if(!d||!d.lob)return;Promise.resolve(d.lob.presence({n:String(S.me.name||"").slice(0,20),ch:chKey(),bz:!!d.g,inv:d.inv||null,acc:d.acc||null})).catch(()=>{})}
+function duPres(){const d=DU;if(!d||!d.lob)return;Promise.resolve(d.lob.presence({n:String(S.me.name||"").slice(0,20),ch:chKey(),bz:!!d.g||!!(TM&&TM.H&&TM.H.st!=="lobby")||!!(TM&&!TM.host),inv:d.inv||null,acc:d.acc||null,tr:TM&&TM.host&&TM.H&&TM.H.st==="lobby"?{id:TM.id,c:TM.lc||1}:null})).catch(()=>{})}
 const duPeers=()=>{try{return DU&&DU.lob?DU.lob.peers().filter(p=>!p.sameTab&&p.presence&&p.presence.n):[]}catch(e){return[]}};
-function duLobChange(){const d=DU;if(!d||d.g||d.joining)return;
+function duLobChange(){const d=DU;if(!d||d.g||d.joining||TM)return;
 if(d.inv){const t=duPeers().find(p=>p.peer===d.inv.to);if(t&&t.presence.acc===d.inv.gid)return duGo(d.inv.gid,true,t);if(!t){d.inv=null;d.msg="상대가 나갔어요.";duPres()}}
 clearTimeout(d.rt);d.rt=setTimeout(()=>{if(DU===d&&!d.g)duDraw()},150)}
 function duInvite(peer){const d=DU;if(!d||d.g)return;d.inv={to:peer,gid:("du"+String(S.me.cls).replace(/[^0-9a-z]/gi,"").toLowerCase()+"-"+Math.random().toString(36).slice(2,8)).slice(0,40)};d.msg="";duPres();duDraw()}
@@ -2364,12 +2444,12 @@ if(d.host)duHP();const cn=win?40:15,pt=win?3:1;G.res=(why?why+" ":"")+`🪙 ${cn
 try{await db.doc("students/"+S.me.cls+"_"+S.me.sid).update({points:S.me.points,coins:S.me.coins})}catch(e){}}
 function duOpLeft(){const d=DU,G=d.G;if(!G||G.ph==="end")return;if(G.r>=1)duEnd(true,"상대가 대결에서 나갔어요.");else{G.ph="end";G.res="상대가 나갔어요.";G.nr=1;duDraw()}}
 function duBack(){const d=DU;if(!d)return duEnter();["tq","tp","ti","tw"].forEach(k=>{clearTimeout(d[k]);clearInterval(d[k])});try{d.ung&&d.ung()}catch(e){}if(d.g)d.g.leave().catch(()=>{});d.g=null;d.G=null;d.acc=null;d.inv=null;d.msg="";duPres();duDraw()}
-function duDraw(){const d=DU;if(!d)return;
-if(!d.g){const ps=duPeers(),me=d.me;let L;
+function duDraw(){const d=DU;if(!d)return;if(TM)return tmDraw();
+if(!d.g){const ps=duPeers().filter(p=>!(p.presence.tr)),me=d.me,trs=duPeers().filter(p=>p.presence.tr&&p.presence.tr.id);let L;
 if(d.st==="conn")L='<p class="mu">연결하는 중…</p>';else if(d.st==="none")L='<p class="err">실시간 연결을 사용할 수 없어요. 잠시 후 다시 해 보세요.</p>';
 else L=ps.length?ps.map(p=>{const q=p.presence,inc=q.inv&&q.inv.to===me,mine=d.inv&&d.inv.to===p.peer;
 return `<div class="row" style="gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="font-size:30px;line-height:1">${chH(q.ch)}</span><b style="flex:1">${esc(q.n)}</b>${q.bz?'<span class="mu">대결 중</span>':inc?`<button onclick="duAccept('${p.peer}')">✅ 수락</button>`:mine?`<span class="mu">신청함…</span><button class="g" onclick="duCancel()">취소</button>`:`<button ${d.inv?"disabled":""} onclick="duInvite('${p.peer}')">⚔️ 대결 신청</button>`}</div>`}).join(""):'<p class="mu">지금 대결하기에 들어와 있는 친구가 없어요. 친구가 들어오면 여기에 나타나요.</p>';
-tb.innerHTML=`<div id="duroot"><div class="card"><h2>⚔️ 대결하기</h2><p class="mu">같은 반 친구에게 대결을 신청해요. 수학 문제를 먼저 맞힌 사람이 선공! 틀리면 후공이고, 둘 다 틀리면 다음 문제로 넘어가요.<br>승리 🪙40원·⭐3점 / 패배 🪙15원·⭐1점<br>🎴 체력이 낮아지면 찬스카드를 딱 한 번 뽑을 수 있어요!</p>${L}${d.msg?`<p class="err">${esc(d.msg)}</p>`:""}</div><button class="g" onclick="duExit()">← 토벌 메뉴</button></div>`;return}
+tb.innerHTML=`<div id="duroot"><div class="card"><h2>⚔️ 대결하기</h2><p class="mu">같은 반 친구에게 대결을 신청해요. 수학 문제를 먼저 맞힌 사람이 선공! 틀리면 후공이고, 둘 다 틀리면 다음 문제로 넘어가요.<br>승리 🪙40원·⭐3점 / 패배 🪙15원·⭐1점<br>🎴 체력이 낮아지면 찬스카드를 딱 한 번 뽑을 수 있어요!</p>${L}${d.st==="ok"?`<div style="margin-top:12px;padding-top:10px;border-top:2px dashed var(--bd)"><h3 style="margin:0 0 6px">👥 2:2 팀 대결</h3>${trs.map(p=>`<div class="row" style="gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="font-size:30px;line-height:1">${chH(p.presence.ch)}</span><b style="flex:1">${esc(p.presence.n)}의 팀 대결방 <small class="mu">${p.presence.tr.c}/4명</small></b><button ${p.presence.tr.c>=4||d.inv?"disabled":""} onclick="tmJoin('${esc(p.presence.tr.id)}')">👥 참가</button></div>`).join("")||'<p class="mu" style="margin:0 0 6px">열린 팀 대결방이 없어요.</p>'}<button style="width:100%;margin-top:6px" ${d.inv?"disabled":""} onclick="tmCreate()">👥 2:2 팀 대결방 만들기</button></div>`:""}${d.msg?`<p class="err">${esc(d.msg)}</p>`:""}</div><button class="g" onclick="duExit()">← 토벌 메뉴</button></div>`;return}
 const G=d.G,hp=hearts,pop=s=>G.pop&&G.pop.s===s?`<span class="pp${/CRIT/.test(G.pop.t)?" cr":""}" style="color:${G.pop.c}">${G.pop.t}</span>`:"";let body;
 if(G.ph==="wait")body='<p class="mu" style="text-align:center">상대를 기다리는 중…</p>';
 else if(G.ph==="q")body=G.my?`<p style="text-align:center;margin:10px 0">${G.my.ok?"✅ 정답!":"❌ 오답!"} 상대가 답하길 기다려요…</p>`:`<p class="mu" style="text-align:center;margin:0">남은 시간 <b id="dut">${DU_QT}초</b></p><h2 style="text-align:center;font-size:24px;line-height:1.4">${esc(G.q.q)}</h2>`+(G.q.opts?`<div class="grid" style="grid-template-columns:1fr 1fr">${G.q.opts.map((o,i)=>`<button onclick="duAnsI(${i})" style="padding:14px;font-size:18px">${esc(o)}</button>`).join("")}</div>`:`<div class="row" style="gap:8px"><input id="dua" autocomplete="off" style="margin:0;font-size:18px" onkeydown="if(event.key==='Enter')duAnsT()"><button onclick="duAnsT()" style="white-space:nowrap">확인</button></div>`);
