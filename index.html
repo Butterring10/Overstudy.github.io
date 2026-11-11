@@ -693,25 +693,49 @@ if(o.dual){for(const a of[.06,.52]){rBox(R,x+a+.17,y+.3,.1,.1,.72,.08,"#3a3a46")
 else if(o.lap){rBox(R,x+.2,y+.45,.6,.34,.72,.03,"#c9d1da");rBox(R,x+.2,y+.38,.6,.05,.75,.4,"#3a3a46");rPoly(R,[[x+.24,y+.43,.8],[x+.76,y+.43,.8],[x+.76,y+.43,1.1],[x+.24,y+.43,1.1]],"#9cd8ff",1);rBox(R,x+.82,y+.6,.1,.1,.72,.12,"#ffffff");rBox(R,x+.1,y+.2,.08,.08,.72,.22,"#58b848")}
 else if(o.rgb){rBox(R,x+.04,y+.82,w-.08,.05,.72,.04,"#ff4fd8");rBox(R,x+.04,y+.04,.05,.84,.72,.04,"#4fd8ff");rBox(R,x+.42,y+.3,.16,.16,.72,.08,"#1c1d26");rBox(R,x+.12,y+.38,.76,.06,.78,.5,"#1c1d26");rPoly(R,[[x+.16,y+.44,.82],[x+.84,y+.44,.82],[x+.84,y+.44,1.24],[x+.16,y+.44,1.24]],"#6a4cff",1);rPoly(R,[[x+.16,y+.44,.82],[x+.5,y+.44,.82],[x+.34,y+.44,1.24],[x+.16,y+.44,1.24]],"#ff4fd8",0);rBox(R,x+.25,y+.62,.5,.14,.72,.03,"#1c1d26");rBox(R,x+.27,y+.64,.46,.1,.75,.01,"#4fd8ff")}
 else if(o.mon){rBox(R,x+.42,y+.3,.16,.16,.72,.08,"#3a3a46");rBox(R,x+.15,y+.4,.7,.07,.78,.5,"#3a3a46");rPoly(R,[[x+.2,y+.47,.84],[x+.8,y+.47,.84],[x+.8,y+.47,1.24],[x+.2,y+.47,1.24]],"#9cd8ff",1);rBox(R,x+.3,y+.62,.4,.16,.72,.03,"#c9d1da")}else rBox(R,x+.3,y+.25,.3,.22,.72,.06,o.acc||"#6aa8e8")}},
-chair:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.sw){rBox(R,x+.15,y+.15,.7,.7,0,.06,"#3a3a46");rBox(R,x+.46,y+.46,.08,.08,.06,.34,"#9aa5b1")}else for(const[a,b]of[[.25,.25],[.65,.25],[.25,.65],[.65,.65]])rBox(R,x+a,y+b,.08,.08,0,.38,o.fr);
-rBox(R,x+.2,y+.2,.08,.6,.46,.6,o.back);rBox(R,x+.2,y+.2,.6,.6,.38,.1,o.seat)}},
+chair:{w:1,d:1,dr:(R,x,y,w,d,o)=>dChair(R,x,y,w,d,o)},
 shelf:{w:1,d:1,dr:(R,x,y,w,d,o)=>{const H=o.low?.95:1.9;rBox(R,x+.1,y+.25,.8,.5,0,H,o.fr);const rows=o.low?2:3;
 if(o.cube){const cs=o.cube;for(let k=0;k<rows;k++)for(let i=0;i<3;i++)rBox(R,x+.9,y+.3+i*.14,.03,.11,.1+k*.6,.4,cs[(i+k)%cs.length])}
 else{const cs=["#e5564a","#6aa8e8","#ffd24a","#8fd466","#c79af0"];for(let k=0;k<rows;k++)for(let i=0;i<4;i++)rBox(R,x+.9,y+.3+i*.11,.03,.09,.15+k*(o.low?.45:.6),.4,cs[(i+k)%5])}}},
 plant:{w:1,d:1,dr:(R,x,y,w,d,o)=>{const k=o.k;if(k==="cactus"){rBox(R,x+.3,y+.3,.4,.4,0,.4,o.pot);rBox(R,x+.4,y+.4,.2,.2,.4,.75,"#58b848");rBox(R,x+.22,y+.42,.18,.14,.7,.1,"#58b848");rBox(R,x+.22,y+.42,.1,.14,.7,.4,"#58b848");rBox(R,x+.62,y+.42,.18,.14,.85,.1,"#58b848");rBox(R,x+.7,y+.42,.1,.14,.85,.3,"#58b848");rDot(R,x+.5,y+.62,1.2,.03,"#ff8fb1")}
-else if(k==="tree"){rBox(R,x+.38,y+.38,.24,.24,0,.9,"#a8744a");rBlob(R,x+.5,y+.5,1.4,20,"#58b848");rBlob(R,x+.3,y+.55,1.7,15,"#6cc450");rBlob(R,x+.62,y+.4,1.95,16,"#7ccb5c");rBlob(R,x+.5,y+.5,2.35,12,"#8fd466")}
+else if(k==="tree"){const cx=x+.5,cy=y+.5;rCyl(R,cx,cy,.26,.32,0,.36,"#c8946a",shd("#c8946a",1.08));rCyl(R,cx,cy,.33,.33,.36,.05,"#b07a4a","#6a4a32");
+rCyl(R,cx,cy,.05,.07,.4,.85,"#8a5a38",null);rLine(R,[cx,cy,.95],[cx-.2,cy+.05,1.25],"#8a5a38",3);rLine(R,[cx,cy,1.05],[cx+.18,cy-.08,1.35],"#8a5a38",3);
+[[-22,1.42,14,"#3f9a46"],[22,1.42,14,"#3f9a46"],[0,1.32,15,"#479f47"],[-13,1.7,15,"#58b848"],[13,1.7,15,"#5fbf4f"],[-24,1.75,11,"#4aa84c"],[24,1.75,11,"#58b848"],[0,1.95,15,"#6cc450"],[-9,2.2,12,"#7ccb5c"],[9,2.2,12,"#7ccb5c"],[0,2.42,10,"#8fd466"]].forEach(([dx,z,r,c])=>{const a=dx/64;rBlob(R,cx+a,cy-a,z,r,c)});
+rDot(R,cx-.12,cy+.12,2.3,3,"#b6e88c");rDot(R,cx+.2,cy-.2,1.95,2.6,"#a8e07c");rDot(R,cx-.3,cy+.3,1.8,2.4,"#a8e07c");rDot(R,cx+.05,cy-.05,2.58,2.2,"#c4f0a0")}
 else if(k==="flower")vaseDraw(R,x+.5,y+.5,o);
-else{rBox(R,x+.3,y+.3,.4,.4,0,.4,o.pot);rBlob(R,x+.5,y+.5,.75,13,"#58b848");rBlob(R,x+.35,y+.55,.95,10,"#6cc450");rBlob(R,x+.6,y+.4,1.05,10,"#7ccb5c")}}},
+else{const cx=x+.5,cy=y+.5,pc=o.pot;rCyl(R,cx,cy,.17,.23,0,.36,pc,null);rCyl(R,cx,cy,.25,.25,.33,.07,shd(pc,1.05),"#6a4a32");
+const G=["#3f9a46","#58b848","#4aa84c","#6cc450","#7ccb5c","#58b848","#8fd466"];[[-1.15,24],[1.1,23],[-.6,28],[.55,29],[-.2,31],[.2,27],[0,22]].forEach(([a,l],i)=>rLeaf(R,cx,cy,.42,a,l,8,G[i]));rDot(R,cx,cy,.42,2.4,"#6a4a32")}}},
 lamp:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.k)return lampDraw(R,x,y,o);rBox(R,x+.35,y+.35,.3,.3,0,.06,"#9aa5b1");rBox(R,x+.47,y+.47,.06,.06,.06,1.2,"#c9d1da");if(o.round)rBlob(R,x+.5,y+.5,1.5,15,o.sh);else rBox(R,x+.28,y+.28,.44,.44,1.2,.35,o.sh)}},
 sofa:{w:2,d:1,dr:(R,x,y,w,d,o)=>{const r=w>d,c=o.c;rBox(R,x+.05,y+.05,w-.1,d-.1,0,.4,c);if(r){rBox(R,x+.05,y+.05,w-.1,.25,.4,.45,c);rBox(R,x+.05,y+.3,.22,d-.35,.4,.22,shd(c,.9));rBox(R,x+w-.27,y+.3,.22,d-.35,.4,.22,shd(c,.9));rBox(R,x+.5,y+.34,.5,.4,.4,.1,shd(c,1.1));rBox(R,x+1,y+.34,.5,.4,.4,.1,shd(c,1.1))}
 else{rBox(R,x+.05,y+.05,.25,d-.1,.4,.45,c);rBox(R,x+.3,y+.05,w-.35,.22,.4,.22,shd(c,.9));rBox(R,x+.3,y+d-.27,w-.35,.22,.4,.22,shd(c,.9))}}},
-table:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.round){rBox(R,x+.42,y+.42,.16,.16,0,.4,o.fr);rRound(R,x+.5,y+.5,.42,.4,shd(o.top,.8));rRound(R,x+.5,y+.5,.42,.46,o.top);rBox(R,x+.38,y+.36,.16,.16,.46,.14,"#fff")}
-else{rBox(R,x+.42,y+.42,.16,.16,0,.4,o.fr);rBox(R,x+.1,y+.1,.8,.8,.4,.08,o.top);rBox(R,x+.35,y+.3,.18,.18,.48,.15,"#ffffff")}}},
-tv:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.crt){rBox(R,x+.12,y+.2,.76,.62,0,.78,o.fr);rBox(R,x+.2,y+.12,.6,.1,.1,.58,shd(o.fr,.9));rPoly(R,[[x+.18,y+.82,.14],[x+.64,y+.82,.14],[x+.64,y+.82,.68],[x+.18,y+.82,.68]],"#2e3a46",1);rPoly(R,[[x+.2,y+.82,.34],[x+.4,y+.82,.34],[x+.3,y+.82,.64],[x+.2,y+.82,.64]],"#4f6a80",0);rBox(R,x+.7,y+.82,.12,.03,.55,.1,"#8a7a5a");rBox(R,x+.7,y+.82,.12,.03,.3,.1,"#8a7a5a");rLine(R,[x+.4,y+.45,.78],[x+.22,y+.3,1.3],"#4a2c2a",1.4);rLine(R,[x+.6,y+.45,.78],[x+.78,y+.3,1.3],"#4a2c2a",1.4)}
+table:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.round){rCyl(R,x+.5,y+.5,.2,.2,0,.04,shd(o.fr,.9));rCyl(R,x+.5,y+.5,.05,.06,.04,.36,o.fr,null);rCyl(R,x+.5,y+.5,.42,.42,.4,.06,shd(o.top,.88),o.top);rRound(R,x+.5,y+.5,.3,.461,shd(o.top,1.06),0)}
+else{for(const[a,b]of[[.14,.14],[.8,.14],[.14,.8],[.8,.8]])rBox(R,x+a,y+b,.06,.06,0,.4,o.fr);rBox(R,x+.1,y+.1,.8,.8,.4,.08,o.top);rHL(R,x+.16,y+.16,.68,.68,.481,shd(o.top,1.06))}}},
+tv:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.crt){const fr=o.fr,DK="#3a3530";for(const[a,b]of[[.16,.26],[.78,.26],[.16,.74],[.78,.74]])rBox(R,x+a,y+b,.06,.06,0,.05,DK);
+rBox(R,x+.26,y+.1,.48,.14,.16,.48,shd(fr,.82));rBox(R,x+.12,y+.22,.76,.6,.05,.72,fr);rHL(R,x+.16,y+.26,.68,.52,.77,shd(fr,1.08));
+for(let k=0;k<4;k++)rLine(R,[x+.3+k*.1,y+.32,.77],[x+.3+k*.1,y+.5,.77],shd(fr,.75),1);
+rPoly(R,[[x+.15,y+.82,.13],[x+.63,y+.82,.13],[x+.63,y+.82,.7],[x+.15,y+.82,.7]],"#5a5048",1);
+rPoly(R,[[x+.19,y+.82,.18],[x+.59,y+.82,.18],[x+.59,y+.82,.65],[x+.19,y+.82,.65]],"#2e3a46",1);
+rPoly(R,[[x+.22,y+.82,.42],[x+.34,y+.82,.42],[x+.27,y+.82,.62],[x+.22,y+.82,.62]],"#5f7d94",0);
+rPoly(R,[[x+.67,y+.82,.13],[x+.84,y+.82,.13],[x+.84,y+.82,.7],[x+.67,y+.82,.7]],shd(fr,.92),1);
+rDot(R,x+.755,y+.82,.58,4.2,"#6a5a48");rDot(R,x+.755,y+.82,.44,4.2,"#6a5a48");for(let k=0;k<3;k++)rLine(R,[x+.7,y+.82,.2+k*.05],[x+.81,y+.82,.2+k*.05],"#6a5a48",1);
+rDot(R,x+.5,y+.5,.78,4,"#5a5048");rLine(R,[x+.5,y+.5,.78],[x+.28,y+.3,1.32],"#4a2c2a",1.4);rLine(R,[x+.5,y+.5,.78],[x+.76,y+.34,1.3],"#4a2c2a",1.4);rDot(R,x+.28,y+.3,1.32,2.6,"#c0c4cc");rDot(R,x+.76,y+.34,1.3,2.6,"#c0c4cc")}
 else if(o.big){rBox(R,x+.04,y+.15,.92,.7,0,.42,o.fr);rBox(R,x+.14,y+.85,.34,.03,.08,.26,shd(o.fr,1.1));rBox(R,x+.54,y+.85,.34,.03,.08,.26,shd(o.fr,1.1));rBox(R,x+.04,y+.4,.92,.06,.5,.78,"#2f3140");rPoly(R,[[x+.08,y+.46,.54],[x+.92,y+.46,.54],[x+.92,y+.46,1.24],[x+.08,y+.46,1.24]],o.scr,1);rPoly(R,[[x+.08,y+.46,.54],[x+.5,y+.46,.54],[x+.3,y+.46,1.24],[x+.08,y+.46,1.24]],"#a8dcff",0);rBox(R,x+.0,y+.35,.05,.14,.5,.4,"#2f3140");rBox(R,x+.95,y+.35,.05,.14,.5,.4,"#2f3140")}
 else if(o.game){rBox(R,x+.08,y+.15,.84,.7,0,.5,o.fr);rBox(R,x+.14,y+.62,.34,.2,.5,.06,"#f4f1ea");rBox(R,x+.2,y+.8,.1,.03,.52,.02,"#4fd8ff");rBox(R,x+.58,y+.66,.26,.12,.5,.04,"#ff6b6b");rBox(R,x+.42,y+.28,.16,.16,.5,.06,"#3a3a46");rBox(R,x+.14,y+.34,.72,.07,.56,.6,"#3a3a46");rPoly(R,[[x+.18,y+.41,.6],[x+.82,y+.41,.6],[x+.82,y+.41,1.12],[x+.18,y+.41,1.12]],"#ffe6f2",1);rBox(R,x+.28,y+.42,.1,.02,.7,.1,"#58b848");rBox(R,x+.5,y+.42,.14,.02,.9,.1,"#e5564a");rBox(R,x+.62,y+.42,.1,.02,.65,.1,"#ffd24a")}
 else if(o.stand){rBox(R,x+.08,y+.15,.84,.7,0,.5,o.fr);rBox(R,x+.12,y+.85,.3,.03,.12,.28,shd(o.fr,1.15));rBox(R,x+.58,y+.85,.3,.03,.12,.28,shd(o.fr,1.15));rBox(R,x+.42,y+.35,.16,.16,.5,.06,"#3a3a46");rBox(R,x+.1,y+.4,.8,.08,.56,.58,"#3a3a46");rPoly(R,[[x+.16,y+.48,.62],[x+.84,y+.48,.62],[x+.84,y+.48,1.08],[x+.16,y+.48,1.08]],o.scr||"#9cd8ff",1)}
-else{rBox(R,x+.1,y+.2,.8,.6,0,.45,o.fr);rBox(R,x+.45,y+.25,.1,.5,.45,.75,"#3a3a46");rBox(R,x+.38,y+.2,.06,.6,.6,.5,"#3a3a46")}}},
+else if(o.cab){const fr=o.fr,BK="#26282f";for(const[a,b]of[[.14,.1],[.8,.1],[.14,.84],[.8,.84]])rBox(R,x+a,y+b,.06,.06,0,.1,shd(fr,.8));
+rBox(R,x+.12,y+.08,.76,.84,.1,.32,fr);rHL(R,x+.14,y+.1,.72,.8,.42,shd(fr,1.1));
+for(const[a,b]of[[.12,.48],[.52,.88]]){rPoly(R,[[x+.88,y+a,.15],[x+.88,y+b,.15],[x+.88,y+b,.37],[x+.88,y+a,.37]],shd(fr,.88),1);rDot(R,x+.88,y+(a+b)/2,.26,2.4,"#ffd24a")}
+rBox(R,x+.38,y+.2,.14,.06,.42,.04,BK);rBox(R,x+.38,y+.74,.14,.06,.42,.04,BK);rBox(R,x+.43,y+.23,.03,.04,.46,.06,BK);rBox(R,x+.43,y+.73,.03,.04,.46,.06,BK);
+rBox(R,x+.42,y+.08,.06,.84,.52,.6,BK);
+rPoly(R,[[x+.48,y+.11,.55],[x+.48,y+.89,.55],[x+.48,y+.89,1.09],[x+.48,y+.11,1.09]],"#8fd0ff",1);
+rPoly(R,[[x+.48,y+.11,.55],[x+.48,y+.89,.55],[x+.48,y+.89,.72],[x+.48,y+.66,.8],[x+.48,y+.4,.7],[x+.48,y+.11,.78]],"#7cc86a",0);
+rDot(R,x+.48,y+.72,.96,4,"#ffe066");rDot(R,x+.48,y+.32,.98,3,"#ffffff");rDot(R,x+.48,y+.37,.99,3.4,"#ffffff");
+rBox(R,x+.58,y+.28,.08,.44,.42,.05,"#3a3a46");rHL(R,x+.58,y+.28,.08,.44,.47,"#4a4a58")}
+else{const fr=o.fr,BK="#2f3140";rBox(R,x+.16,y+.14,.68,.72,0,.06,shd(fr,.85));rBox(R,x+.2,y+.18,.6,.64,.06,.3,fr);rHL(R,x+.22,y+.2,.56,.6,.36,shd(fr,1.12));
+rBox(R,x+.34,y+.36,.22,.28,.36,.03,BK);rBox(R,x+.42,y+.46,.06,.08,.39,.1,BK);
+rBox(R,x+.42,y+.1,.08,.8,.47,.58,BK);
+rPoly(R,[[x+.5,y+.14,.51],[x+.5,y+.86,.51],[x+.5,y+.86,1.01],[x+.5,y+.14,1.01]],"#3a4658",1);
+rPoly(R,[[x+.5,y+.18,.7],[x+.5,y+.36,.98],[x+.5,y+.46,.98],[x+.5,y+.24,.66]],"#56677e",0);rDot(R,x+.5,y+.82,.49,1.6,"#7cff9a")}}},
 wardrobe:{w:1,d:1,dr:(R,x,y,w,d,o)=>{rBox(R,x+.08,y+.1,.84,.78,0,2.1,o.c);const f=.88;for(const[a,b]of[[.14,.48],[.52,.86]])rPoly(R,[[x+a,y+f,.12],[x+b,y+f,.12],[x+b,y+f,2.0],[x+a,y+f,2.0]],shd(o.c,1.1),1);rDot(R,x+.44,y+f,1.1,.035,"#ffd24a");rDot(R,x+.56,y+f,1.1,.035,"#ffd24a");if(o.mir)rPoly(R,[[x+.57,y+f,.3],[x+.8,y+f,.3],[x+.8,y+f,1.8],[x+.57,y+f,1.8]],"#d6ecff",1)}}
 };
 const FDEF=[
@@ -724,11 +748,11 @@ const FDEF=[
 {id:"lp1",t:"lamp",n:"노랑 스탠드",p:25,o:{sh:"#ffe9a8"}},{id:"lp2",t:"lamp",n:"하늘 스탠드",p:25,o:{sh:"#bfe6ff"}},{id:"lp3",t:"lamp",n:"둥근 조명",p:35,o:{round:1,sh:"#fff3c4"}},
 {id:"sf1",t:"sofa",n:"빨강 소파",p:80,o:{c:"#e5726a"}},{id:"sf2",t:"sofa",n:"파랑 소파",p:90,o:{c:"#6a9ae0"}},{id:"sf3",t:"sofa",n:"초록 소파",p:90,o:{c:"#6cc47a"}},{id:"sf4",t:"sofa",n:"노랑 소파",p:85,o:{c:"#f0c040"}},
 {id:"tb1",t:"table",n:"원목 탁자",p:30,o:{fr:"#a8744a",top:"#f0d5a8"}},{id:"tb2",t:"table",n:"흰색 둥근 탁자",p:40,o:{round:1,fr:"#c9d1da",top:"#ffffff"}},{id:"tb3",t:"table",n:"유리 탁자",p:50,o:{fr:"#6a7a8a",top:"#cfeeff"}},
-{id:"tv1",t:"tv",n:"TV",p:100,o:{fr:"#8a5a38"}},{id:"tv2",t:"tv",n:"TV 장식장",p:120,o:{stand:1,fr:"#f4f1ea"}},
+{id:"tv1",t:"tv",n:"TV",p:100,o:{cab:1,fr:"#a8744a"}},{id:"tv2",t:"tv",n:"TV 장식장",p:120,o:{stand:1,fr:"#f4f1ea"}},
 {id:"wd1",t:"wardrobe",n:"원목 옷장",p:80,o:{c:"#b8814f"}},{id:"wd2",t:"wardrobe",n:"거울 옷장",p:100,o:{c:"#f4f1ea",mir:1}},
 {id:"tv3",t:"tv",n:"구형 브라운관 TV",p:70,o:{crt:1,fr:"#c9b99a"}},{id:"tv4",t:"tv",n:"와이드 TV 장식장",p:170,o:{big:1,fr:"#f4f1ea",scr:"#7fc8ff"}},{id:"tv5",t:"tv",n:"게임기 TV",p:140,o:{game:1,fr:"#6a7a8a"}},
 {id:"dk5",t:"desk",n:"듀얼 모니터 책상",p:130,o:{dual:1,fr:"#4a5568",top:"#cbd5e0"}},{id:"dk6",t:"desk",n:"노트북 책상",p:110,o:{lap:1,fr:"#d9a86a",top:"#f6e7c8"}},{id:"dk7",t:"desk",n:"게이밍 책상",p:160,o:{rgb:1,fr:"#2d2f3a",top:"#454a5c"}},
-{id:"ld1",t:"ledge",n:"나무 2단 선반",p:70,o:{h:1.0,n:2,fr:"#c8946a",top:"#d9a86a",bk:["#e5564a","#6aa8e8","#ffd24a"]}},{id:"ld2",t:"ledge",n:"흰색 3단 선반",p:90,o:{h:1.5,n:3,fr:"#f4f1ea",top:"#ffffff",bk:["#8fd466","#ff8fb1","#9cc8f0"]}},{id:"ld3",t:"ledge",n:"파스텔 칸 선반",p:110,o:{h:1.0,n:2,mid:1,fr:"#ffd9e6",top:"#fff0f5",bk:["#c79af0","#ffd24a"]}},
+{id:"ld1",t:"ledge",n:"나무 2단 선반",p:70,o:{h:1.3,n:2,fr:"#c8946a",top:"#d9a86a",bk:["#e5564a","#6aa8e8","#ffd24a"]}},{id:"ld2",t:"ledge",n:"흰색 3단 선반",p:90,o:{h:1.95,n:3,fr:"#f4f1ea",top:"#ffffff",bk:["#8fd466","#ff8fb1","#9cc8f0"]}},{id:"ld3",t:"ledge",n:"파스텔 칸 선반",p:110,o:{h:1.3,n:2,mid:1,fr:"#ffd9e6",top:"#fff0f5",bk:["#c79af0","#ffd24a"]}},{id:"lg1",t:"ledge",n:"검은 철제 3단 선반",p:100,o:{h:1.95,n:3,open:1,fr:"#3f4048",top:"#55565f",bk:["#e5564a","#f4f1ea","#ffd24a"]}},{id:"lg2",t:"ledge",n:"원목 1단 낮은 선반",p:50,o:{h:.7,n:1,fr:"#b8814f",top:"#d9a86a",bk:["#8fd466","#6aa8e8"]}},{id:"lg3",t:"ledge",n:"민트 2단 선반",p:80,o:{h:1.3,n:2,fr:"#9fdcc4",top:"#d4f4e6",pc:"#c4ecdb",bk:["#ff8fb1","#ffd24a","#6aa8e8"]}},{id:"lg4",t:"ledge",n:"노랑 칸 선반",p:110,o:{h:1.3,n:2,mid:1,fr:"#ffd98a",top:"#fff0c4",pc:"#ffe8b0",bk:["#6aa8e8","#e5564a"]}},
 {id:"or1",t:"orn",n:"곰인형",p:12,o:{k:"bear"}},{id:"or2",t:"orn",n:"토끼 인형",p:12,o:{k:"rabbit"}},{id:"or3",t:"orn",n:"책 더미",p:8,o:{k:"books"}},{id:"or4",t:"orn",n:"탁상시계",p:14,o:{k:"clock"}},{id:"or5",t:"orn",n:"사진 액자",p:10,o:{k:"frame"}},{id:"or6",t:"orn",n:"지구본",p:18,o:{k:"globe"}},{id:"or7",t:"orn",n:"트로피",p:20,o:{k:"trophy"}},{id:"or8",t:"orn",n:"작은 선인장",p:8,o:{k:"cactus"}},{id:"or9",t:"orn",n:"어항",p:24,o:{k:"fish"}},{id:"or10",t:"orn",n:"촛불",p:6,o:{k:"candle"}},{id:"or11",t:"orn",n:"머그컵",p:6,o:{k:"mug"}},{id:"or12",t:"orn",n:"장난감 로봇",p:16,o:{k:"robot"}}
 ];
 const FTN={wall:"가벽",door:"문",ledge:"선반",orn:"선반 장식",rug:"러그",bed:"침대",desk:"책상",chair:"의자",shelf:"책장",plant:"식물",lamp:"조명",sofa:"소파",table:"탁자",tv:"TV",wardrobe:"옷장",etc:"기타"};
@@ -791,11 +815,20 @@ if(!K(0,-1))L([x,y,0],[x+1,y,0]);if(!K(-1,0))L([x,y,0],[x,y+1,0]);if(!sm(0,-1))L
 if(!S){L([x,y+1,0],[x+1,y+1,0]);if(!(sm(-1,0)&&!K(-1,1)))L([x,y+1,0],[x,y+1,H]);if(!E||!(sm(1,0)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
 if(!E){L([x+1,y,0],[x+1,y+1,0]);if(!(sm(0,-1)&&!K(1,-1)))L([x+1,y,0],[x+1,y,H]);if(S&&!(sm(0,1)&&!K(1,1)))L([x+1,y+1,0],[x+1,y+1,H])}
 ct.restore()}};
-FT.ledge={w:2,d:1,walk:0,dr(R,x,y,w,d,o){const hz=w>=d,L=hz?w:d,B=(a,b,c,e,z,h,col)=>hz?rBox(R,x+a,y+b,c,e,z,h,col):rBox(R,x+b,y+a,e,c,z,h,col),H=o.h,fr=o.fr;
-B(.06,.25,L-.12,.5,0,.07,fr);for(const a of[.06,L-.14])B(a,.25,.08,.5,0,H,fr);if(o.mid)B(L/2-.04,.25,.08,.5,0,H,fr);
-for(let t=1;t<o.n;t++)B(.06,.25,L-.12,.5,t*H/o.n,.06,fr);
-for(let t=0;t<o.n;t++){const z0=t?t*H/o.n+.06:.07,bh=H/o.n-.2;for(let i=0;i<o.bk.length;i++){const a=o.mid?(i%2?L/2+.16:.2):.22+i*.15;if(t%2===(o.mid?0:i%2))B(a,.32,.1,.3,z0,Math.max(.14,bh),o.bk[(i+t)%o.bk.length])}}
-B(.02,.21,L-.04,.58,H,.06,o.top||fr)}};
+FT.ledge={w:2,d:1,walk:0,dr(R,x,y,w,d,o){const hz=w>=d,L=hz?w:d,B=(a,b,c,e,z,h,col)=>hz?rBox(R,x+a,y+b,c,e,z,h,col):rBox(R,x+b,y+a,e,c,z,h,col),H=o.h,n=o.n,fr=o.fr,th=H/n,
+W=(a,b)=>{const p=hz?[x+a,y+b]:[x+b,y+a];return RXF?xfp(p[0],p[1]):p},sm=(p)=>p[0]+p[1],nearEnd=sm(W(L-.1,.5))>=sm(W(.1,.5)),farB=sm(W(L/2,.2))<=sm(W(L/2,.8)),bb=farB?.2:.75,
+ends=nearEnd?[.06,L-.14]:[L-.14,.06],occ=o._occ||{},pc=o.pc||shd(fr,.86);
+const lay=(k,part)=>{if(k>=n){if(part==="a")B(.02,.16,L-.04,.68,H,.06,o.top||fr);return}const z0=k*th;
+if(part==="b"){const zt=k?z0+.06:z0+.07;if(o.open){for(const b of[.2,.74])B(ends[1],b,.06,.06,zt,th-(zt-z0),fr)}else B(ends[1],.2,.08,.6,zt,th-(zt-z0),fr);return}
+B(.06,.2,L-.12,.6,z0,k?.06:.07,fr);const zb=k?z0+.06:.07,bh=Math.max(.14,th-.32),zt=k?z0+.06:z0+.07;
+if(!o.open)B(.06,bb,L-.12,.05,zt,th-(zt-z0),pc);if(o.open){for(const b of[.2,.74])B(ends[0],b,.06,.06,zt,th-(zt-z0),fr)}else B(ends[0],.2,.08,.6,zt,th-(zt-z0),fr);if(o.mid)B(L/2-.04,.2,.08,.6,zt,th-(zt-z0),fr);
+for(let i=0;i<o.bk.length;i++){const a=o.mid?(i%2?L/2+.16:.2):.22+i*.15;if(k%2!==(o.mid?0:i%2))continue;const wp=W(a+.05,.5);if(occ[(k+1)+":"+Math.floor(wp[0])+","+Math.floor(wp[1])])continue;
+B(a,.4,.1,.32,zb,bh,o.bk[(i+k)%o.bk.length]);rHL(R,...(hz?[x+a,y+.4]:[x+.4,y+a]),...(hz?[.1,.32]:[.32,.1]),zb+bh,shd(o.bk[(i+k)%o.bk.length],1.15))}};
+if(o._lay!=null)return lay(o._lay,o._part||"a");for(let k=0;k<=n;k++){lay(k,"a");lay(k,"b")}}};
+function rOrnZ(sf,lv){const q=FD[sf.f[0]];if(lv>0&&q.t==="ledge"){const o=q.o,th=o.h/o.n;return lv===1?.07:(lv-1)*th+.06}return sf.z}
+function rOrnLvs(sf){const q=sf&&FD[sf.f[0]];if(!q)return[];if(q.t!=="ledge")return[0];return[0,...Array.from({length:q.o.n},(_,i)=>q.o.n-i)]}
+function rOrnFree(r,x,y,ex,want){const sf=rSurf(r,x,y),L=rOrnLvs(sf);if(!L.length)return-1;const used=new Set(r.f.filter((f,i)=>i!==ex&&fTy(f).orn&&f[1]===x&&f[2]===y).map(f=>f[4]||0));if(want!=null&&L.includes(want)&&!used.has(want))return want;const v=L.find(l=>!used.has(l));return v==null?-1:v}
+function rLv(){const r=rCfg(),f=r.f[RM.sel];if(!f||!fTy(f).orn)return;const sf=rSurf(r,f[1],f[2]),L=rOrnLvs(sf);if(L.length<2)return rMsg("이 가구에는 한 층만 있어요");const cur=f[4]||0,used=new Set(r.f.filter((g,i)=>g!==f&&fTy(g).orn&&g[1]===f[1]&&g[2]===f[2]).map(g=>g[4]||0));let k=L.indexOf(cur);for(let s=0;s<L.length;s++){k=(k+1)%L.length;if(!used.has(L[k]))break}if(L[k]===cur)return rMsg("다른 층이 모두 차 있어요");f[4]=L[k];rDirty();tRoom();rMsg(L[k]?`아래에서 ${L[k]}번째 칸에 놓았어요`:"맨 위에 올렸어요")}
 const SURF={shelf:o=>o.low?.95:1.9,ledge:o=>o.h+.06,desk:o=>.72,ldesk2:o=>.72,ldesk3:o=>.72,ldesk4:o=>.72,table:o=>o.round?.46:.48};
 function rSurf(r,x,y){for(const f of r.f){const t=FD[f[0]].t;if(!SURF[t])continue;const[w,d]=rFoot(f);if(x>=f[1]&&x<f[1]+w&&y>=f[2]&&y<f[2]+d)return{f,z:SURF[t](FD[f[0]].o)}}return null}
 function rCyl(R,cx,cy,r0,r1,z,h,col,top){const c=R.c,s=R.s,pb=rP(R,cx,cy,z),pt=rP(R,cx,cy,z+h),K=45.25*s,k=22.63*s,a0=r0*K,b0=r0*k,a1=r1*K,b1=r1*k;
@@ -817,7 +850,12 @@ FDEF.push({id:"et1",t:"etc",n:"컵라면",p:90,o:{k:"ramen"}},{id:"et2",t:"etc",
 function rOns(r,i){const f=r.f[i],[w,d]=rFoot(f);return r.f.map((g,j)=>j).filter(j=>fTy(r.f[j]).orn&&r.f[j][1]>=f[1]&&r.f[j][1]<f[1]+w&&r.f[j][2]>=f[2]&&r.f[j][2]<f[2]+d)}
 FT.orn={w:1,d:1,walk:0,orn:1,dr(R,x,y,w,d,o){const cx=x+.5,cy=y+.5,k=o.k,LN="#4a2c2a";
 if(k==="bear"){rBlob(R,cx-.17,cy,.66,3.4,"#c8946a");rBlob(R,cx+.17,cy,.66,3.4,"#c8946a");rBlob(R,cx,cy,.2,8,"#c8946a");rBlob(R,cx,cy,.52,7.4,"#d9a878");rDot(R,cx-.07,cy+.14,.54,1.5,LN);rDot(R,cx+.07,cy+.14,.54,1.5,LN);rDot(R,cx,cy+.16,.44,2.2,"#f3d7b5")}
-else if(k==="rabbit"){rBox(R,cx-.15,cy-.04,.07,.07,.5,.4,"#ffffff");rBox(R,cx+.08,cy-.04,.07,.07,.5,.4,"#ffffff");rBlob(R,cx,cy,.2,8,"#ffffff");rBlob(R,cx,cy,.5,7,"#ffffff");rDot(R,cx-.07,cy+.14,.52,1.5,LN);rDot(R,cx+.07,cy+.14,.52,1.5,LN);rDot(R,cx,cy+.16,.46,1.6,"#ff9ec0")}
+else if(k==="rabbit"){const W="#fffdf8",PK="#ffb3c8",P=(f,s,z)=>[cx+f*.7+s*.7,cy+f*.7-s*.7,z];
+rEll(R,...P(-.02,-.07,.64),-.3,3.3,9.5,W);rEll(R,...P(-.02,.07,.64),.3,3.3,9.5,W);rEll(R,...P(-.01,-.07,.65),-.3,1.6,6.8,PK,0);rEll(R,...P(-.01,.07,.65),.3,1.6,6.8,PK,0);
+rBlob(R,cx,cy,.2,8.8,W);rDot(R,...P(.15,-.09,.04),3.6,W);rDot(R,...P(.15,.09,.04),3.6,W);rDot(R,...P(.15,-.09,.04),1.6,PK);rDot(R,...P(.15,.09,.04),1.6,PK);rDot(R,...P(.12,0,.2),4.2,"#fff0f4");
+rBlob(R,...P(.1,-.14,.26),2.9,W);rBlob(R,...P(.1,.14,.26),2.9,W);
+rBlob(R,cx,cy,.5,7.6,W);rDot(R,...P(.14,-.07,.52),1.7,LN);rDot(R,...P(.14,.07,.52),1.7,LN);rDot(R,...P(.13,-.13,.46),2,"#ffc4d6");rDot(R,...P(.13,.13,.46),2,"#ffc4d6");rDot(R,...P(.17,0,.47),1.4,"#ff8fb1");
+rEll(R,...P(.14,-.05,.31),-.7,2.8,1.7,"#ff8fb1");rEll(R,...P(.14,.05,.31),.7,2.8,1.7,"#ff8fb1");rDot(R,...P(.15,0,.31),1.4,"#ff6f9a")}
 else if(k==="books"){rBox(R,x+.2,y+.25,.6,.5,0,.12,"#e5564a");rBox(R,x+.26,y+.28,.52,.44,.12,.1,"#6aa8e8");rBox(R,x+.22,y+.3,.5,.4,.22,.12,"#ffd24a");rBox(R,x+.3,y+.32,.4,.36,.34,.08,"#8fd466")}
 else if(k==="clock"){rBox(R,x+.25,y+.4,.5,.2,0,.06,"#8a5a38");rBlob(R,cx,cy,.44,8,"#ffffff");rLine(R,[cx,cy+.1,.44],[cx,cy+.1,.62],LN,1.4);rLine(R,[cx,cy+.1,.44],[cx+.09,cy+.1,.44],LN,1.4);rDot(R,cx,cy+.1,.44,1.4,"#e5564a")}
 else if(k==="frame"){rBox(R,x+.16,y+.5,.68,.06,0,.52,"#c8946a");rPoly(R,[[x+.22,y+.56,.06],[x+.78,y+.56,.06],[x+.78,y+.56,.46],[x+.22,y+.56,.46]],"#bfe6ff",1);rPoly(R,[[x+.22,y+.56,.06],[x+.78,y+.56,.06],[x+.78,y+.56,.2],[x+.5,y+.56,.26]],"#7ccb5c",0);rDot(R,x+.64,y+.56,.38,2.6,"#ffd24a")}
@@ -870,9 +908,42 @@ seg(L-.1,L,0,.32,fr);seg(m-.3,m-.18,0,.05,dk,Wd-.35,.2);seg(m+.22,m+.3,0,.05,dk,
 function dBed2(R,x,y,w,d,o){if(o.brk)return brokenBed(R,x,y,w,d,o);rBox(R,x+.04,y+.02,w-.08,.14,0,o.hb||1.05,o.fr);rBox(R,x+.06,y+.16,w-.12,d-.24,.08,.3,o.fr);rBox(R,x+.1,y+.18,w-.2,d-.3,.38,.14,"#ffffff");
 rBox(R,x+.2,y+.24,.72,.34,.52,.12,o.pl);rBox(R,x+1.08,y+.24,.72,.34,.52,.12,o.pl);rBox(R,x+.08,y+.74,w-.16,d-.86,.52,.08,o.bl);rBox(R,x+.08,y+.7,w-.16,.14,.52,.11,shd(o.bl,1.18));
 if(o.dots)for(const[a,b]of[[.4,1.2],[1.1,1.05],[1.5,1.5],[.7,1.6]])rDot(R,x+a,y+b,.61,.05,o.dc);rBox(R,x+.04,y+d-.1,w-.08,.08,0,.5,o.fr)}
-function dBench(R,x,y,w,d,o){for(const a of[.12,w-.2])for(const b of[.2,d-.24])rBox(R,x+a,y+b,.08,.08,0,.42,o.fr);
-if(o.slat){for(let i=0;i<3;i++)rBox(R,x+.08,y+.2+i*.2,w-.16,.16,.42,.06,o.seat);rBox(R,x+.08,y+.12,w-.16,.06,.5,.18,o.back);rBox(R,x+.08,y+.12,w-.16,.06,.78,.18,o.back);for(const a of[.14,w-.2])rBox(R,x+a,y+.12,.06,.06,.42,.58,o.fr)}
-else{rBox(R,x+.08,y+.16,w-.16,d-.3,.42,.08,o.fr);rBox(R,x+.08,y+.12,w-.16,.08,.5,.55,o.back);rBox(R,x+.14,y+.24,(w-.34)/2,d-.42,.5,.07,o.seat);rBox(R,x+w/2+.03,y+.24,(w-.34)/2,d-.42,.5,.07,o.seat);for(const a of[.06,w-.14])rBox(R,x+a,y+.16,.08,d-.3,.42,.26,o.fr)}}
+function rEll(R,x,y,z,ang,rx,ry,col,lw){const go=()=>{const s=RXF;RXF=null;try{const p=rP(R,x,y,z),c=R.c;c.beginPath();c.ellipse(p[0],p[1]-ry*R.s*.8,rx*R.s,ry*R.s,ang,0,6.2832);c.fillStyle=col;c.fill();if(lw!==0){c.strokeStyle=RLN;c.lineWidth=(lw||1.2)*R.s;c.stroke()}}finally{RXF=s}};if(!(RXF&&RXF.q&&rxq(xb([[x,y,z]]),go)))go()}
+function rLeaf(R,x,y,z,ang,len,wd,col){const go=()=>{const s=RXF;RXF=null;try{const p=rP(R,x,y,z),c=R.c,L=len*R.s,Wd=wd*R.s;c.save();c.translate(p[0],p[1]);c.rotate(ang);c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(Wd,-L*.5,0,-L);c.quadraticCurveTo(-Wd,-L*.5,0,0);c.fillStyle=col;c.fill();c.strokeStyle=RLN;c.lineWidth=1.1*R.s;c.stroke();c.beginPath();c.moveTo(0,-L*.1);c.lineTo(0,-L*.8);c.strokeStyle=shd(col,.75);c.lineWidth=.9*R.s;c.stroke();c.restore()}finally{RXF=s}};if(!(RXF&&RXF.q&&rxq(xb([[x,y,z]]),go)))go()}
+function rHL(R,x,y,w,d,z,col){rPoly(R,[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z]],col,0)}
+function rHeart(R,x,y,z,r,col){const go=()=>{const s=RXF;RXF=null;try{const p=rP(R,x,y,z),c=R.c,k=r*R.s;c.beginPath();c.moveTo(p[0],p[1]+k*.9);c.bezierCurveTo(p[0]-k*1.3,p[1]-k*.1,p[0]-k*.7,p[1]-k*1.1,p[0],p[1]-k*.45);c.bezierCurveTo(p[0]+k*.7,p[1]-k*1.1,p[0]+k*1.3,p[1]-k*.1,p[0],p[1]+k*.9);c.fillStyle=col;c.fill();c.strokeStyle=RLN;c.lineWidth=1.1*R.s;c.stroke()}finally{RXF=s}};if(!(RXF&&RXF.q&&rxq(xb([[x,y,z]]),go)))go()}
+function dChair(R,x,y,w,d,o){const fr=o.fr,st=o.seat,bk=o.back,lt=c=>shd(c,1.12);
+if(o.sw){const DK="#3a3d47",MT="#aab4be";
+rBox(R,x+.14,y+.47,.72,.06,.05,.04,DK);rBox(R,x+.47,y+.14,.06,.72,.05,.04,DK);for(const[a,b]of[[.16,.5],[.5,.16],[.84,.5],[.5,.84]])rDot(R,x+a,y+b,.02,3,"#22242a");
+rCyl(R,x+.5,y+.5,.07,.07,.07,.07,DK);rCyl(R,x+.5,y+.5,.04,.04,.14,.18,MT);
+rBox(R,x+.2,y+.46,.06,.08,.3,.24,"#5a5e68");rBox(R,x+.12,y+.2,.1,.6,.5,.48,bk);rHL(R,x+.12,y+.24,.1,.52,.98,lt(bk));
+rBox(R,x+.3,y+.13,.3,.05,.42,.13,DK);rBox(R,x+.27,y+.12,.38,.07,.55,.04,"#4a4e58");
+rCyl(R,x+.52,y+.5,.29,.29,.32,.1,st,lt(st));
+rBox(R,x+.3,y+.82,.3,.05,.42,.13,DK);rBox(R,x+.27,y+.81,.38,.07,.55,.04,"#4a4e58");return}
+const wood=!o.cu&&fr!=="#ffffff"&&st===bk&&fr==="#a8744a",pink=fr==="#ffffff";
+rBox(R,x+.2,y+.2,.07,.07,0,1.02,fr);rBox(R,x+.2,y+.73,.07,.07,0,1.02,fr);
+if(wood){rBox(R,x+.2,y+.24,.07,.52,.88,.12,shd(fr,1.05));for(let i=0;i<3;i++)rBox(R,x+.215,y+.34+i*.12,.04,.06,.48,.4,st)}
+else{rBox(R,x+.2,y+.27,.06,.46,.52,.46,fr);rBox(R,x+.24,y+.29,.09,.42,.55,.4,bk);rHL(R,x+.24,y+.31,.09,.38,.95,lt(bk));
+if(pink)rHeart(R,x+.33,y+.5,.76,5.5,"#ffffff");else for(const b of[.4,.6])rDot(R,x+.33,y+b,.76,2.2,shd(bk,.7))}
+rBox(R,x+.73,y+.2,.07,.07,0,.38,fr);rBox(R,x+.27,y+.225,.46,.03,.12,.04,shd(fr,.9));rBox(R,x+.27,y+.745,.46,.03,.12,.04,shd(fr,.9));
+rBox(R,x+.27,y+.2,.55,.6,.36,.06,fr);
+if(wood){rBox(R,x+.27,y+.2,.55,.6,.42,.03,st);rLine(R,[x+.3,y+.4,.45],[x+.8,y+.4,.45],shd(st,.82),1);rLine(R,[x+.3,y+.6,.45],[x+.8,y+.6,.45],shd(st,.82),1)}
+else{rBox(R,x+.29,y+.22,.51,.56,.42,.07,st);rHL(R,x+.33,y+.26,.43,.48,.49,lt(st));if(!pink)rDot(R,x+.55,y+.5,.49,2.2,shd(st,.7))}
+rBox(R,x+.73,y+.73,.07,.07,0,.38,fr);rBox(R,x+.2,y+.73,.07,.07,0,.12,fr)}
+function dBench(R,x,y,w,d,o){const fr=o.fr,lt=c=>shd(c,1.12);
+if(o.slat){const IR=fr;for(const a of[.12,w-.19])rBox(R,x+a,y+.14,.07,.07,0,1,IR);
+rBox(R,x+.08,y+.12,w-.16,.06,.88,.13,o.back);rBox(R,x+.08,y+.12,w-.16,.06,.68,.13,o.back);rHL(R,x+.08,y+.12,w-.16,.06,1.01,lt(o.back));
+for(const a of[.12,w-.19])rBox(R,x+a,y+.21,.07,.5,.34,.06,IR);
+for(let i=0;i<3;i++){rBox(R,x+.05,y+.22+i*.17,w-.1,.14,.4,.05,o.seat);rHL(R,x+.05,y+.235+i*.17,w-.1,.035,.45,lt(o.seat))}
+for(const a of[.12,w-.19]){rBox(R,x+a,y+.71,.07,.07,0,.62,IR);rBox(R,x+a-.02,y+.2,.11,.6,.62,.05,IR)}return}
+for(const a of[.1,w-.18])for(const b of[.18,d-.24])rBox(R,x+a,y+b,.07,.07,0,.36,fr);
+rBox(R,x+.08,y+.12,w-.16,.08,.36,.64,fr);rBox(R,x+.14,y+.2,(w-.34)/2,.08,.5,.42,o.back);rBox(R,x+w/2+.03,y+.2,(w-.34)/2,.08,.5,.42,o.back);
+rHL(R,x+.14,y+.2,(w-.34)/2,.08,.92,lt(o.back));rHL(R,x+w/2+.03,y+.2,(w-.34)/2,.08,.92,lt(o.back));
+rBox(R,x+.06,y+.14,.1,d-.26,.36,.3,fr);rHL(R,x+.06,y+.14,.1,d-.26,.66,lt(fr));
+rBox(R,x+.16,y+.16,w-.32,d-.3,.36,.12,shd(fr,.95));
+rBox(R,x+.16,y+.28,(w-.36)/2,d-.44,.48,.08,o.seat);rBox(R,x+w/2+.02,y+.28,(w-.36)/2,d-.44,.48,.08,o.seat);
+rHL(R,x+.2,y+.32,(w-.36)/2-.08,d-.52,.56,lt(o.seat));rHL(R,x+w/2+.06,y+.32,(w-.36)/2-.08,d-.52,.56,lt(o.seat));
+rBox(R,x+w-.16,y+.14,.1,d-.26,.36,.3,fr);rHL(R,x+w-.16,y+.14,.1,d-.26,.66,lt(fr))}
 function dLSofa(R,x,y,w,d,o){const c=o.c;rBox(R,x+.05,y+.08,w-.1,d-.14,0,.22,c);rBox(R,x+.05,y+.08,w-.1,.24,.22,.32,shd(c,.93));for(const a of[.05,w-.25])rBox(R,x+a,y+.32,.2,d-.4,.22,.14,shd(c,.9));
 rBox(R,x+.27,y+.34,(w-.56)/2,d-.44,.22,.1,shd(c,1.1));rBox(R,x+w/2+.01,y+.34,(w-.56)/2,d-.44,.22,.1,shd(c,1.1));if(o.ac){rBox(R,x+.32,y+.3,.3,.1,.32,.26,o.ac);rBox(R,x+w-.62,y+.3,.3,.1,.32,.26,o.ac2||o.ac)}}
 Object.assign(FT,{ldesk2:{w:2,d:1,cat:"desk",dr:lDesk},ldesk3:{w:3,d:1,cat:"desk",dr:lDesk},ldesk4:{w:4,d:2,cat:"desk",dr:lDesk},
@@ -920,9 +991,46 @@ else if(k==="moon"){base(6,0,"#e2e8f0");pole(36,"#c9d1da");rGlow(c,X,Y-48*u,30*u
 else if(k==="star"){base(6,0,"#c8946a");pole(34,"#a8744a");rGlow(c,X,Y-46*u,28*u,GL);c.fillStyle=sh;c.beginPath();for(let i=0;i<10;i++){const rr=(i%2?5:12)*u,an=i*Math.PI/5-Math.PI/2;c.lineTo(X+Math.cos(an)*rr,Y-46*u+Math.sin(an)*rr)}c.closePath();c.fill();c.lineWidth=1.2*u;c.stroke();c.fillStyle="rgba(255,255,255,.6)";c.beginPath();c.arc(X-3*u,Y-49*u,1.8*u,0,6.2832);c.fill()}
 c.restore()}
 
+Object.assign(FT,{table2:{w:2,d:1,cat:"table",dr(R,x,y,w,d,o){for(const[a,b]of[[.12,.14],[1.82,.14],[.12,.8],[1.82,.8]])rBox(R,x+a,y+b,.06,.06,0,.4,o.fr);rBox(R,x+.1,y+.22,1.8,.04,.32,.06,shd(o.fr,.9));rBox(R,x+.08,y+.1,1.84,.8,.4,.08,o.top);rHL(R,x+.14,y+.16,1.72,.68,.481,shd(o.top,1.06))}},
+rack:{w:1,d:1,cat:"wardrobe",dr(R,x,y,w,d,o){const fr=o.fr,cl=o.cl;for(const a of[.1,.84]){rBox(R,x+a,y+.3,.06,.4,0,.04,fr);rBox(R,x+a+.01,y+.47,.04,.06,.04,1.5,fr)}
+rBox(R,x+.14,y+.32,.72,.36,.2,.03,shd(fr,.9));[[.22,"#e5564a"],[.4,"#6aa8e8"]].forEach(([a,c])=>{rBox(R,x+a,y+.38,.12,.2,.23,.08,c)});
+rBox(R,x+.1,y+.47,.8,.06,1.5,.04,fr);cl.forEach((c,i)=>{const a=.2+i*.17;rLine(R,[x+a+.06,y+.5,1.5],[x+a+.06,y+.5,1.42],"#6a6a72",1.2);rLine(R,[x+a-.01,y+.5,1.36],[x+a+.06,y+.5,1.43],"#6a6a72",1.2);rLine(R,[x+a+.13,y+.5,1.36],[x+a+.06,y+.5,1.43],"#6a6a72",1.2);
+rBox(R,x+a,y+.42,.12,.16,.78,.58,c);rBox(R,x+a-.03,y+.44,.18,.12,1.22,.14,c);rHL(R,x+a,y+.42,.12,.16,1.361,shd(c,1.1))})}},
+drawer:{w:1,d:1,cat:"wardrobe",dr(R,x,y,w,d,o){const c=o.c,n=o.n||4,H=1.0;for(const[a,b]of[[.14,.18],[.8,.18],[.14,.76],[.8,.76]])rBox(R,x+a,y+b,.06,.06,0,.08,shd(c,.75));rBox(R,x+.1,y+.14,.8,.72,.08,H,c);rBox(R,x+.07,y+.11,.86,.78,.08+H,.05,o.top||shd(c,1.06));rHL(R,x+.12,y+.14,.76,.72,.131+H,shd(o.top||c,1.08));
+const hh=(H-.1)/n;for(let i=0;i<n;i++){const z0=.13+i*hh;rPoly(R,[[x+.15,y+.86,z0],[x+.85,y+.86,z0],[x+.85,y+.86,z0+hh-.05],[x+.15,y+.86,z0+hh-.05]],shd(c,1.04),1);rLine(R,[x+.42,y+.86,z0+hh/2-.02],[x+.58,y+.86,z0+hh/2-.02],o.kn||"#c8a050",2.2)}}},
+inst:{w:1,d:1,cat:"etc",dr(R,x,y,w,d,o){const cx=x+.5,cy=y+.5,LN="#4a2c2a";
+if(o.k==="guitar"){rLine(R,[cx-.18,cy+.22,0],[cx,cy,.42],"#3a3a46",2);rLine(R,[cx+.18,cy+.22,0],[cx,cy,.42],"#3a3a46",2);rLine(R,[cx,cy-.25,0],[cx,cy,.42],"#3a3a46",2);
+rBox(R,cx-.03,cy+.02,.06,.05,.62,.72,"#6a4428");rBox(R,cx-.05,cy+.01,.1,.06,1.32,.16,"#3a2a20");for(const z of[1.36,1.42])for(const s of[-1,1])rDot(R,cx+s*.06,cy+.04,z,1.3,"#d8d8d8");
+rEll(R,cx,cy+.08,.3,0,12,10.5,o.c);rEll(R,cx,cy+.08,.52,0,9,8,o.c);rEll(R,cx,cy+.09,.3,0,9.5,8.2,shd(o.c,1.12),0);rDot(R,cx,cy+.1,.5,3.2,"#3a2a20");rBox(R,cx-.05,cy+.1,.1,.02,.3,.03,"#3a2a20");
+for(const s of[-1.5,-.5,.5,1.5])rLine(R,[cx+s*.012,cy+.1,.32],[cx+s*.012,cy+.08,1.32],"#eee",.6)}
+else{rBlob(R,cx+.28,cy-.22,.02,2,"#555");rLine(R,[cx+.28,cy-.22,0],[cx+.28,cy-.22,1.05],"#8a8f99",1.6);rCyl(R,cx+.28,cy-.22,.2,.2,1.05,.015,"#e8b830","#f6d060");
+rLine(R,[cx-.3,cy-.25,0],[cx-.3,cy-.25,.82],"#8a8f99",1.6);rCyl(R,cx-.3,cy-.25,.16,.16,.82,.012,"#e8b830","#f6d060");
+const P=(a,z)=>[cx+Math.cos(a)*.3,cy+.06,.32+Math.sin(a)*.3],ring=[];for(let i=0;i<24;i++)ring.push(P(i/24*6.2832));
+rPoly(R,ring.map(p=>[p[0],p[1]-.18,p[2]]),"#c8344a",1);rBox(R,cx-.3,cy-.12,.6,.18,.02,.6,"#e5484d");rPoly(R,ring,"#f4f1ea",1.4);
+rDot(R,cx,cy+.06,.32,4,"#e5484d");rCyl(R,cx-.28,cy+.28,.14,.14,.48,.12,"#e5484d","#f4f1ea");for(const a of[-.38,-.18])rLine(R,[cx+a,cy+.36,0],[cx-.28,cy+.28,.48],"#8a8f99",1.2);
+rCyl(R,cx+.08,cy-.16,.13,.13,.66,.12,"#e5484d","#f4f1ea");rCyl(R,cx+.3,cy+.26,.15,.15,0,.48,"#e5484d","#f4f1ea");rLine(R,[cx-.2,cy+.3,.62],[cx-.05,cy+.2,.72],"#e8c890",1.6);rLine(R,[cx-.32,cy+.34,.62],[cx-.1,cy+.12,.74],"#e8c890",1.6)}}},
+inst2:{w:2,d:1,cat:"etc",dr(R,x,y,w,d,o){const LN="#4a2c2a";
+if(o.k==="piano"){const c=o.c;for(const a of[.18,1.74]){rBox(R,x+a,y+.6,.08,.08,0,.62,c);rBox(R,x+a-.01,y+.6,.1,.1,0,.05,shd(c,.8))}
+rBox(R,x+.1,y+.18,1.8,.4,0,1.35,c);rHL(R,x+.12,y+.2,1.76,.36,1.351,shd(c,1.25));rBox(R,x+.14,y+.58,1.72,.08,.15,.4,shd(c,.92));
+rBox(R,x+.1,y+.56,1.8,.32,.62,.1,c);rPoly(R,[[x+.16,y+.58,.721],[x+1.84,y+.58,.721],[x+1.84,y+.84,.721],[x+.16,y+.84,.721]],"#fbfaf6",1);
+for(let i=1;i<21;i++){const a=.16+i*.08;rLine(R,[x+a,y+.6,.722],[x+a,y+.84,.722],"#bfb8ae",.6)}for(let i=0;i<20;i++){if(![0,1,3,4,5].includes(i%7))continue;const a=.16+i*.08+.055;rPoly(R,[[x+a,y+.58,.73],[x+a+.05,y+.58,.73],[x+a+.05,y+.72,.73],[x+a,y+.72,.73]],"#26262c",0)}
+rBox(R,x+.14,y+.54,1.72,.04,.73,.42,shd(c,1.1));rBox(R,x+.76,y+.5,.48,.06,1.0,.22,"#fff8e6");rLine(R,[x+.82,y+.56,1.08],[x+1.18,y+.56,1.08],"#888",.8);rLine(R,[x+.82,y+.56,1.14],[x+1.18,y+.56,1.14],"#888",.8)}
+else{const c=o.c,DK="#2f3140",wh=(a)=>{const ring=[];for(let i=0;i<28;i++){const t=i/28*6.2832;ring.push([x+a+Math.cos(t)*.32,y+.5,.34+Math.sin(t)*.32])}rPoly(R,ring,null,3.2);const inr=ring.map(p=>[x+a+(p[0]-x-a)*.86,p[1],.34+(p[2]-.34)*.86]);rPoly(R,inr,null,1);for(let i=0;i<8;i++){const t=i/8*3.1416;rLine(R,[x+a+Math.cos(t)*.27,y+.5,.34+Math.sin(t)*.27],[x+a-Math.cos(t)*.27,y+.5,.34-Math.sin(t)*.27],"#9aa0aa",.6)}rDot(R,x+a,y+.5,.34,2.2,"#9aa0aa")};
+wh(.42);const A=[x+.42,y+.5,.34],B=[x+.95,y+.5,.32],C=[x+1.55,y+.5,.34],D=[x+.82,y+.5,.82],E=[x+1.4,y+.5,.85];
+for(const[p,q]of[[A,B],[A,D],[B,D],[B,E],[D,E],[C,E]])rLine(R,p,q,c,3.4);rLine(R,D,[x+.76,y+.5,.95],c,3);rBox(R,x+.64,y+.42,.22,.16,.95,.05,DK);rLine(R,E,[x+1.36,y+.5,1.08],c,3);rLine(R,[x+1.36,y+.3,1.08],[x+1.36,y+.7,1.08],DK,3);
+rDot(R,x+.95,y+.5,.32,3,DK);rLine(R,[x+.95,y+.5,.32],[x+1.02,y+.62,.2],DK,1.6);rBox(R,x+.98,y+.6,.1,.06,.18,.02,DK);wh(1.55);rLine(R,[x+1.36,y+.5,1.0],[x+1.55,y+.5,.34],c,3.4)}}}});
+Object.assign(SURF,{table2:o=>.48,drawer:o=>1.13});Object.assign(FTN,{});
+FDEF.push({id:"sf5",t:"sofa",n:"갈색 소파",p:90,o:{c:"#9a6a48"}},{id:"sf6",t:"sofa",n:"흰색 소파",p:90,o:{c:"#f4f1ea"}},{id:"sf7",t:"sofa",n:"검은색 소파",p:90,o:{c:"#46464e"}},
+{id:"sh5",t:"shelf",n:"검은색 책장",p:70,o:{fr:"#3f4048"}},{id:"sh6",t:"shelf",n:"파스텔 분홍 책장",p:70,o:{fr:"#ffd6e2"}},{id:"sh7",t:"shelf",n:"파스텔 하늘 책장",p:70,o:{fr:"#cfe4fa"}},{id:"sh8",t:"shelf",n:"파스텔 민트 책장",p:70,o:{fr:"#cdeedd"}},
+{id:"tb4",t:"table",n:"분홍 둥근 탁자",p:40,o:{round:1,fr:"#f6a8c0",top:"#ffe0ea"}},{id:"tb5",t:"table",n:"민트 둥근 탁자",p:40,o:{round:1,fr:"#7fc8b0",top:"#d4f4e6"}},{id:"tb6",t:"table",n:"원목 둥근 탁자",p:40,o:{round:1,fr:"#8a5a38",top:"#d9a86a"}},{id:"tb7",t:"table",n:"노랑 둥근 탁자",p:40,o:{round:1,fr:"#e8b830",top:"#fff0c4"}},
+{id:"tt1",t:"table2",n:"원목 2인용 탁자",p:60,o:{fr:"#8a5a38",top:"#e0b884"}},{id:"tt2",t:"table2",n:"흰색 2인용 탁자",p:60,o:{fr:"#c9d1da",top:"#ffffff"}},
+{id:"hg1",t:"rack",n:"철제 행거",p:70,o:{fr:"#a8b0bc",cl:["#ff8fb1","#9cc8f0","#ffd24a","#8fd466"]}},{id:"hg2",t:"rack",n:"원목 행거",p:75,o:{fr:"#a8744a",cl:["#f4f1ea","#e5564a","#6a7a8a","#c79af0"]}},
+{id:"dw1",t:"drawer",n:"원목 서랍장",p:80,o:{c:"#b8814f",top:"#d9a86a"}},{id:"dw2",t:"drawer",n:"흰색 서랍장",p:80,o:{c:"#f4f1ea",kn:"#9aa5b1"}},{id:"dw3",t:"drawer",n:"분홍 서랍장",p:85,o:{c:"#ffd1df",kn:"#ff8fb1",n:3}},
+{id:"ms1",t:"inst",n:"기타",p:120,o:{k:"guitar",c:"#e0a050"}},{id:"ms2",t:"inst",n:"드럼",p:220,o:{k:"drum"}},{id:"ms3",t:"inst2",n:"피아노",p:300,o:{k:"piano",c:"#2e2e36"}},{id:"ms4",t:"inst2",n:"자전거",p:200,o:{k:"bike",c:"#3a9ae0"}});
+FDEF.forEach(f=>{if(["sh4","tb1","ba_plant"].includes(f.id))f.hide=1;if(f.t==="sofa"&&/^sf\d/.test(f.id))f.fp=420;if(f.t==="lsofa")f.fp=472});
 {const v=FTN.etc;delete FTN.etc;FTN.etc=v}const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
-{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7))})}
+{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7));if(f.fp)f.p=f.fp})}
 const fTy=f=>FT[FD[f[0]].t];
 function rFoot(f){const t=fTy(f);return f[3]%2?[t.d,t.w]:[t.w,t.d]}
 const fqOf=id=>(S.me.fq&&+S.me.fq[id])||0;
@@ -933,7 +1041,8 @@ const cnt={};r.f=r.f.filter(f=>{if(!Array.isArray(f)||!FD[f[0]])return false;cnt
 if(!ownWF(r.wp,WD))r.wp="w0";if(!ownWF(r.fl,FLD))r.fl="f0";r.w=RW=Math.min(20,Math.max(8,Math.floor(+r.w)||8));r.d=RD=Math.min(20,Math.max(8,Math.floor(+r.d)||8));return r}
 const rAvail=(r,id)=>fqOf(id)-r.f.filter(f=>f[0]===id).length;
 function rBlocked(r,ex,wk){const g={};r.f.forEach((f,i)=>{if(i===ex||fTy(f).walk||fTy(f).orn||fTy(f).wl||(wk&&f[4]&&fTy(f)===FT.door))return;const[w,d]=rFoot(f);for(let a=0;a<w;a++)for(let b=0;b<d;b++)g[(f[1]+a)+","+(f[2]+b)]=1});return g}
-function rFits(r,id,x,y,rot,ex){const T=FT[FD[id].t],w=rot%2?T.d:T.w,d=rot%2?T.w:T.d;if(x<0||y<0||x+w>RW||y+d>RD)return false;if(T.wl){const od=rot%2;if(od?x!==0:y!==0)return false;const a=od?y:x;return!r.f.some((f,i)=>{if(i===ex||!fTy(f).wl||(f[3]%2)!==od)return false;const b=od?f[2]:f[1];return a<b+fTy(f).w&&b<a+T.w})}if(T.orn)return!!rSurf(r,x,y)&&!r.f.some((f,i)=>i!==ex&&fTy(f).orn&&f[1]===x&&f[2]===y);if(T.walk)return!r.f.some((f,i)=>i!==ex&&fTy(f).walk&&(()=>{const[fw,fd]=rFoot(f);return x<f[1]+fw&&f[1]<x+w&&y<f[2]+fd&&f[2]<y+d})());const g=rBlocked(r,ex);for(let a=0;a<w;a++)for(let b=0;b<d;b++)if(g[(x+a)+","+(y+b)])return false;return true}
+function rFits(r,id,x,y,rot,ex){const T=FT[FD[id].t],w=rot%2?T.d:T.w,d=rot%2?T.w:T.d;if(x<0||y<0||x+w>RW||y+d>RD)return false;if(T.wl){const od=rot%2;if(od?x!==0:y!==0)return false;const a=od?y:x;return!r.f.some((f,i)=>{if(i===ex||!fTy(f).wl||(f[3]%2)!==od)return false;const b=od?f[2]:f[1];return a<b+fTy(f).w&&b<a+T.w})}if(T.orn)return rOrnFree(r,x,y,ex)>=0;if(T.walk)return!r.f.some((f,i)=>i!==ex&&fTy(f).walk&&(()=>{const[fw,fd]=rFoot(f);return x<f[1]+fw&&f[1]<x+w&&y<f[2]+fd&&f[2]<y+d})());const g=rBlocked(r,ex);for(let a=0;a<w;a++)for(let b=0;b<d;b++)if(g[(x+a)+","+(y+b)])return false;return true}
+{const _C=rCyl;rCyl=function(R,cx,cy,r0,r1,z,h,col,top){if(!RXF)return _C(R,cx,cy,r0,r1,z,h,col,top);const q=xfp(cx,cy),r=Math.max(r0,r1),go=()=>{const s=RXF;RXF=null;try{_C(R,q[0],q[1],r0,r1,z,h,col,top)}finally{RXF=s}};if(!rxq([q[0]-r,q[0]+r,q[1]-r,q[1]+r,z,z+h],go))go()};}
 {const _B=rBox,_P=rPoly,_F=rFill,_D=rDot,_L=rBlob,_N=rLine;
 rBox=function(R,x,y,w,d,z,h,col){if(!RXF)return _B(R,x,y,w,d,z,h,col);const p1=xfp(x,y),p2=xfp(x+w,y+d),nx=Math.min(p1[0],p2[0]),ny=Math.min(p1[1],p2[1]),nw=Math.abs(p2[0]-p1[0]),nd=Math.abs(p2[1]-p1[1]);const go=()=>{const s=RXF;RXF=null;try{_B(R,nx,ny,nw,nd,z,h,col)}finally{RXF=s}};if(!rxq([nx,nx+nw,ny,ny+nd,z,z+h],go))go()};
 rPoly=function(R,pts,f,lw){if(!RXF||!RXF.q)return _P(R,pts,f,lw);rxq(xb(pts),()=>_P(R,pts,f,lw))};
@@ -959,7 +1068,7 @@ function tRoom(){bgmStart("room");const r=rCfg(),ed=RM&&RM.ed,m=S.me;let pal="";
 if(ed){const have0=FDEF.filter(f=>fqOf(f.id)>0),cty=f=>FT[f.t].cat||f.t,cts=Object.keys(FTN).filter(k=>have0.some(f=>cty(f)===k)),pt=cts.includes(RM.pty)?RM.pty:"all",have=pt==="all"?have0:have0.filter(f=>cty(f)===pt);
 pal=`<p class="mu" style="margin:8px 0 4px">${RM.sel!=null?"옮길 칸을 누르세요.":RM.pick?`<b>${FD[RM.pick].n}</b>을(를) 놓을 칸을 눌러요.`:"가구를 골라 바닥을 누르면 놓여요. 놓인 가구를 누르면 옮기거나 돌릴 수 있어요."}</p>
 ${RM.sel==null&&r.f.length?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px"><button class="g" style="${RM.clr?"background:#e5484d;color:#fff;border-color:#e5484d":""}" onclick="rClearAll()">${RM.clr?"정말 모두 넣어 둘까요?":"📦 모두 넣어 두기"}</button>${RM.clr?`<button class="g" onclick="RM.clr=0;tRoom()">취소</button>`:""}</div>`:""}
-${RM.sel!=null?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px">${fTy(r.f[RM.sel]).orn?`<button class="g" onclick="rUnder()">⬇ 아래 선반 선택</button>`:fTy(r.f[RM.sel]).wl?"":`<button class="g" onclick="rRot()">↻ 돌리기</button>`}<button class="g" onclick="rDel()">📦 넣어 두기</button><button class="g" onclick="RM.sel=null;tRoom()">취소</button></div>`:""}
+${RM.sel!=null?`<div class="row" style="gap:6px;justify-content:flex-start;margin-bottom:6px">${fTy(r.f[RM.sel]).orn?`<button class="g" onclick="rUnder()">⬇ 아래 선반 선택</button>${rOrnLvs(rSurf(r,r.f[RM.sel][1],r.f[RM.sel][2])).length>1?`<button class="g" onclick="rLv()">↕ 층 바꾸기</button>`:""}`:fTy(r.f[RM.sel]).wl?"":`<button class="g" onclick="rRot()">↻ 돌리기</button>`}<button class="g" onclick="rDel()">📦 넣어 두기</button><button class="g" onclick="RM.sel=null;tRoom()">취소</button></div>`:""}
 ${have0.length?`<div class="stp" style="margin:0 0 6px">${[["all","전체"],...cts.map(k=>[k,FTN[k]])].map(([k,l])=>`<button class="stb${pt===k?" on":""}" style="font-size:12px" onclick="RM.pty='${k}';tRoom()">${l}</button>`).join("")}</div>`:""}${have.length?`<div class="rpal">${have.map(f=>{const a=rAvail(r,f.id);return `<button class="${RM.pick===f.id?"on":""}" ${a>0?"":"disabled"} onclick="rPick('${f.id}')"><img alt="" src="${rThumb(f.id)}"><small>${f.n}</small><i class="rq">×${a}</i></button>`}).join("")}</div>`:`<div class="card" style="text-align:center;margin:6px 0 0"><p class="mu" style="margin:0 0 8px">아직 가구가 없어요. 상점에서 사 오세요!</p><button onclick="S.shopTab='home';goTab('shop')">🛒 상점 인테리어 가기</button></div>`}
 <p class="mu" style="margin:10px 0 4px">벽지</p><div class="rpal sm">${WDEF.filter(w=>ownWF(w.id,WD)).map(w=>`<button class="${r.wp===w.id?"on":""}" onclick="rSet('wp','${w.id}')"><img alt="" src="${rWallThumb(w.id)}"><small>${w.n}</small></button>`).join("")}</div>
 <p class="mu" style="margin:10px 0 4px">바닥</p><div class="rpal sm">${FLDEF.filter(w=>ownWF(w.id,FLD)).map(w=>`<button class="${r.fl===w.id?"on":""}" onclick="rSet('fl','${w.id}')"><img alt="" src="${rFloorThumb(w.id)}"><small>${w.n}</small></button>`).join("")}</div>
@@ -984,8 +1093,8 @@ function rMsg(t,ms){const e=document.getElementById("rmsg");if(e){e.textContent=
 function rPick(k){RM.pick=RM.pick===k?null:k;RM.sel=null;RM.gh=null;tRoom()}
 function rGhNo(){if(RM)RM.gh=null;tRoom()}
 function rGhOk(){const G=RM&&RM.gh;if(!G)return;const r=rCfg();RM.gh=null;
-if(G.k==="mv"){const f=r.f[RM.sel],gr=G.rot!=null?G.rot:f&&f[3];if(f&&rFits(r,f[0],G.x,G.y,gr,RM.sel)){f[3]=gr;const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
-else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,G.rot||0,-1)){r.f.push([RM.pick,G.x,G.y,G.rot||0]);if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
+if(G.k==="mv"){const f=r.f[RM.sel],gr=G.rot!=null?G.rot:f&&f[3];if(f&&rFits(r,f[0],G.x,G.y,gr,RM.sel)){f[3]=gr;const on=fTy(f).orn?[]:rOns(r,RM.sel),dx=G.x-f[1],dy=G.y-f[2];on.forEach(j=>{r.f[j][1]+=dx;r.f[j][2]+=dy});f[1]=G.x;f[2]=G.y;if(fTy(f).orn)f[4]=rOrnFree(r,G.x,G.y,RM.sel,f[4]||0);RM.sel=null;rDirty()}else rMsg("거기에는 놓을 수 없어요")}
+else if(RM.pick&&rAvail(r,RM.pick)>0&&rFits(r,RM.pick,G.x,G.y,G.rot||0,-1)){{const nf=[RM.pick,G.x,G.y,G.rot||0];if(FT[FD[RM.pick].t].orn)nf[4]=rOrnFree(r,G.x,G.y,-1);r.f.push(nf)}if(rAvail(r,RM.pick)<=0)RM.pick=null;rDirty()}else rMsg("거기에는 놓을 수 없어요");tRoom()}
 const isoBefore=(a,b)=>a[1]<=b[0]+.02||a[3]<=b[2]+.02||a[5]<=b[4]+.05;
 function rSortAll(fo,chs){if(!chs.length)return isoSort(fo);const o=isoSort([...fo,...chs]);let ok=true;const F=o.filter(x=>!x.c);for(let i=0;i<F.length&&ok;i++)for(let j=i+1;j<F.length;j++){const A=F[i].b,B=F[j].b;if(isoBefore(B,A)&&!isoBefore(A,B)){ok=false;break}}if(ok)return o;const r=isoSort(fo);chs.forEach(ch=>rInsCh(r,ch));return r}
 function rInsCh(ord,ch){const n=ord.length,mb=ord.map(o=>{const a=isoBefore(o.b,ch.b),b=isoBefore(ch.b,o.b);return a&&!b?1:b&&!a?-1:a&&b&&o.w?.5:0});let best=0,bv=1e9;for(let p=0;p<=n;p++){let v=0;for(let k=0;k<n;k++){const m=mb[k];if(k<p&&m<0)v+=1;else if(k>=p&&m>0)v+=m}if(v<bv){bv=v;best=p}}ord.splice(best,0,ch)}
@@ -1035,14 +1144,18 @@ if(!pv&&RM.ed&&RM.sel!=null&&r.f[RM.sel]){const f=r.f[RM.sel],[w,d]=rFoot(f);rPo
 let rr=r;const gi=[];if(!pv&&RM&&RM.ed&&RM.gh){const G=RM.gh;rr={...r,f:r.f.slice()};let its=[];if(G.k==="new"&&RM.pick)its=[[RM.pick,G.x,G.y,G.rot||0]];else if(G.k==="mv"&&r.f[RM.sel]){const f0=r.f[RM.sel],dx=G.x-f0[1],dy=G.y-f0[2];its=[[f0[0],G.x,G.y,G.rot!=null?G.rot:f0[3]],...(fTy(f0).orn?[]:rOns(r,RM.sel)).map(j=>{const o=r.f[j];return[o[0],o[1]+dx,o[2]+dy,o[3]]})]}its.forEach(it=>{gi.push(rr.f.length);rr.f.push(it)})}
 const ws=[],fo=[],orns=[],wls=[];rr.f.forEach((f,i)=>{const t=fTy(f),[w,d]=rFoot(f),gh=gi.includes(i);let fn;
 if(t.wl){const od=f[3]%2,a=od?f[2]:f[1];fn=()=>wlDraw(R,od?"x":"y",a,a+t.w,FD[f[0]].o);if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}wls.push({fn,i,f});return}
-if(t.orn){const sf=rSurf(rr,f[1],f[2]),z=sf?sf.z:0;fn=()=>rRotDraw(R,f,z,()=>t.dr({...R,oy:R.oy-z*RTH*R.s},f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i});return}
+if(t.orn){const sf=rSurf(rr,f[1],f[2]),lv=sf&&FD[sf.f[0]].t==="ledge"?(f[4]||0):0,z=sf?rOrnZ(sf,lv):0;let RR={...R,oy:R.oy-z*RTH*R.s};if(lv){const so=FD[sf.f[0]].o,k=Math.min(.85,(so.h/so.n-.22)/.72),sv=(sf.f[3]||0)%2?[.13,0]:[0,.13],s0=RXF;RXF=null;const p=rP(RR,f[1]+.5+sv[0],f[2]+.5+sv[1],0),R2={...RR,s:RR.s*k},p2=rP(R2,f[1]+.5,f[2]+.5,0);RXF=s0;R2.ox+=p[0]-p2[0];R2.oy+=p[1]-p2[1];RR=R2}
+fn=()=>rRotDraw(R,f,z,()=>t.dr(RR,f[1],f[2],1,1,FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}orns.push({sf:sf&&sf.f,fn,i,lv});return}
+if(t===FT.ledge){const Lo=FD[f[0]].o,mine=()=>orns.filter(q=>q.sf===f&&q.lv>0),occ={};rr.f.forEach(g=>{if(fTy(g).orn&&(g[4]||0)>0)occ[g[4]+":"+g[1]+","+g[2]]=1});
+fn=()=>{const M=mine();for(let k=0;k<=Lo.n;k++){rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],t.w,t.d,{...Lo,_lay:k,_part:"a",_occ:occ}));M.filter(q=>q.lv===k+1).forEach(q=>q.fn());if(k<Lo.n)rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],t.w,t.d,{...Lo,_lay:k,_part:"b",_occ:occ}))}};
+if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}(t.walk?ws:fo).push({b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i,w:false});return}
 fn=()=>rRotDraw(R,f,0,()=>t.dr(R,f[1],f[2],f[3]&&t!==FT.wall?t.w:w,f[3]&&t!==FT.wall?t.d:d,t===FT.door?{...FD[f[0]].o,op:f[4]?1:0,rt:(f[3]||0)%2}:(t===FT.bed||t===FT.bed2)&&f[4]?{...FD[f[0]].o,brk:1}:FD[f[0]].o));if(gh){const g0=fn;fn=()=>{c.save();c.globalAlpha=.5;g0();c.restore()}}
 const o={b:[f[1],f[1]+w,f[2],f[2]+d,0,3],fn,f,i,w:t===FT.wall||t===FT.door};(t.walk?ws:fo).push(o)});
 const sF=!pv&&RM&&RM.seat?r.f[RM.seat.i]:null,sEmb=sF&&(sF[3]||0)%4!==0&&fTy(sF)!==FT.wall,late=[],chs=[];
 if(!pv&&!sEmb){const ch={b:[RM.x-.08,RM.x+.08,RM.y-.08,RM.y+.08,0,2],fn:()=>rChar(R),c:1},si=RM.seat?fo.find(o=>o.i===RM.seat.i):null;if(si)late.push([ch,si]);else chs.push(ch)}
 if(!pv)visOthers().forEach(o=>{const ch={b:[o.x-.08,o.x+.08,o.y-.08,o.y+.08,0,2],fn:()=>rCharO(R,o),c:1},si=o.z>0?fo.find(q=>q.f&&SEATZ[FD[q.f[0]].t]!=null&&(()=>{const[w,d]=rFoot(q.f);return o.x>=q.f[1]&&o.x<=q.f[1]+w&&o.y>=q.f[2]&&o.y<=q.f[2]+d})()):null;if(si)late.push([ch,si]);else chs.push(ch)});
 const ord=rSortAll(fo,chs);late.forEach(([ch,si])=>ord.splice(ord.indexOf(si)+1,0,ch));
-const seq=[];wls.forEach(o=>seq.push(o));ws.sort((a,b)=>a.i-b.i).forEach(o=>seq.push(o));ord.forEach(o=>{seq.push(o);if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(a.i-b.i)).forEach(q=>seq.push(q))});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>seq.push(q));RSEAT=sEmb?{f:sF}:null;try{seq.forEach(o=>o.fn())}finally{RSEAT=null}if(!pv&&RM)RM.hit={R,seq:seq.filter(o=>o.i!=null&&!gi.includes(o.i)&&o.i<r.f.length),W:cv.width,H:cv.height,rw:new Map(RWALL)};RWALL=new Map()}
+const seq=[];wls.forEach(o=>seq.push(o));ws.sort((a,b)=>a.i-b.i).forEach(o=>seq.push(o));ord.forEach(o=>{seq.push(o);if(o.f)orns.filter(q=>q.sf===o.f).sort((a,b)=>(b.lv||0)-(a.lv||0)||(a.i-b.i)).forEach(q=>seq.push(q.lv?{...q,nd:1}:q))});orns.filter(q=>!q.sf||!rr.f.includes(q.sf)).forEach(q=>seq.push(q));RSEAT=sEmb?{f:sF}:null;try{seq.forEach(o=>{if(!o.nd)o.fn()})}finally{RSEAT=null}if(!pv&&RM)RM.hit={R,seq:seq.filter(o=>o.i!=null&&!gi.includes(o.i)&&o.i<r.f.length),W:cv.width,H:cv.height,rw:new Map(RWALL)};RWALL=new Map()}
 const SEATZ={chair:.48,sofa:.5,lsofa:.32,bench:.5,bed:.56,bed2:.62};
 function rChar(R){const c=R.c,H=RM.hop,ht=H?Math.min(1,(RM.t-H.t0)/H.d):1;if(H&&ht>=1)RM.hop=null;const e=ht<1?(1-Math.cos(Math.PI*ht))/2:1,hx=ht<1?H.x0+(RM.x-H.x0)*e:RM.x,hy=ht<1?H.y0+(RM.y-H.y0)*e:RM.y,z=(ht<1?H.z0+((RM.seat?RM.sz:0)-H.z0)*e+Math.sin(Math.PI*ht)*.75:(RM.seat?RM.sz:0)),p=rP(R,hx,hy,z),[cid,hid0,tid0]=String(RCK||chKeyNT()).split("|"),ch=CHR[(+String(cid).slice(1))-1];
 if(!ch){const im=chImgOf(chKeyNT());if(im&&im.complete&&im.naturalWidth){const h=46*R.s*(im.hr||1),w=im.naturalWidth/im.naturalHeight*h;c.drawImage(im,p[0]-w/2,p[1]-h+4,w,h)}return}
