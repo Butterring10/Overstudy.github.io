@@ -922,7 +922,7 @@ c.restore()}
 
 {const v=FTN.etc;delete FTN.etc;FTN.etc=v}const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
-{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p)})}
+{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7))})}
 const fTy=f=>FT[FD[f[0]].t];
 function rFoot(f){const t=fTy(f);return f[3]%2?[t.d,t.w]:[t.w,t.d]}
 const fqOf=id=>(S.me.fq&&+S.me.fq[id])||0;
