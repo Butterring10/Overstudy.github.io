@@ -918,6 +918,7 @@ c.restore()}
 
 {const v=FTN.etc;delete FTN.etc;FTN.etc=v}const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
+{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p)})}
 const fTy=f=>FT[FD[f[0]].t];
 function rFoot(f){const t=fTy(f);return f[3]%2?[t.d,t.w]:[t.w,t.d]}
 const fqOf=id=>(S.me.fq&&+S.me.fq[id])||0;
@@ -1059,7 +1060,7 @@ body=`<div class="stp">${[["all","전체"],...ts.map(k=>[k,FTN[k]])].map(([k,l])
 else if(t==="size"){const r=rCfg(),bx=(k,l)=>{const nw=r.w+(k==="w"?1:0),nd=r.d+(k==="d"?1:0),mx=r[k]>=20,F=FLD[r.fl]||FLD.f0,W=WD[r.wp]||WD.w0;
 return `<div class="it" style="padding:12px;width:auto"><span style="font-size:15px;font-weight:700;display:block;margin-bottom:6px">${l}</span>
 <div class="ba"><figure><img alt="" src="${rSizeThumb(r.w,r.d,r.w,r.d,nw,nd,F,W)}"><figcaption>지금<br><b>${r.w}×${r.d}</b></figcaption></figure><span class="baa">${mx?"":"➜"}</span>${mx?"":`<figure><img alt="" src="${rSizeThumb(nw,nd,r.w,r.d,nw,nd,F,W)}"><figcaption>구매 후<br><b>${nw}×${nd}</b></figcaption></figure>`}</div>
-<span class="mu">${mx?"더 이상 넓힐 수 없어요 (최대 20칸)":"🪙 500 · 💎 "+gP(500)+" · 최대 20칸"}</span><br><button ${mx?"disabled":""} onclick="buyR('${k}')">${mx?"최대 크기":"1칸 넓히기"}</button></div>`};
+<span class="mu">${mx?"더 이상 넓힐 수 없어요 (최대 20칸)":"🪙 250 · 💎 "+gP(250)+" · 최대 20칸"}</span><br><button ${mx?"disabled":""} onclick="buyR('${k}')">${mx?"최대 크기":"1칸 넓히기"}</button></div>`};
 body=`<p class="mu" style="margin:0 0 8px;text-align:center">현재 방 크기 <b>${r.w} × ${r.d}칸</b> (가로 × 세로)</p><div style="display:grid;gap:10px">${bx("w","↔ 가로 넓히기")}${bx("d","↕ 세로 넓히기")}</div>`}
 else{const L=t==="wall"?WDEF:FLDEF,th=t==="wall"?rWallThumb:rFloorThumb;body=`<div class="grid">${L.map(w=>{const own=ownWF(w.id,t==="wall"?WD:FLD);return `<div class="it"><img class="rsi" alt="" src="${th(w.id)}">${w.n}<br>${own?`<span class="mu">${w.p?"보유함":"기본 제공"}</span><br>`:`<span class="mu">${pG(w.p)}</span><br>`}<button class="g pvb" onclick="shopPrev('${t}','${w.id}')">미리보기</button><br><button ${own?"disabled":""} onclick="buyWF('${w.id}')">${own?"보유":"구매"}</button></div>`}).join("")}</div>`}
 return `<div class="card"><h2>인테리어</h2><p class="mu" style="margin:0 0 8px">🪙 코인과 💎 보석을 함께 써서 살 수 있어요. 산 가구는 <b>방 꾸미기</b> 탭에서 놓아요. (가구는 여러 개 살 수 있어요)</p>${sub}${body}</div>`}
@@ -1069,7 +1070,7 @@ function rSizeThumb(cw,cd,ow,od,nw,nd,F,W){const cv=document.createElement("canv
 const wc=W.c1;rPoly(R,[[0,0,0],[cw,0,0],[cw,0,1.8],[0,0,1.8]],shd(wc,1),1.2);rPoly(R,[[0,0,0],[0,cd,0],[0,cd,1.8],[0,0,1.8]],shd(wc,.86),1.2);
 for(let x=0;x<cw;x++)for(let y=0;y<cd;y++){const nw_=(x>=ow||y>=od);rPoly(R,[[x,y,0],[x+1,y,0],[x+1,y+1,0],[x,y+1,0]],nw_?"#ffcf70":floorCol(F,x,y),.5)}
 rPoly(R,[[0,cd,0],[cw,cd,0],[cw,0,0],[cw,0,-.3],[cw,cd,-.3],[0,cd,-.3]],shd(F.c1,.7),1.2);return cv.toDataURL()}
-async function buyR0(k){const m=S.me,r=rCfg();if(r[k]>=20)return;const g=gP(500);if(m.coins<500)return alert("코인이 부족해요.");if((m.gems||0)<g)return alert("보석이 부족해요.");const oc=m.coins,og=m.gems||0,ov=r[k];m.coins-=500;m.gems=og-g;r[k]=ov+1;
+async function buyR0(k){const m=S.me,r=rCfg();if(r[k]>=20)return;const g=gP(250);if(m.coins<250)return alert("코인이 부족해요.");if((m.gems||0)<g)return alert("보석이 부족해요.");const oc=m.coins,og=m.gems||0,ov=r[k];m.coins-=250;m.gems=og-g;r[k]=ov+1;
 try{await db.doc("students/"+m.cls+"_"+m.sid).update({coins:m.coins,gems:m.gems,room:m.room})}catch(e){m.coins=oc;m.gems=og;r[k]=ov;alert("저장하지 못했어요.")}tShop()}
 async function buyWF0(id){const m=S.me,w=WD[id]||FLD[id];if(!w||ownWF(id,WD)||ownWF(id,FLD))return;const g=gP(w.p);if(m.coins<w.p)return alert("코인이 부족해요.");if((m.gems||0)<g)return alert("보석이 부족해요.");const oc=m.coins,og=m.gems||0,oi=[...m.items];m.coins-=w.p;m.gems=og-g;m.items=[...oi,id];
 try{await db.doc("students/"+m.cls+"_"+m.sid).update({coins:m.coins,gems:m.gems,items:m.items})}catch(e){m.coins=oc;m.gems=og;m.items=oi;alert("저장하지 못했어요.")}tShop()}
@@ -1261,7 +1262,7 @@ dough:{n:"피자 도우",e:"🫓",p:3,ov:1},chicken:{n:"생닭",e:"🍗",p:5,dp:
 cookie:{n:"쿠키 반죽",e:"🍪",p:3,ov:1},pastry:{n:"생지",e:"🥐",p:3,ov:1},batter:{n:"케이크 반죽",e:"🥣",p:3,ov:1},cream:{n:"생크림",e:"🍦",p:3},choco:{n:"초콜릿",e:"🍫",p:3},strawberry:{n:"딸기",e:"🍓",p:3,ch:1},banana:{n:"바나나",e:"🍌",p:2,ch:1},
 cone:{n:"아이스크림 콘",e:"🍦",p:3},icev:{n:"바닐라 아이스크림",e:"🍨",p:4},icec:{n:"초코 아이스크림",e:"🍨",p:4},icest:{n:"딸기 아이스크림",e:"🍨",p:4}};
 for(const k in ING)ING[k].p*=6;
-for(const k in ING)ING[k].p=Math.round(ING[k].p*52.5)/100;const fw=v=>String(Math.round(v*100)/100);
+for(const k in ING)ING[k].p=Math.round(ING[k].p*26.25)/100;const fw=v=>String(Math.round(v*100)/100);
 const MART=[{t:"@shelfveg 채소·과일 코너",k:"shelf",items:["tomato","lettuce","onion","mushroom","carrot","pepper","potato","strawberry","banana"]},{t:"@shelfgrain 곡물·면·반죽 코너",k:"shelf",items:["bun","pasta","rice","noodle","ricecake","seaweed","dough","cookie","pastry","batter","cone"]},{t:"@shelfjar 양념·간식 코너",k:"shelf",items:["sauce","chunjang","choco"]},{t:"@fridge 냉장고",k:"fridge",items:["patty","beef","pork","chicken","fish","shrimp","egg","cheese","dumpling","cream","icev","icec","icest"]}];
 const POTK={"tomato:chopped":"soup","onion:chopped":"soup","pasta:raw":"pasta","rice:raw":"rice","noodle:raw":"noodle","ricecake:raw":"ricecake","dumpling:raw":"dumpling"},POTN={soup:3,pasta:1,rice:1,noodle:1,ricecake:1,dumpling:1};
 const GB=["rice:boiled","seaweed:raw","carrot:chopped"];
@@ -2525,6 +2526,6 @@ function buy(id){if(S.me.items.includes(id))return buy0(id);shopAsk("char",id,()
 function buyG(id){const m=S.me;if(m.items.includes(id))return buyG0(id);shopAsk("char",id,()=>buyG0(id))}
 function buyF(id){if(!FD[id])return;shopAsk("furn",id,()=>buyF0(id))}
 function buyWF(id){if(ownWF(id,WD)||ownWF(id,FLD))return;shopAsk(WD[id]?"wall":"floor",id,()=>buyWF0(id))}
-function buyR(k){const r=rCfg();if(r[k]>=20)return;if(S.me.coins<500)return alert("코인이 부족해요. (필요 🪙 500)");if((S.me.gems||0)<gP(500))return alert("보석이 부족해요. (필요 💎 "+gP(500)+")");window._shfn=()=>buyR0(k);shmOpen(`<div style="font-size:54px">📐</div><b style="font-size:17px">방 ${k==="w"?"가로":"세로"} 1칸 넓히기</b><div style="margin:6px 0 2px">🪙 500 · 💎 ${gP(500)}에 구매할까요?</div><div class="mu">지금 ${r.w}×${r.d} → ${r.w+(k==="w"?1:0)}×${r.d+(k==="d"?1:0)} · 내 코인 🪙 ${S.me.coins} · 보석 💎 ${S.me.gems||0}</div><div class="shmb"><button class="g" onclick="shmClose()">취소</button><button onclick="shmClose();window._shfn()">구매</button></div>`)}
+function buyR(k){const r=rCfg();if(r[k]>=20)return;if(S.me.coins<250)return alert("코인이 부족해요. (필요 🪙 250)");if((S.me.gems||0)<gP(250))return alert("보석이 부족해요. (필요 💎 "+gP(250)+")");window._shfn=()=>buyR0(k);shmOpen(`<div style="font-size:54px">📐</div><b style="font-size:17px">방 ${k==="w"?"가로":"세로"} 1칸 넓히기</b><div style="margin:6px 0 2px">🪙 250 · 💎 ${gP(250)}에 구매할까요?</div><div class="mu">지금 ${r.w}×${r.d} → ${r.w+(k==="w"?1:0)}×${r.d+(k==="d"?1:0)} · 내 코인 🪙 ${S.me.coins} · 보석 💎 ${S.me.gems||0}</div><div class="shmb"><button class="g" onclick="shmClose()">취소</button><button onclick="shmClose();window._shfn()">구매</button></div>`)}
 init();
 </script></body></html>
