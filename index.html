@@ -183,7 +183,7 @@ return new Promise((resolve,reject)=>{
 let T={p:{},e:{}},ready=false,closed=false,done=false,skew=null,pruned=false,cnt=0,sig="",hb=null,chk=null,es=null;
 const handlers={},peerFns=new Set(),Q={};
 const parse=s=>{try{return s?JSON.parse(s):{}}catch(e){return{}}};
-const alive=v=>!v||v.t==null||skew==null||Date.now()+skew-v.t<7000;
+const alive=v=>!v||v.t==null||skew==null||Date.now()+skew-v.t<20000;
 const peers=()=>Object.keys(T.p).filter(id=>id===TABID||alive(T.p[id])).map(id=>{const v=T.p[id]||{};return{peer:id,isMe:id===TABID,sameTab:id===TABID,presence:parse(v.d),j:+v.j||0}}).sort((a,b)=>(a.j-b.j)||(a.peer<b.peer?-1:1)).map(x=>({peer:x.peer,isMe:x.isMe,sameTab:x.sameTab,presence:x.presence}));
 const fire=()=>{peerFns.forEach(f=>{try{f()}catch(e){}})};
 const mkSig=()=>Object.keys(T.p).filter(id=>id===TABID||alive(T.p[id])).sort().join(",");
@@ -1073,7 +1073,7 @@ async function buyR0(k){const m=S.me,r=rCfg();if(r[k]>=20)return;const g=gP(500)
 try{await db.doc("students/"+m.cls+"_"+m.sid).update({coins:m.coins,gems:m.gems,room:m.room})}catch(e){m.coins=oc;m.gems=og;r[k]=ov;alert("저장하지 못했어요.")}tShop()}
 async function buyWF0(id){const m=S.me,w=WD[id]||FLD[id];if(!w||ownWF(id,WD)||ownWF(id,FLD))return;const g=gP(w.p);if(m.coins<w.p)return alert("코인이 부족해요.");if((m.gems||0)<g)return alert("보석이 부족해요.");const oc=m.coins,og=m.gems||0,oi=[...m.items];m.coins-=w.p;m.gems=og-g;m.items=[...oi,id];
 try{await db.doc("students/"+m.cls+"_"+m.sid).update({coins:m.coins,gems:m.gems,items:m.items})}catch(e){m.coins=oc;m.gems=og;m.items=oi;alert("저장하지 못했어요.")}tShop()}
-function classPage(){const m=S.me;visInit();if(m&&typeof m._cs!=="number")m._cs=m.coins;
+function classPage(){const m=S.me;visInit();if(!S.stPI)S.stPI=setInterval(()=>{if(S.view==="class")statPush()},3000);statPush(1);if(m&&typeof m._cs!=="number")m._cs=m.coins;
 const ct=(S.cls&&S.cls.theme)||{};$.innerHTML=`<div class="row"><div><b${hexOk(ct.tc)?` style="color:${ct.tc}"`:""}>${esc(S.cls.name)}</b></div>${S.isT?`<button class="g" onclick="loadT()">← 교사 화면</button>`:`<button class="g" onclick="nav('home',{me:null})">로그아웃</button>`}</div>
 <div class="tabs mtabs" style="margin-top:10px">${(S.isT?[...TABS,["status","👀 학생 현황"]]:TABS).map(([k,l])=>`<button class="${S.tab===k?"on":""}" onclick="goTab('${k}')">${l}</button>`).join("")}</div><div id="tb"></div>`;
 if(hexOk(ct.bg)){document.body.style.background=ct.bg;document.documentElement.style.background=ct.bg}
@@ -1088,6 +1088,11 @@ VZ.joining=false;visUI()}
 function visQuit(){const l=VZ.lob,g=VZ.vr;clearTimeout(VZ.rqT);clearInterval(VZ.poll);VZ={lob:null,cls:null,joining:false,rq:null,rqT:0,an:null,seen:{},ask:null,vr:null,role:null,msg:"",pos:{},lt:0,ls:"",gl:{}};S.visit=null;if(l)l.leave().catch(()=>{});if(g)g.leave().catch(()=>{});const a=document.getElementById("vask");if(a)a.remove()}
 function visAct(){try{if(document.hidden)return"💤 자리 비움";if(S.visit)return"🏠 친구 방 놀러감";if(typeof K!=="undefined"&&K&&!K.over)return"🍳 요리 중";if(W&&document.getElementById("wroot"))return"🌿 제초 중";if(B&&document.getElementById("barena"))return"⚔️ 토벌 중";if(DU&&DU.g)return"🤺 대결 중"}catch(e){}
 return{my:"🙂 마이페이지",study:"📚 학습 중",game:CK?"🍳 요리 준비 중":"🎮 게임 고르는 중",room:"🛋️ 방 꾸미기",rank:"🏆 랭킹 보는 중",friend:"👫 친구 탭",shop:"🛍️ 상점",status:"👀 학생 현황"}[S.tab]||"🟢 접속 중"}
+function statPush(force){const m=S.me;if(!m||!m.sid||S.view!=="class"||!db)return;const ac=visAct(),now=Date.now();if(!force&&ac===VZ.sac&&now-(S.stPt||0)<15000)return;VZ.sac=ac;S.stPt=now;
+try{if(typeof FBURL!=="undefined"){fetch(FBURL+"/rooms/stat_"+visNm(m.cls)+"/"+visNm(m.sid)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({s:m.sid,ac,t:{".sv":"timestamp"}})}).then(r=>r.ok?r.json():null).then(v=>{if(v&&typeof v.t==="number")S.stSkew=v.t-Date.now()}).catch(()=>{})}
+else{Promise.resolve(db.doc("stat/"+m.cls+"_"+m.sid).set({cls:String(m.cls),sid:m.sid,ac,t:now})).catch(()=>{})}}catch(e){}}
+async function statFetch(cls){const o={};try{if(typeof FBURL!=="undefined"){const r=await fetch(FBURL+"/rooms/stat_"+visNm(cls)+".json");const v=r.ok?await r.json():null;const sn=Date.now()+(S.stSkew||0);for(const k in v||{}){const x=v[k];if(x&&x.s&&typeof x.t==="number"&&sn-x.t<45000)o[x.s]=String(x.ac||"🟢 접속 중")}}
+else{const q=await db.collection("stat").where("cls","==",String(cls)).get();q.docs.forEach(d=>{const x=d.data();if(x&&x.sid&&Date.now()-(+x.t||0)<60000)o[x.sid]=String(x.ac||"🟢 접속 중")})}}catch(e){}return o}
 function visPres(){if(!VZ.lob||!S.me)return;VZ.ac=visAct();Promise.resolve(VZ.lob.presence({s:S.me.sid,n:String(S.me.name||"").slice(0,20),rq:VZ.rq,an:VZ.an,ac:VZ.ac})).catch(()=>{})}
 const visPeers=()=>{try{return VZ.lob?VZ.lob.peers().filter(p=>!p.sameTab&&p.presence&&p.presence.s):[]}catch(e){return[]}};
 function visLob(){if(!VZ.lob||!S.me)return;const P=visPeers(),me=S.me.sid;
@@ -1138,10 +1143,10 @@ function rCharO(R,o){const sv={x:RM.x,y:RM.y,dir:RM.dir,seat:RM.seat,sz:RM.sz,ho
 const c=R.c,p=rP(R,o.x,o.y,o.z);c.save();c.font=`800 ${Math.round(12*R.s)}px sans-serif`;c.textAlign="center";c.lineWidth=3.5*R.s/1.4;c.strokeStyle="rgba(255,255,255,.95)";c.fillStyle="#3b2a6b";const ty=p[1]-54*R.s;c.strokeText(o.n,p[0],ty);c.fillText(o.n,p[0],ty);c.restore()}
 async function tStatus(){if(!S.isT)return tMy();if(!document.getElementById("stl"))tb.innerHTML='<div class="card"><h2>👀 학생 현황</h2><p class="mu">불러오는 중…</p></div>';
 if(!S.stList||Date.now()-(S.stAt||0)>30000){try{const q=await db.collection("students").where("cls","==",S.me.cls).get();S.stList=q.docs.map(d=>d.data()).filter(x=>x.sid!=="teacher");S.stAt=Date.now()}catch(e){S.stList=S.stList||[]}}
-if(S.tab!=="status")return;stDraw();clearInterval(S.stIv);S.stIv=setInterval(()=>{if(S.tab!=="status"||S.view!=="class"){clearInterval(S.stIv);return}stDraw()},2000)}
-function stDraw(){const el=tb;if(!el)return;const P={};visPeers().forEach(p=>{P[p.presence.s]=p.presence});const L=(S.stList||[]).map(x=>({x,p:P[x.sid]})).sort((a,b)=>(a.p?0:1)-(b.p?0:1)||String(a.x.name).localeCompare(String(b.x.name),"ko"));
+if(S.tab!=="status")return;S.stMap=await statFetch(S.me.cls);if(S.tab!=="status")return;stDraw();clearInterval(S.stIv);let k=0;S.stIv=setInterval(async()=>{if(S.tab!=="status"||S.view!=="class"){clearInterval(S.stIv);return}if(++k%2===0){const mp=await statFetch(S.me.cls);if(S.tab!=="status")return;S.stMap=mp}stDraw()},2000)}
+function stDraw(){const el=tb;if(!el)return;const P={};for(const k in (S.stMap||{}))P[k]={s:k,ac:S.stMap[k]};visPeers().forEach(p=>{P[p.presence.s]=p.presence});const L=(S.stList||[]).map(x=>({x,p:P[x.sid]})).sort((a,b)=>(a.p?0:1)-(b.p?0:1)||String(a.x.name).localeCompare(String(b.x.name),"ko"));
 const on=L.filter(o=>o.p).length,cnt={};L.forEach(o=>{if(o.p){const k=String(o.p.ac||"🟢 접속 중");cnt[k]=(cnt[k]||0)+1}});
-el.innerHTML=`<div class="card" id="stl"><h2>👀 학생 현황</h2><p class="mu" style="margin:0 0 8px">접속 ${on}명 · 오프라인 ${L.length-on}명 <small>(2초마다 새로 고침)</small></p>${Object.keys(cnt).length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${Object.entries(cnt).map(([k,v])=>`<span class="tag">${esc(k)} ${v}</span>`).join("")}</div>`:""}${VZ.lob?"":'<p class="err">실시간 연결이 안 돼서 모두 오프라인으로 보일 수 있어요.</p>'}
+el.innerHTML=`<div class="card" id="stl"><h2>👀 학생 현황</h2><p class="mu" style="margin:0 0 8px">접속 ${on}명 · 오프라인 ${L.length-on}명 <small>(2초마다 새로 고침)</small></p>${Object.keys(cnt).length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${Object.entries(cnt).map(([k,v])=>`<span class="tag">${esc(k)} ${v}</span>`).join("")}</div>`:""}
 ${L.length?L.map(({x,p})=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)${p?"":";opacity:.55"}"><div style="font-size:26px;line-height:1">${charHTML(x.char,(x.equip||{}).hat,0,"")}</div><b style="flex:1;min-width:0">${esc(x.name)}</b><span style="font-size:14px;white-space:nowrap">${p?esc(String(p.ac||"🟢 접속 중")):"⚪ 오프라인"}</span></div>`).join(""):'<p class="mu">아직 학생이 없어요.</p>'}</div>`}
 async function tFriend(){if(S.visit)return tVisit();bgmOff(["room"]);if(S.fsel)return tFriendOne(S.fsel);tb.innerHTML='<div class="card"><h2>👫 친구</h2><p class="mu">불러오는 중…</p></div>';
 let l=[];try{const q=await db.collection("students").where("cls","==",S.me.cls).get();l=q.docs.map(d=>d.data()).filter(x=>x.sid!==S.me.sid)}catch(e){}if(S.tab!=="friend"||S.fsel)return;S.flist=l;
