@@ -1769,7 +1769,7 @@ const ex=K.orders.filter(o=>o.age>=OLIFE);if(ex.length){K.failed+=ex.length;K.co
 K.ret=K.ret.filter(r=>{if(K.t>=r){K.dirty++;return false}return true});
 kLocal(dt);
 kCam(Math.min(1,dt*8));kFx(dt);
-let washing=kWork(dt);if(K.pl)for(const p of K.pl)if(p.on&&!p.left)washing=kAs(p,()=>kWork(dt))||washing;if(!washing)K.wp=0;
+let washing=kWork(dt);if(K.pl)for(const p of K.pl)if(p.on&&!p.left)washing=kAs(p,()=>kWork(dt))||washing;
 for(const s of K.st){if(s.t==="icm"&&s.item&&s.item.st==="raw"){s.tt+=dt;if(s.tt>=4){s.item.st="soft";sfx.done()}}if(s.t==="pan"&&s.item&&(s.item.st==="raw"||s.item.st==="fried"||s.item.st==="baked"||s.item.st==="deep")){s.tt+=dt;if(s.tt>=(s.ov?34:s.dp?32:30)){s.item.st="burnt";sfx.burn()}else if(s.tt>=(s.ov?10:s.dp?8:7)&&s.item.st==="raw"){s.item.st=s.ov?"baked":s.dp?"deep":"fried";sfx.done()}}
 if(s.t==="pot"&&s.tt!=null){s.tt+=dt;if(s.tt>=34&&!s.burnt){s.burnt=true;sfx.burn();s.items=s.items.map(t=>t.split(":")[0]+":burnt")}else if(s.tt>=9&&!s.done&&!s.burnt){s.done=true;sfx.done();s.items=s.items.map(t=>t.split(":")[0]+":boiled")}}}
 kSnd(dt);
