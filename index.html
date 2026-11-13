@@ -2534,13 +2534,16 @@ if(host){TM.H={st:"lobby",tm:{},nm:{},r:0,ph:"",hp:{},ord:[],rs:null,q:null}}
 TM.un=g.onPeers(()=>tmChange());tmPres();duPres();tmDraw();clearInterval(TM.tn);TM.tn=setInterval(()=>{if(TM){if(TM.host)tmHostStep();tmChange(1)}},1000)}
 function tmCreate(){if(!DU||DU.g||TM)return;tmJoin(("tm"+visNm(S.me.cls)+"-"+Math.random().toString(36).slice(2,8)).slice(0,40),true)}
 function tmPres(){const t=TM;if(!t)return;const o={n:String(S.me.name||"").slice(0,20),ch:chKey(),w:t.want,r:t.r,an:t.an,a:t.a};if(t.host)o.H=t.H;Promise.resolve(t.g.presence(o)).catch(()=>{})}
-function tmWant(w){const t=TM;if(!t||(t.H&&t.H.st&&t.H.st!=="lobby"))return;t.want=w;tmPres();if(t.host)tmHostStep();tmDraw()}
+function tmWant(w){const t=TM;if(!t||(t.H&&t.H.st&&t.H.st!=="lobby"))return;const H=t.H||{},asg=H.asg||{};if(Object.keys(asg).filter(p=>p!==t.me&&asg[p]===w).length>=2)return tmDraw();t.want=w;tmPres();if(t.host)tmHostStep();tmDraw()}
 // ---- 방장 진행 ----
 function tmAlive(H,team){return Object.keys(H.tm).filter(p=>H.tm[p]===team&&H.hp[p]>0)}
 function tmMine(){const t=TM;return{peer:t.me,r:t.r,an:t.an,a:t.a,w:t.want,n:S.me.name,ch:chKey()}}
 function tmAll(){const t=TM,L=tmPeers().filter(p=>!p.sameTab).map(p=>({peer:p.peer,...p.presence}));L.push(tmMine());return L}
 function tmHostStep(){const t=TM;if(!t||!t.host)return;const H=t.H,L=tmAll(),by={};L.forEach(x=>by[x.peer]=x);
-if(H.st==="lobby"){const nm={};L.forEach(x=>nm[x.peer]={n:String(x.n||"").slice(0,20),ch:x.ch||""});if(JSON.stringify(nm)!==JSON.stringify(H.nm)){H.nm=nm;tmPres()}if(t.lc!==L.length){t.lc=L.length;duPres()}return}
+if(H.st==="lobby"){t.ord=(t.ord||[]).filter(p=>by[p]);L.forEach(x=>{if(!t.ord.includes(x.peer))t.ord.push(x.peer)});if(t.ord.includes(t.me)){t.ord=[t.me,...t.ord.filter(p=>p!==t.me)]}
+const mem=t.ord.slice(0,4),full=t.ord.slice(4),old=H.asg||{},asg={};mem.forEach(p=>{if(old[p])asg[p]=old[p]});
+mem.forEach(p=>{const w=by[p]&&by[p].w;if(w!=="A"&&w!=="B"){delete asg[p];return}if(asg[p]===w)return;const cnt=Object.keys(asg).filter(q=>q!==p&&asg[q]===w).length;if(cnt<2)asg[p]=w});
+const nm={};mem.forEach(p=>{const x=by[p];nm[p]={n:String(x.n||"").slice(0,20),ch:x.ch||""}});const sig=JSON.stringify([nm,asg,full]);if(sig!==t.lsig){t.lsig=sig;H.nm=nm;H.asg=asg;H.mem=mem;H.full=full;tmPres()}if(t.lc!==mem.length){t.lc=mem.length;duPres()}return}
 if(H.st!=="play"||t.anim)return;
 for(const p of Object.keys(H.tm))if(!by[p]&&H.hp[p]>0){H.hp[p]=0}
 const win=["A","B"].find(T=>!tmAlive(H,T==="A"?"B":"A").length);if(win&&H.ph!=="rs")return tmEnd(win);
@@ -2555,8 +2558,8 @@ const en=H.tm[p]==="A"?"B":"A",cand=Object.keys(H.tm).filter(x=>H.tm[x]===en&&hp
 const cr=Math.random()<CRIT,df=act(tg).k!=="atk",dm=(df?.5:1)*(cr?2:1);hp[tg]=Math.max(0,hp[tg]-dm);ev.push({k:p,a:"atk",t:tg,dm,cr,df,ko:hp[tg]<=0});
 if(!Object.keys(H.tm).some(x=>H.tm[x]===en&&hp[x]>0))end=H.tm[p]}
 H.ph="rs";H.rs={ev,hp,end};tmPres();tmPlay()}}
-function tmStart(){const t=TM;if(!t||!t.host)return;const H=t.H,L=tmAll(),A=L.filter(x=>x.w==="A"),B=L.filter(x=>x.w==="B");if(L.length!==4||A.length!==2||B.length!==2)return;
-H.st="play";t.lc=-1;duPres();H.tm={};H.hp={};L.forEach(x=>{H.tm[x.peer]=x.w;H.hp[x.peer]=TM_HP;H.nm[x.peer]={n:String(x.n||"").slice(0,20),ch:x.ch||""}});H.r=0;tmRound()}
+function tmStart(){const t=TM;if(!t||!t.host)return;tmHostStep();const H=t.H,asg=H.asg||{},mem=(H.mem||[]).filter(p=>asg[p]),A=mem.filter(p=>asg[p]==="A"),B=mem.filter(p=>asg[p]==="B"),by={};tmAll().forEach(x=>by[x.peer]=x);if(mem.length!==4||A.length!==2||B.length!==2||!mem.every(p=>by[p]))return tmDraw();
+H.st="play";t.lc=-1;duPres();H.tm={};H.hp={};mem.forEach(p=>{H.tm[p]=asg[p];H.hp[p]=TM_HP});H.r=0;tmRound()}
 function tmRound(){const t=TM,H=t.H;H.r++;H.q=mkQ();H.ph="q";H.t0=Date.now();H.rs=null;H.ord=[];tmPres();tmLocalRound()}
 function tmEnd(win){const t=TM,H=t.H;H.st="end";H.win=win;H.ph="end";tmPres();tmFinish()}
 // ---- 모두: 상태 받기 ----
@@ -2569,7 +2572,7 @@ if(H.st==="play"&&H.ph==="rs"&&H.rs&&t.seenR!==H.r&&!t.anim){tmPlay();return}
 if(H.st==="end"&&!t.paid){tmFinish();return}
 tmMaybe();return}
 tmHostStep();tmMaybe()}
-function tmSig(){const t=TM,H=t.H||{};let x=[H.st,H.ph,H.r,JSON.stringify(H.nm||{}),!!t.an,!!t.a,t.want,JSON.stringify(H.hp||{})];if(H.st==="lobby"||!H.st){const L=t.host?tmAll():tmPeers().map(p=>({peer:p.peer,...p.presence}));x.push(L.map(p=>p.peer+(p.w||"")+(p.n||"")).sort().join())}return x.join("|")}
+function tmSig(){const t=TM,H=t.H||{};let x=[H.st,H.ph,H.r,JSON.stringify(H.nm||{}),!!t.an,!!t.a,t.want,JSON.stringify(H.hp||{})];if(H.st==="lobby"||!H.st)x.push(JSON.stringify([H.asg,H.mem,H.full]));return x.join("|")}
 function tmMaybe(){const t=TM;if(!t||t.anim)return;const g=tmSig();if(g!==t.sig)tmDraw();else{const e=document.getElementById("tmt"),H=t.H;if(e&&H){const lim=H.ph==="q"?DU_QT*1000-(Date.now()-(t.qt0||0)):DU_PT*1000-(Date.now()-(t.pt0||0));e.textContent=Math.max(0,Math.ceil(lim/1000))+"초"}}}
 function tmLocalRound(){const t=TM,H=t.H;t.r=H.r;t.an=null;t.a=null;t.sel=null;t.v={log:`${H.r}번째 문제! 빨리 맞힐수록 먼저 움직여요.`,fx:{},pop:null,hp:null};t.qt0=Date.now();tmPres();tmDraw();
 clearTimeout(t.tq);t.tq=setTimeout(()=>{if(TM===t&&!t.an&&t.H.ph==="q"&&t.H.r===t.r)tmAnsV(null)},DU_QT*1000)}
@@ -2588,7 +2591,8 @@ async function tmFinish(){const t=TM;if(!t||t.paid)return;t.paid=1;const H=t.H,m
 try{await db.doc("students/"+S.me.cls+"_"+S.me.sid).update({points:S.me.points,coins:S.me.coins})}catch(e){}}
 // ---- 화면 ----
 function tmDraw(){const t=TM;if(!t||!DU)return;t.sig=tmSig();const H=t.H||{st:"lobby",nm:{},tm:{}},el=tb;if(!el)return;
-if(H.st==="lobby"){const L=t.host?tmAll():tmPeers().map(p=>({peer:p.peer,...p.presence})),A=L.filter(x=>x.w==="A"),B=L.filter(x=>x.w==="B"),N=L.filter(x=>!x.w),row=x=>`<div class="row" style="gap:6px;padding:4px 0;justify-content:flex-start"><span style="font-size:26px;line-height:1">${chH(x.ch)}</span><b>${esc(x.n||"")}</b>${x.peer===t.me?' <small class="mu">(나)</small>':""}</div>`,col=(T,l,c)=>`<div style="flex:1;border:2px solid ${c};border-radius:12px;padding:8px;min-width:0"><b style="color:${c}">${T}팀 ${l.length}/2</b>${l.map(row).join("")||'<p class="mu" style="margin:6px 0">비어 있어요</p>'}<button style="width:100%;margin-top:6px" ${t.want===T||l.length>=2?"disabled":""} onclick="tmWant('${T}')">${t.want===T?"✔ 이 팀":"이 팀 하기"}</button></div>`;
+if(H.st==="lobby"){if((H.full||[]).includes(t.me)){el.innerHTML=`<div id="duroot"><div class="card"><h2>👥 2:2 팀 대결방</h2><p>방이 가득 찼어요 (4명). 다른 방을 찾아 주세요.</p><button onclick="tmBack()">대결 목록으로</button></div></div>`;if(!t.fullT)t.fullT=setTimeout(()=>{if(TM===t)tmBack()},2500);return}
+const asg=H.asg||{},mem=H.mem||[],L=mem.map(p=>({peer:p,...(H.nm[p]||{}),w:asg[p]})),A=L.filter(x=>x.w==="A"),B=L.filter(x=>x.w==="B"),N=L.filter(x=>!x.w),row=x=>`<div class="row" style="gap:6px;padding:4px 0;justify-content:flex-start"><span style="font-size:26px;line-height:1">${chH(x.ch)}</span><b>${esc(x.n||"")}</b>${x.peer===t.me?' <small class="mu">(나)</small>':""}</div>`,col=(T,l,c)=>`<div style="flex:1;border:2px solid ${c};border-radius:12px;padding:8px;min-width:0"><b style="color:${c}">${T}팀 ${l.length}/2</b>${l.map(row).join("")||'<p class="mu" style="margin:6px 0">비어 있어요</p>'}<button style="width:100%;margin-top:6px" ${asg[t.me]===T||l.length>=2?"disabled":""} onclick="tmWant('${T}')">${asg[t.me]===T?"✔ 이 팀":t.want===T?"요청 중…":l.length>=2?"자리 없음":"이 팀 하기"}</button></div>`;
 const ok=L.length===4&&A.length===2&&B.length===2;
 el.innerHTML=`<div id="duroot"><div class="card"><h2>👥 2:2 팀 대결방</h2><p class="mu" style="margin:0 0 8px">4명이 모이면 팀을 골라요. 모두 문제를 풀고, 빨리 맞힌 순서대로 상대 팀을 공격하거나 방어해요. 상대 팀 두 명을 모두 쓰러뜨리면 승리!<br>승리 🪙40원·⭐3점 / 패배 🪙15원·⭐1점</p><p class="mu" style="margin:0 0 8px">참가 ${L.length}/4명</p><div class="row" style="gap:8px;align-items:stretch">${col("A",A,"#e5484d")}${col("B",B,"#3a7be0")}</div>${N.length?`<p class="mu" style="margin:8px 0 0">팀 고르는 중: ${N.map(x=>esc(x.n||"")).join(", ")}</p>`:""}
 ${t.host?`<button style="width:100%;margin-top:10px" ${ok?"":"disabled"} onclick="tmStart()">${ok?"⚔️ 대결 시작!":"4명이 2명씩 팀을 고르면 시작할 수 있어요"}</button>`:'<p class="mu" style="margin:10px 0 0;text-align:center">방장이 시작하길 기다려요…</p>'}</div><button class="g" onclick="tmBack()">← 나가기</button></div>`;return}
