@@ -1053,7 +1053,7 @@ FDEF.push({id:"sf5",t:"sofa",n:"갈색 소파",p:90,o:{c:"#9a6a48"}},{id:"sf6",t
 FDEF.forEach(f=>{if(["sh4","tb1","ba_plant"].includes(f.id))f.hide=1;if(f.t==="sofa"&&/^sf\d/.test(f.id))f.fp=420;if(f.t==="lsofa")f.fp=472});
 {const v=FTN.etc;delete FTN.etc;FTN.etc=v}const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
-{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g)}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7));if(f.fp)f.p=f.fp})}
+{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g);if(i.t!=="tool"&&i.p>0)i.p=Math.max(1,Math.round(i.p*.35))}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7));if(f.fp)f.p=f.fp})}
 const fTy=f=>FT[FD[f[0]].t];
 function rFoot(f){const t=fTy(f);return f[3]%2?[t.d,t.w]:[t.w,t.d]}
 const fqOf=id=>(S.me.fq&&+S.me.fq[id])||0;
