@@ -1697,7 +1697,7 @@ const blk={},nb=[1,2,2,3,3][L],shp=[[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0]],[[0,
 for(let b=0,tr=0;b<nb&&tr<200;tr++){const sh=shp[ri(shp.length)],ax=2+ri(W-4),ay=2+ri(H-4),cells=sh.map(([dx,dy])=>[ax+dx,ay+dy]);if(cells.some(([x,y])=>x<2||y<2||x>W-3||y>H-3))continue;
 if(cells.some(([x,y])=>{for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(blk[(x+i)+","+(y+j)])return true;return false}))continue;cells.forEach(([x,y])=>{blk[x+","+y]=1;isl.push([x,y])});b++}
 if(isl.length<3)return null;
-const hol=[];if(K.si>=3){const nh=K.si>=4?3:2,hsh=[[[0,0]],[[0,0],[1,0]],[[0,0],[0,1]]];for(let b=0,tr=0;b<nh&&tr<300;tr++){const sh=hsh[ri(hsh.length)],ax=2+ri(W-4),ay=2+ri(H-4),cells=sh.map(([dx,dy])=>[ax+dx,ay+dy]);if(cells.some(([x,y])=>x<2||y<2||x>W-3||y>H-3))continue;
+const hol=[];if(K.si>=3){const nh=K.si>=4?3:2,hsh=[[[0,0]]];for(let b=0,tr=0;b<nh&&tr<300;tr++){const sh=hsh[ri(hsh.length)],ax=2+ri(W-4),ay=2+ri(H-4),cells=sh.map(([dx,dy])=>[ax+dx,ay+dy]);if(cells.some(([x,y])=>x<2||y<2||x>W-3||y>H-3))continue;
 if(cells.some(([x,y])=>{for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(blk[(x+i)+","+(y+j)])return true;return false}))continue;cells.forEach(([x,y])=>{blk[x+","+y]=1;hol.push([x,y])});b++}if(hol.length<nh)return null}
 const free=[];for(let x=1;x<=W-2;x++)for(let y=1;y<=H-2;y++)if(!blk[x+","+y])free.push([x,y]);const seen={},q=[free[0]];seen[free[0].join()]=1;while(q.length){const[x,y]=q.pop();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+","+(y+dy);if(!seen[k]&&x+dx>=1&&y+dy>=1&&x+dx<=W-2&&y+dy<=H-2&&!blk[k]){seen[k]=1;q.push([x+dx,y+dy])}}}
 if(Object.keys(seen).length!==free.length)return null;
