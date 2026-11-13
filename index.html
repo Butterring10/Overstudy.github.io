@@ -1650,7 +1650,7 @@ tb.innerHTML=`<div id="cookroot"><div class="card" style="text-align:center"><h2
 <button style="width:100%" onclick="CK.view='menu';ckDraw()">${r.unlocked?"다음 단계 준비하러 가기":"요리 메뉴로"}</button><button class="g" style="width:100%;margin-top:8px" onclick="CK.sel=${r.si};CK.view='brief';ckDraw()">같은 단계 다시 하기</button></div></div>`}
 // --- 주방 (오버쿡드2 스타일) ---
 function kStart(o){const si=o?o.si:selIdx();if(!o&&!readyOf(si))return;const nd=o?Object.fromEntries(o.ids.map(i=>[i,1])):needOf(si),pa=pan_(),stock={};for(const k of Object.keys(ING))stock[k]=o?(o.stock[k]||0):(pa[k]||0);const SP=o?{time:LVC[si].t,total:o.total||LVC[si].n,cat:o.plan.cat,menus:o.plan.menus,n:(CATS[o.plan.cat]||"")+" Lv."+(si+1)}:stg(si);
-K={si,seed:o&&o.sd!=null?o.sd:null,ids:Object.keys(nd),stock,st:[],grid:{},hold:null,x:3.5*KT,y:3.5*KT,fx:0,fy:1,t:0,time:SP.time,plan:SP,orders:[],spawned:0,total:SP.total,served:0,failed:0,score:0,rack:4,dirty:0,sinkd:0,wp:0,ret:[],dash:0,dcd:0,jx:0,jy:0,keys:{},chop:false,moving:false,msg:"",mt:0,over:false,last:0,img:null,ctx:null,pt:[],trail:[],bt:0,bm:1,pause:false,qDone:false,qAt:SP.time*(.2+Math.random()*.5),cx:0,cy:0,shk:0,act:0,hpop:0,wtm:0,dtm:0,tgt:null};
+K={si,lay:o&&o.lay||null,seed:o&&o.sd!=null?o.sd:null,ids:Object.keys(nd),stock,st:[],grid:{},hold:null,x:3.5*KT,y:3.5*KT,fx:0,fy:1,t:0,time:SP.time,plan:SP,orders:[],spawned:0,total:SP.total,served:0,failed:0,score:0,rack:4,dirty:0,sinkd:0,wp:0,ret:[],dash:0,dcd:0,jx:0,jy:0,keys:{},chop:false,moving:false,msg:"",mt:0,over:false,last:0,img:null,ctx:null,pt:[],trail:[],bt:0,bm:1,pause:false,qDone:false,qAt:SP.time*(.2+Math.random()*.5),cx:0,cy:0,shk:0,act:0,hpop:0,wtm:0,dtm:0,tgt:null};
 kBuild();kBg();K.time0=K.time;K.sth=starTh(K.total);K.combo=0;if(o){K.co=o.co;K.pl=[];K.sq=[];K.fxq=[]}aInit();bgmStart();aLoopOn();K.x=K.sp[0][0]*KT;K.y=K.sp[0][1]*KT;kCam(1);const mc=myChar(),mm=mc&&mc.e.match(/src="([^"]+)"/);if(mm){K.img=new Image();K.img.src=mm[1];K.img.hr=mc.r||1}
 CK.view="play";drawKit();K.raf=requestAnimationFrame(kLoop);addEventListener("keydown",kDown);addEventListener("keyup",kUp)}
 function kStop(){if(!K)return;bgmStop();aLoopOff();{const p=document.getElementById("sndp");if(p)p.remove()}cancelAnimationFrame(K.raf);removeEventListener("keydown",kDown);removeEventListener("keyup",kUp);K=null}
@@ -1704,8 +1704,14 @@ if(Object.keys(seen).length!==free.length)return null;
 isl.forEach(([x,y])=>put(x,y,"counter"));hol.forEach(([x,y])=>put(x,y,"hole"));
 const cx=W/2-.5,cy=H/2-.5,fs=free.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy)).slice(0,4);if(fs.length<4)return null;
 return{sp,spw:fs.map(([x,y])=>[x+.5,y+.5]),W,H,L}}
-function kBuild(){const sd0=K.seed==null?Math.floor(Math.random()*1e9):K.seed;K.seed=sd0;let r=null;for(let t=0;t<30&&!r;t++){try{r=kLayout(kRng(sd0+t*7919))}catch(e){r=null}}
-if(!r)return kBuild0();const{sp,W,H,L}=r;K.W=W;K.H=H;K.L=L;K.sp=r.spw;
+const APPV=175;const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
+function kLayEnc(){const out=[];for(const s of K.st){const edge=s.x===0||s.y===0||s.x===K.W-1||s.y===K.H-1;if(s.t==="counter"&&edge)continue;let cd=s.t==="crate"?"c"+s.id:s.t==="pan"?(s.ov?"o":s.dp?"f":"p"):LAYC[s.t];if(!cd)continue;out.push(s.x+"."+s.y+"."+cd)}return{W:K.W,H:K.H,L:K.L,sp:K.sp.map(p=>[+p[0].toFixed(2),+p[1].toFixed(2)]),s:out.join(";")}}
+function kLayDec(lay){const W=Math.floor(cNum(lay.W,4,30)),H=Math.floor(cNum(lay.H,4,30)),IC={};for(const k in LAYC)IC[LAYC[k]]=k;const sp={};
+for(const e of String(lay.s||"").split(";")){const m=/^(\d+)\.(\d+)\.(c[a-z0-9_]+|[a-z])$/.exec(e);if(!m)continue;const x=+m[1],y=+m[2],cd=m[3];if(x>=W||y>=H)continue;let t,o={};if(cd[0]==="c"&&cd.length>1){if(!ING[cd.slice(1)])continue;t="crate";o={id:cd.slice(1)}}else if(cd==="p")t="pan";else if(cd==="o"){t="pan";o={ov:1}}else if(cd==="f"){t="pan";o={dp:1}}else{t=IC[cd];if(!t)continue}sp[x+","+y]=[t,o]}
+const spw=(Array.isArray(lay.sp)?lay.sp:[]).filter(p=>Array.isArray(p)).slice(0,4).map(p=>[cNum(p[0],.5,W-.5),cNum(p[1],.5,H-.5)]);if(spw.length<4)return null;return{sp,spw,W,H,L:Math.floor(cNum(lay.L,0,9))}}
+function kBuild(){if(K.lay){const r=kLayDec(K.lay);if(r){kPlace(r);return}}const sd0=K.seed==null?Math.floor(Math.random()*1e9):K.seed;K.seed=sd0;let r=null;for(let t=0;t<30&&!r;t++){try{r=kLayout(kRng(sd0+t*7919))}catch(e){r=null}}
+if(!r)return kBuild0();kPlace(r)}
+function kPlace(r){const{sp,W,H,L}=r;K.W=W;K.H=H;K.L=L;K.sp=r.spw;
 for(let x=0;x<W;x++)for(let y=0;y<H;y++){const k=x+","+y,edge=x===0||y===0||x===W-1||y===H-1;let s=null;if(sp[k])s=Object.assign({x,y,t:sp[k][0]},sp[k][1]);else if(edge)s={x,y,t:"counter"};if(!s)continue;
 if(s.t==="pot")Object.assign(s,{items:[],tt:null,kind:null,done:false,burnt:false});if(s.t==="pan"||s.t==="icm")Object.assign(s,{item:null,tt:0});if(s.t==="board")Object.assign(s,{item:null,cp:0});if(s.t==="counter")s.item=null;K.st.push(s);K.grid[k]=s}}
 // --- 효과(애니메이션) 도우미
@@ -2299,7 +2305,7 @@ c.g=g;c.gname=gname;c.mem=pl.slice(1).map(q=>q.p);c.play=true;c.msg="";const st=
 await g.presence({ini}).catch(()=>{});
 if(vs){vsBegin(ini,me,g,true);coPres();return}
 c.uAc=g.on("ac",m=>coOnAct(m));c.uQe=g.on("qe",m=>{if(K&&K.co==="host"&&K.qz&&m.data&&m.data.id===K.qid){K.qz=0;if(K.lq){const e=document.getElementById("kqst");if(e){e.textContent="⏱ 친구가 먼저 답해서 시간이 다시 흐르고 있어요!";e.style.color="#ffb4b4"}}}});c.uTh=g.on("th",m=>coOnThrow(m));c.uBy=g.on("by",m=>coOnBye(m));
-kStart({si,plan,ids:Object.keys(nd),stock,co:"host",total:tot,sd:ini.sd});K.spg=SPG/coF(n);K.col=PCOL[0];K.myc=pl[0].c;
+kStart({si,plan,ids:Object.keys(nd),stock,co:"host",total:tot,sd:ini.sd});ini.lay=kLayEnc();ini.v=APPV;c.ini=ini;g.presence({ini}).catch(()=>{});K.spg=SPG/coF(n);K.col=PCOL[0];K.myc=pl[0].c;
 K.pl=pl.slice(1).map((q,i)=>coMkP(q.p,q.ch,q.n,PCOL[i+1],q.c));coPres()}
 // ===== 경쟁 모드: 각자 자기 주방, 상대 화면은 구석에 작게 =====
 let VS=null;
@@ -2373,11 +2379,11 @@ p.left=true;p.on=false;p.hold=null;kmsg((p.n||"친구")+" 님이 나갔어요");
 async function coGStart(h){const c=CO;if(!c||c.inGame)return;c.inGame=true;const q=h.presence;c.lastG=q.gr;let g;
 try{g=await ROOM.join(String(q.gr))}catch(e){c.inGame=false;c.msg="주방에 들어가지 못했어요.";return ckDraw()}
 c.g=g;c.hostG=h.peer;c.me=myPeer(c.lob);let ini=null;const t0=Date.now();
-while(Date.now()-t0<8000){const x=g.peers().find(p=>p.peer===h.peer);if(x&&x.presence&&x.presence.ini){ini=x.presence.ini;break}await new Promise(r=>setTimeout(r,150))}
+while(Date.now()-t0<8000){const x=g.peers().find(p=>p.peer===h.peer);if(x&&x.presence&&x.presence.ini){ini=x.presence.ini;if(ini.lay||ini.md==="vs"||Date.now()-t0>3000)break}await new Promise(r=>setTimeout(r,150))}
 const bad=()=>{g.leave().catch(()=>{});c.g=null;c.inGame=false;c.msg="방장과 연결하지 못했어요.";ckDraw()};
 if(!ini||!Array.isArray(ini.menus)||!Array.isArray(ini.ids)||!Array.isArray(ini.pl))return bad();
 const si=Math.floor(cNum(ini.si,0,NLV-1)),menus=ini.menus.filter(d=>DISH[d]),ids=ini.ids.filter(i=>ING[i]),idx=ini.pl.findIndex(x=>Array.isArray(x)&&x[0]===c.me);if(!menus.length||idx<0)return bad();if(ini.md==="vs"){vsBegin({md:"vs",si,cat:CATS[ini.cat]?ini.cat:"pz",menus,ids,pl:ini.pl,sd:ini.sd},c.me,g,false);return}
-kStart({si,plan:{cat:CATS[ini.cat]?ini.cat:"pz",menus},ids,stock:{},co:"guest",total:Math.floor(cNum(ini.tot,1,99))||undefined,sd:ini.sd==null?null:Math.floor(cNum(ini.sd,0,2e9))});const sp=K.sp[idx]||K.sp[3];K.x=sp[0]*KT;K.y=sp[1]*KT;kCam(1);K.col=PCOL[idx%4];K.lastSt=performance.now();
+kStart({si,plan:{cat:CATS[ini.cat]?ini.cat:"pz",menus},ids,stock:{},co:"guest",total:Math.floor(cNum(ini.tot,1,99))||undefined,sd:ini.sd==null?null:Math.floor(cNum(ini.sd,0,2e9)),lay:ini.lay&&typeof ini.lay==="object"?ini.lay:null});if(ini.v!==APPV)kmsg("방장과 게임 버전이 달라요. 끝나면 새로고침해 주세요");const sp=K.sp[idx]||K.sp[3];K.x=sp[0]*KT;K.y=sp[1]*KT;kCam(1);K.col=PCOL[idx%4];K.lastSt=performance.now();
 K.pl=ini.pl.filter(x=>Array.isArray(x)&&x[0]!==c.me).map(x=>coMkP(x[0],String(x[1]||""),String(x[2]||"친구").slice(0,20),PCOL[ini.pl.indexOf(x)%4]));
 c.uSt=g.on("st",m=>coOnSt(m));c.uEd=g.on("ed",m=>coOnEd(m));c.uRt=g.on("rt",m=>coOnRt(m))}
 function coQe(){const g=CO&&CO.g;if(g&&K&&K.lqid)Promise.resolve(g.emit("qe",{id:K.lqid})).catch(()=>{})}
