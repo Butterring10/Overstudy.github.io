@@ -1402,7 +1402,7 @@ dough:{n:"피자 도우",e:"🫓",p:3,ov:1},chicken:{n:"생닭",e:"🍗",p:5,dp:
 cookie:{n:"쿠키 반죽",e:"🍪",p:3,ov:1},pastry:{n:"생지",e:"🥐",p:3,ov:1},batter:{n:"케이크 반죽",e:"🥣",p:3,ov:1},cream:{n:"생크림",e:"🍦",p:3},choco:{n:"초콜릿",e:"🍫",p:3},strawberry:{n:"딸기",e:"🍓",p:3,ch:1},banana:{n:"바나나",e:"🍌",p:2,ch:1},
 cone:{n:"아이스크림 콘",e:"🍦",p:3},icev:{n:"바닐라 아이스크림",e:"🍨",p:4},icec:{n:"초코 아이스크림",e:"🍨",p:4},icest:{n:"딸기 아이스크림",e:"🍨",p:4}};
 for(const k in ING)ING[k].p*=6;
-for(const k in ING)ING[k].p=Math.round(ING[k].p*26.25)/100;const fw=v=>String(Math.round(v*100)/100);
+for(const k in ING)ING[k].p=Math.round(ING[k].p*13.125)/100;const fw=v=>String(Math.round(v*100)/100);
 const MART=[{t:"@shelfveg 채소·과일 코너",k:"shelf",items:["tomato","lettuce","onion","mushroom","carrot","pepper","potato","strawberry","banana"]},{t:"@shelfgrain 곡물·면·반죽 코너",k:"shelf",items:["bun","pasta","rice","noodle","ricecake","seaweed","dough","cookie","pastry","batter","cone"]},{t:"@shelfjar 양념·간식 코너",k:"shelf",items:["sauce","chunjang","choco"]},{t:"@fridge 냉장고",k:"fridge",items:["patty","beef","pork","chicken","fish","shrimp","egg","cheese","dumpling","cream","icev","icec","icest"]}];
 const POTK={"tomato:chopped":"soup","onion:chopped":"soup","pasta:raw":"pasta","rice:raw":"rice","noodle:raw":"noodle","ricecake:raw":"ricecake","dumpling:raw":"dumpling"},POTN={soup:3,pasta:1,rice:1,noodle:1,ricecake:1,dumpling:1};
 const GB=["rice:boiled","seaweed:raw","carrot:chopped"];
