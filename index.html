@@ -2637,11 +2637,11 @@ c.fillStyle="rgba(120,170,110,.45)";c.beginPath();c.ellipse(-rr*.35,-rr*.62,rr*.
 c.strokeStyle="#4b5361";c.lineWidth=2.2;c.lineJoin="round";path();c.stroke();
 c.strokeStyle="rgba(60,68,80,.6)";c.lineWidth=1.4;c.beginPath();c.moveTo(rr*.1,-rr*.5);c.lineTo(rr*.25,-rr*.15);c.lineTo(rr*.1,rr*.1);c.moveTo(rr*.25,-rr*.15);c.lineTo(rr*.45,-rr*.05);c.stroke();c.restore()}
 
-// 플레이어 탄막 공격 (빨간 포션 1개 = 3발, 1발 = 보스 체력 0.5, 보스 자동 조준)
+// 플레이어 탄막 공격 (빨간 포션 1개 = 3발, 1발 = 보스 체력 0.5, 쏘는 순간 보스 쪽으로 조준 · 유도 없음)
 function rdFire(){const r=RAID,B=r&&r.bar;if(!B||B.t>=B.dur||!(r.ammo>0)||!(r.hp>0)||!r.H||r.H.ph!=="bar")return;const now=performance.now();if(now-(r.lf||0)<220)return;r.lf=now;r.ammo--;r.fs=(r.fs||0)+1;r.ps=r.ps||[];const a=Math.atan2(B.by-(r.y-14),B.bx-r.x);r.ps.push({x:r.x,y:r.y-14,vx:Math.cos(a)*460,vy:Math.sin(a)*460,mine:1,l:2.5});try{sfx.chop()}catch(e){}rdPres(1)}
 function rdShots(c,dt,P){const r=RAID,B=r.bar,H=r.H,tx=B?B.bx:480,ty=B?B.by:170;r.ps=r.ps||[];r.ofs=r.ofs||{};
 rdPeers().forEach(q=>{const v=q.presence,p=q.peer;if(!v||p===r.me||typeof v.fs!=="number")return;const o=(r.op||{})[p];if(r.ofs[p]==null){r.ofs[p]=v.fs;return}if(v.fs>r.ofs[p]&&o&&H.ph==="bar"){for(let i=0;i<Math.min(3,v.fs-r.ofs[p]);i++){const a=Math.atan2(ty-(o.y-14),tx-o.x);r.ps.push({x:o.x,y:o.y-14,vx:Math.cos(a)*460,vy:Math.sin(a)*460,l:2.5})}}r.ofs[p]=v.fs});
-r.ps=r.ps.filter(s=>{s.l-=dt;if(s.l<=0)return false;const a=Math.atan2(ty-s.y,tx-s.x),v=460;s.vx+=(Math.cos(a)*v-s.vx)*Math.min(1,dt*6);s.vy+=(Math.sin(a)*v-s.vy)*Math.min(1,dt*6);s.x+=s.vx*dt;s.y+=s.vy*dt;
+r.ps=r.ps.filter(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;if(s.x<RDX0-10||s.x>RDX1+10||s.y<RDY0-10||s.y>RDY1+10)return false;for(const k of H.rk||[])if(Math.hypot(s.x-k[0],(s.y-k[1])*1.15)<k[2]+3){r.pops.push({x:s.x,y:s.y-10,v:"막힘",c:"#d0d6de",l:.5});return false}
 if(Math.hypot(s.x-tx,s.y-ty)<36){r.bfl=.2;r.pops.push({x:tx+(Math.random()*40-20),y:ty-40,v:"-0.5",c:"#ffcf6a",l:.8});if(s.mine&&H.ph==="bar"){r.dh=(r.dh||0)+1;rdPres(1)}return false}return true});
 for(const s of r.ps){const g=c.createRadialGradient(s.x,s.y,0,s.x,s.y,15);g.addColorStop(0,"rgba(255,200,90,.95)");g.addColorStop(.5,"rgba(255,110,50,.6)");g.addColorStop(1,"rgba(255,80,40,0)");c.fillStyle=g;c.fillRect(s.x-15,s.y-15,30,30);c.fillStyle="#fff6d8";c.beginPath();c.arc(s.x,s.y,4.5,0,7);c.fill()}
 const am=document.getElementById("rdam"),bt=document.getElementById("rdfire");if(am){const t=(r.ammo||0)+"발";if(am.textContent!==t)am.textContent=t;const dis=!(r.ammo>0)||!(r.hp>0)||!B||B.t>=B.dur;if(bt.disabled!==dis)bt.disabled=dis}}
