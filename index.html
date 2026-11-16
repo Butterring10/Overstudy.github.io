@@ -2620,7 +2620,7 @@ else if(p==="slam")for(let k=0;k<3;k++){at(t0+.1+k*1.05,()=>{const r=me();B.mk.p
 else if(p==="blink")for(let k=0;k<3;k++){const nx=RDX0+110+R()*(RDX1-RDX0-220),ny=RDY0+70+R()*200;at(t0+.3+k*1,()=>{B.bx=nx;B.by=ny;B.bfl=.25;const a=aim();for(let i=-2;i<=2;i++)E(B.bx,B.by,a+i*.22,210)})}
 else if(p==="wave")for(let k=0;k<8;k++){const y0=RDY0+40+R()*(RDY1-RDY0-80),lf=k%2;at(t0+.2+k*.36,()=>{for(let i=0;i<2;i++)E(lf?RDX0+4:RDX1-4,y0,lf?0:3.1416,170,{wy:y0+i*70-35,wa:46,wf:3.2,ph:i*1.6})})}
 else if(p==="flower"){const o=R()*6.28;for(let k=0;k<12;k++)at(t0+.2+k*.25,()=>{const d=k%2?1:-1;for(let i=0;i<6;i++)E(B.bx,B.by,o+d*k*.22+i*1.0472,155)})}});
-at(.6+pats.length*RD_PD-.2,()=>{B.bx=480;B.by=170});ev.sort((a,b)=>a.t-b.t);const n=1+Math.floor(R()*3);for(let i=0;i<n;i++)B.pots.push({id:i,x:RDX0+50+R()*(RDX1-RDX0-100),y:RDY0+150+R()*(RDY1-RDY0-200),t0:1,t1:6});return B}
+at(.6+pats.length*RD_PD-.2,()=>{B.bx=480;B.by=170});ev.sort((a,b)=>a.t-b.t);const n=2+Math.floor(R()*3),last=Math.max(1,H.dur-5.2);for(let i=0;i<n;i++){const t0=.8+R()*(last-.8);B.pots.push({id:i,x:RDX0+50+R()*(RDX1-RDX0-100),y:RDY0+60+R()*(RDY1-RDY0-110),t0,t1:t0+5})}return B}
 
 // 레이드 히트박스: 캐릭터별 귀·수염·꼬리를 뺀 몸통 타원 [가운데x, 가운데y, 가로반지름, 세로반지름] (발 기준, 몽실이 높이 43px와 같은 비율)
 const RDHB=[[0.5,-13.5,18.2,16.8],[0.6,-13.7,19.5,17.5],[0.6,-13.2,19.0,17.2],[0.5,-13.2,20.0,17.6],[-3.2,-13.2,19.3,17.3],[0.0,-13.4,19.1,17.2]];function rdHB(ch){const i=(+String(ch||"c1").split("|")[0].slice(1)||1)-1,h=RDHB[i]||RDHB[0];return{cx:h[0],cy:h[1],rx:h[2],ry:h[3]}}
@@ -2630,7 +2630,7 @@ function rdStep(dt){const r=RAID,B=r.bar;if(!B)return;B.t+=dt;B.inv-=dt;if(B.shk
 B.mk=B.mk.filter(m=>(m.t-=dt)>0);const live=r.hp>0;
 B.bl=B.bl.filter(s=>{if(s.h){const a=Math.atan2(s.vy,s.vx);let da=Math.atan2(r.y-s.y,r.x-s.x)-a;da=Math.atan2(Math.sin(da),Math.cos(da));const na=a+Math.max(-1,Math.min(1,da))*dt*1.4,v=Math.hypot(s.vx,s.vy);s.vx=Math.cos(na)*v;s.vy=Math.sin(na)*v;s.l-=dt;if(s.l<=0)return false}
 s.x+=s.vx*dt;if(s.wy!=null){s.ph+=dt*s.wf;s.y=s.wy+Math.sin(s.ph)*s.wa}else s.y+=s.vy*dt;if(s.x<RDX0-6||s.x>RDX1+6||s.y<RDY0-6||s.y>RDY1+6)return false;
-if(live&&B.inv<=0&&rdHit(r.x,r.y,r.fx,chKey(),s.x,s.y,10)){rdHurt(1);return false}return true});
+if(live&&B.inv<=0&&rdHit(r.x,r.y,r.fx,chKey(),s.x,s.y,7)){rdHurt(1);return false}return true});
 if(live&&B.inv<=0&&B.t>1&&Math.hypot(B.bx-r.x,B.by-r.y)<52)rdHurt(1);
 const taken={};rdPeers().forEach(p=>{const q=p.presence;if(q.br===r.barR&&Array.isArray(q.pt))q.pt.forEach(i=>taken[i]=1)});
 for(const p of B.pots){if(B.got[p.id]||taken[p.id]||B.t<p.t0||B.t>p.t1)continue;if(live&&Math.hypot(p.x-r.x,p.y-r.y)<30){B.got[p.id]=1;r.pt=[...r.pt,p.id];r.hp=Math.min(RD_HP,r.hp+1);r.pops.push({x:p.x,y:p.y-24,v:"+1 ❤",c:"#9dff8a",l:.9});try{sfx.pick()}catch(e){}rdPres(1)}}
@@ -2690,7 +2690,7 @@ for(let i=0;i<RD_HP;i++){c.fillStyle=i<Math.ceil(hp)?"#ff5a7a":"rgba(255,255,255
 const list=[];for(const p of mem){if(p===r.me){list.push([p,r.x,r.y,r.fx,H.ph==="bar"||H.ph==="res"?r.hp:(H.hp[p]||0),1]);continue}const q=ps.find(z=>z.peer===p),v=q&&q.presence,o=r.op[p]=r.op[p]||{x:480,y:400,f:0};if(v&&typeof v.x==="number"){const tx=Math.max(RDX0,Math.min(RDX1,v.x)),ty=Math.max(RDY0,Math.min(RDY1,v.y));if(Math.abs(tx-o.x)>1)o.f=tx<o.x?1:0;o.x+=(tx-o.x)*Math.min(1,dt*10);o.y+=(ty-o.y)*Math.min(1,dt*10)}list.push([p,o.x,o.y,o.f,H.ph==="bar"&&v&&v.br===H.r&&typeof v.hp==="number"?v.hp:(H.hp[p]||0),0])}
 list.sort((a,b)=>a[2]-b[2]).forEach(a=>drawP(...a));
 // 탄막
-if(B){c.save();c.globalCompositeOperation="lighter";for(const s of B.bl){const g4=c.createRadialGradient(s.x,s.y,0,s.x,s.y,17);g4.addColorStop(0,s.h?"rgba(190,120,255,.85)":"rgba(255,120,190,.85)");g4.addColorStop(1,"rgba(255,120,190,0)");c.fillStyle=g4;c.fillRect(s.x-17,s.y-17,34,34)}c.restore();c.fillStyle="#ffe6f3";for(const s of B.bl){c.beginPath();c.arc(s.x,s.y,4.5,0,7);c.fill()}}
+if(B){c.save();c.globalCompositeOperation="lighter";for(const s of B.bl){const g4=c.createRadialGradient(s.x,s.y,0,s.x,s.y,12);g4.addColorStop(0,s.h?"rgba(190,120,255,.85)":"rgba(255,120,190,.85)");g4.addColorStop(1,"rgba(255,120,190,0)");c.fillStyle=g4;c.fillRect(s.x-12,s.y-12,24,24)}c.restore();c.fillStyle="#ffe6f3";for(const s of B.bl){c.beginPath();c.arc(s.x,s.y,3.2,0,7);c.fill()}}
 // 숫자
 r.pops=r.pops.filter(p=>(p.l-=dt)>0);for(const p of r.pops){p.y-=40*dt;c.globalAlpha=Math.min(1,p.l/.3);c.font="bold 22px sans-serif";c.textAlign="center";c.lineWidth=4;c.strokeStyle="rgba(30,30,50,.8)";c.strokeText(p.v,p.x,p.y);c.fillStyle=p.c;c.fillText(p.v,p.x,p.y)}c.globalAlpha=1;c.restore();
 // HUD
