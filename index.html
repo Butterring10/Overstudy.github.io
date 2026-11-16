@@ -2540,7 +2540,7 @@ const bolt=sh===3?`<path class="rwz" d="M-1 3l4-3-1 4 3-1-5 6 1-4-3 1z" fill="${
 return `<span class="rwb${sh===3?" rwl":""}" title="레이드 ${n}승 · ${cn} ${RWS[sh]}" style="display:inline-block;line-height:0;--gl:${k%10===1?"#8a8aa0":c}"><svg width="26" height="24" viewBox="-2 -1 32 26" style="overflow:visible"><defs>${g}</defs>${body}${bolt}</svg></span>`}
 
 // ===== 레이드 토벌 (2~4명, 방장이 진행 · 탄막은 각자 화면에서 같은 씨앗으로 계산) =====
-let RAID=null;const RD_CS=43/137;const RD_HP=5,RD_QT=30,RD_PT=12,RD_BHP={1:6,2:11,3:19,4:28},RDW=960,RDH=576,RDX0=64,RDY0=64,RDX1=896,RDY1=512,RD_PD=3.3;
+let RAID=null;const RD_CS=43/137;const RD_HP=5,RD_QT=30,RD_PT=12,RD_BHP={1:7,2:12,3:20,4:29},RDW=960,RDH=576,RDX0=64,RDY0=64,RDX1=896,RDY1=512,RD_PD=3.3;
 const RD_PATS=[["burst","slam","fan"],["rings","rain","flower"],["fan","blink","sweep"],["star","cross","burst"],["slam","rings","wave"],["rain","sweep","spiral"],["homing","star","blink"],["spiral","fan","rain","cross"],["wave","homing","flower","rings"],["cross","star","spiral","sweep","slam"]];
 const RD_TH=[[200,46,0,"255,150,50"],[160,42,-2,"255,200,80"],[218,40,-2,"180,140,255"],[190,38,3,"150,210,255"],[178,48,-1,"90,230,230"],[208,50,1,"255,140,90"],[226,44,-8,"160,150,255"],[196,46,-1,"255,120,40"],[212,22,-2,"200,215,235"],[204,52,2,"255,215,110"]];
 const rdTk=()=>S.isT?99:(S.me.rt||0),rdPeers=()=>{try{return RAID&&RAID.g?RAID.g.peers().filter(p=>p.presence&&p.presence.n):[]}catch(e){return[]}},rdLobP=()=>{try{return RAID&&RAID.lob?RAID.lob.peers().filter(p=>!p.sameTab&&p.presence&&p.presence.n):[]}catch(e){return[]}};
