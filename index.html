@@ -691,7 +691,7 @@ function rRound(R,cx,cy,rad,z,col,lw){const pts=[];for(let i=0;i<28;i++){const a
 function rLine(R,a,b,col,w){const c=R.c,p=rP(R,a[0],a[1],a[2]),q=rP(R,b[0],b[1],b[2]);c.beginPath();c.moveTo(p[0],p[1]);c.lineTo(q[0],q[1]);c.strokeStyle=col;c.lineWidth=(w||1.2)*R.s;c.lineCap="round";c.stroke()}
 // ---- 가구 종류별 그리기 (o: 색·모양 옵션) ----
 const FT={
-rug:{w:2,d:2,walk:1,dr:(R,x,y,w,d,o)=>{if(o.round){const cx=x+w/2,cy=y+d/2;rRound(R,cx,cy,w/2-.08,.02,o.c1);rRound(R,cx,cy,w/2-.4,.03,o.c2,1);if(o.face){rRound(R,cx-.28,cy-.12,.07,.04,"#4a2c2a",0);rRound(R,cx+.12,cy+.28,.07,.04,"#4a2c2a",0);rRound(R,cx,cy+.08,.1,.04,"#4a2c2a",0)}return}
+rug:{w:2,d:2,walk:1,dr:(R,x,y,w,d,o)=>{if(o.bear)return drBearRug(R,x,y,w,d,o);if(o.round){const cx=x+w/2,cy=y+d/2;rRound(R,cx,cy,w/2-.08,.02,o.c1);rRound(R,cx,cy,w/2-.4,.03,o.c2,1);if(o.face){rRound(R,cx-.28,cy-.12,.07,.04,"#4a2c2a",0);rRound(R,cx+.12,cy+.28,.07,.04,"#4a2c2a",0);rRound(R,cx,cy+.08,.1,.04,"#4a2c2a",0)}return}
 rPoly(R,[[x+.1,y+.1,.02],[x+w-.1,y+.1,.02],[x+w-.1,y+d-.1,.02],[x+.1,y+d-.1,.02]],o.c1);
 if(o.st==="check"){for(let a=0;a<4;a++)for(let b=0;b<4;b++)if((a+b)%2)rPoly(R,[[x+.3+a*.35,y+.3+b*.35,.03],[x+.65+a*.35,y+.3+b*.35,.03],[x+.65+a*.35,y+.65+b*.35,.03],[x+.3+a*.35,y+.65+b*.35,.03]],o.c2,0)}
 else if(o.st==="stripe"){for(let a=0;a<3;a++)rPoly(R,[[x+.3+a*.5,y+.2,.03],[x+.6+a*.5,y+.2,.03],[x+.6+a*.5,y+d-.2,.03],[x+.3+a*.5,y+d-.2,.03]],o.c2,0)}
@@ -703,7 +703,7 @@ if(o.dots){for(const[a,b]of[[.9,.3],[1.25,.6],[1.5,.35],[1.7,.65]])if(a<L-.1){co
 seg(L-.1,L,0,.45,o.fr,o.canopy?.1:0);
 if(o.canopy){for(const[a,i]of[[L-.08,.04],[L-.08,Wd-.1]])r?rBox(R,x+a,y+i,.06,.06,0,2.15,o.fr):rBox(R,x+i,y+a,.06,.06,0,2.15,o.fr);
 r?(rBox(R,x,y+.04,L,.05,2.15,.07,o.fr),rBox(R,x,y+Wd-.09,L,.05,2.15,.07,o.fr)):(rBox(R,x+.04,y,.05,L,2.15,.07,o.fr),rBox(R,x+Wd-.09,y,.05,L,2.15,.07,o.fr))}}},
-desk:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.dual)return drDeskDual(R,x,y,w,d,o);if(o.lap)return drDeskLap(R,x,y,w,d,o);if(o.cab){rBox(R,x+.06,y+.1,.3,.8,0,.62,o.fr);rBox(R,x+.64,y+.1,.3,.8,0,.62,o.fr);rBox(R,x+.1,y+.9,.22,.03,.4,.07,"#ffd24a");rBox(R,x+.1,y+.9,.22,.03,.15,.07,"#ffd24a")}else for(const[a,b]of[[.12,.12],[.8,.12],[.12,.8],[.8,.8]])rBox(R,x+a,y+b,.08,.08,0,.62,o.fr);
+desk:{w:1,d:1,dr:(R,x,y,w,d,o)=>{if(o.dual)return drDeskDual2(R,x,y,w,d,o);if(o.lap)return drDeskLap(R,x,y,w,d,o);if(o.cab){rBox(R,x+.06,y+.1,.3,.8,0,.62,o.fr);rBox(R,x+.64,y+.1,.3,.8,0,.62,o.fr);rBox(R,x+.1,y+.9,.22,.03,.4,.07,"#ffd24a");rBox(R,x+.1,y+.9,.22,.03,.15,.07,"#ffd24a")}else for(const[a,b]of[[.12,.12],[.8,.12],[.12,.8],[.8,.8]])rBox(R,x+a,y+b,.08,.08,0,.62,o.fr);
 rBox(R,x+.04,y+.04,w-.08,d-.08,.62,.1,o.top);
 if(o.dual){for(const a of[.06,.52]){rBox(R,x+a+.17,y+.3,.1,.1,.72,.08,"#3a3a46");rBox(R,x+a,y+.38,.42,.06,.78,.42,"#3a3a46");rPoly(R,[[x+a+.03,y+.44,.82],[x+a+.39,y+.44,.82],[x+a+.39,y+.44,1.16],[x+a+.03,y+.44,1.16]],a<.3?"#9cd8ff":"#ffd9a0",1)}rBox(R,x+.3,y+.62,.4,.14,.72,.03,"#c9d1da")}
 else if(o.lap){rBox(R,x+.2,y+.45,.6,.34,.72,.03,"#c9d1da");rBox(R,x+.2,y+.38,.6,.05,.75,.4,"#3a3a46");rPoly(R,[[x+.24,y+.43,.8],[x+.76,y+.43,.8],[x+.76,y+.43,1.1],[x+.24,y+.43,1.1]],"#9cd8ff",1);rBox(R,x+.82,y+.6,.1,.1,.72,.12,"#ffffff");rBox(R,x+.1,y+.2,.08,.08,.72,.22,"#58b848")}
@@ -1015,7 +1015,7 @@ else if(k==="star"){base(6,0,"#c8946a");pole(34,"#a8744a");rGlow(c,X,Y-46*u,28*u
 c.restore()}
 
 Object.assign(FT,{table2:{w:2,d:1,cat:"table",dr(R,x,y,w,d,o){for(const[a,b]of[[.12,.14],[1.82,.14],[.12,.8],[1.82,.8]])rBox(R,x+a,y+b,.06,.06,0,.4,o.fr);rBox(R,x+.1,y+.22,1.8,.04,.32,.06,shd(o.fr,.9));rBox(R,x+.08,y+.1,1.84,.8,.4,.08,o.top);rHL(R,x+.14,y+.16,1.72,.68,.481,shd(o.top,1.06))}},
-rack:{w:1,d:1,cat:"wardrobe",dr(R,x,y,w,d,o){const fr=o.fr,cl=o.cl;for(const a of[.1,.84]){rBox(R,x+a,y+.3,.06,.4,0,.04,fr);rBox(R,x+a+.01,y+.47,.04,.06,.04,1.5,fr)}
+rack:{w:1,d:1,cat:"wardrobe",dr(R,x,y,w,d,o){return drRack(R,x,y,w,d,o);const fr=o.fr,cl=o.cl;for(const a of[.1,.84]){rBox(R,x+a,y+.3,.06,.4,0,.04,fr);rBox(R,x+a+.01,y+.47,.04,.06,.04,1.5,fr)}
 rBox(R,x+.14,y+.32,.72,.36,.2,.03,shd(fr,.9));[[.22,"#e5564a"],[.4,"#6aa8e8"]].forEach(([a,c])=>{rBox(R,x+a,y+.38,.12,.2,.23,.08,c)});
 rBox(R,x+.1,y+.47,.8,.06,1.5,.04,fr);cl.forEach((c,i)=>{const a=.2+i*.17;rLine(R,[x+a+.06,y+.5,1.5],[x+a+.06,y+.5,1.42],"#6a6a72",1.2);rLine(R,[x+a-.01,y+.5,1.36],[x+a+.06,y+.5,1.43],"#6a6a72",1.2);rLine(R,[x+a+.13,y+.5,1.36],[x+a+.06,y+.5,1.43],"#6a6a72",1.2);
 rBox(R,x+a,y+.42,.12,.16,.78,.58,c);rBox(R,x+a-.03,y+.44,.18,.12,1.22,.14,c);rHL(R,x+a,y+.42,.12,.16,1.361,shd(c,1.1))})}},
@@ -1148,6 +1148,59 @@ rBox(R,x+.28,y+.44,.46,.3,.69,.025,"#c9ced6");rPoly(R,[[x+.31,y+.47,.716],[x+.71
 rCyl(R,x+.84,y+.66,.06,.06,.69,.11,"#ffffff");rDot(R,x+.84,y+.66,.8,2.2,"#8a5a38");
 rBox(R,x+.08,y+.6,.16,.22,.69,.03,"#6aa8e8");rLine(R,[x+.1,y+.84,.7],[x+.22,y+.84,.7],"#ffffff",.8)}
 
+// ===== v211 =====
+function drRack(R,x,y,w,d,o){const fr=o.fr,cl=o.cl||["#ff8fb1","#9cc8f0","#ffd24a","#8fd466"],MT=shd(fr,.85);
+for(const a of[.1,.84]){rBox(R,x+a-.02,y+.22,.1,.56,0,.05,MT);rBox(R,x+a+.01,y+.47,.05,.06,.05,1.62,fr)}
+rBox(R,x+.12,y+.26,.76,.48,.24,.03,shd(fr,.92));for(const a of[.18,.36,.54,.72])rLine(R,[x+a,y+.27,.27],[x+a,y+.73,.27],shd(fr,.75),1);
+rBox(R,x+.18,y+.36,.16,.26,.27,.09,"#6a4a3a");rBox(R,x+.38,y+.36,.16,.26,.27,.09,"#e5564a");rBox(R,x+.62,y+.34,.22,.3,.27,.16,"#e9d6b0");rLine(R,[x+.62,y+.64,.36],[x+.84,y+.64,.36],"#c9a46a",1.2);
+rBox(R,x+.08,y+.46,.84,.08,1.66,.05,fr);rDot(R,x+.12,y+.5,1.72,2,shd(fr,1.1));rDot(R,x+.88,y+.5,1.72,2,shd(fr,1.1));
+cl.forEach((c,i)=>{const a=.18+i*.17,cx=a+.07;rLine(R,[x+cx,y+.5,1.66],[x+cx,y+.5,1.58],"#6a6a72",1.2);rLine(R,[x+cx-.08,y+.5,1.5],[x+cx,y+.5,1.58],"#6a6a72",1.2);rLine(R,[x+cx+.08,y+.5,1.5],[x+cx,y+.5,1.58],"#6a6a72",1.2);
+const dress=i%2===1,b=y+.42,dd=.16,top=1.5,bot=dress?.86:1.02;
+rPoly(R,[[x+a-.02,b+dd,top],[x+a+.16,b+dd,top],[x+a+.15,b+dd,top-.12],[x+a+(dress?.2:.14),b+dd,bot],[x+a-(dress?.06:0),b+dd,bot],[x+a-.01,b+dd,top-.12]],c,1.1);
+rPoly(R,[[x+a+.16,b,top],[x+a+.16,b+dd,top],[x+a+(dress?.2:.14),b+dd,bot],[x+a+(dress?.2:.14),b,bot]],shd(c,.78),1.1);
+rPoly(R,[[x+a+.03,b+dd+.001,top],[x+a+.11,b+dd+.001,top],[x+a+.07,b+dd+.001,top-.07]],shd(c,1.15),.8);
+if(!dress)rLine(R,[x+a+.07,b+dd+.002,top-.08],[x+a+.07,b+dd+.002,bot+.04],shd(c,.8),.8);else rPoly(R,[[x+a-.01,b+dd+.002,1.2],[x+a+.15,b+dd+.002,1.2],[x+a+.15,b+dd+.002,1.16],[x+a-.01,b+dd+.002,1.16]],"#ffffff",0)})}
+function drBearRug(R,x,y,w,d,o){const cx=x+w/2,cy=y+d/2,c=o.c1||"#d9a878",lt=o.c2||"#f0d2a8",LN="#4a2c2a";
+for(const[ex,ey]of[[-.78,-.22],[-.22,-.78]]){rRound(R,cx+ex,cy+ey,.27,.02,c,1.2);rRound(R,cx+ex,cy+ey,.15,.025,lt,0)}
+rRound(R,cx,cy,.8,.02,c,1.3);const bx=cx-.06,by=cy-.06;
+rRound(R,bx-.2,by+.2,.07,.035,LN,0);rRound(R,bx+.2,by-.2,.07,.035,LN,0);
+rRound(R,cx+.2,cy+.2,.28,.03,lt,0);rRound(R,cx+.12,cy+.12,.08,.04,LN,0);rLine(R,[cx+.12,cy+.12,.04],[cx+.24,cy+.24,.04],LN,1);
+rRound(R,bx-.24+.22,by+.44+.0,.1,.035,"#ffb3c6",0);rRound(R,bx+.44,by-.24+.22,.1,.035,"#ffb3c6",0)}
+function drGrassRug(R,x,y,w,d,o){const z=.02,c1="#7cc86a",c2="#5aa84c";rPoly(R,[[x+.06,y+.06,z],[x+w-.06,y+.06,z],[x+w-.06,y+d-.06,z],[x+.06,y+d-.06,z]],c1,1.2);
+const rnd=kRng(7);for(let i=0;i<22;i++){const a=x+.12+rnd()*(w-.24),b=y+.12+rnd()*(d-.24),h=.06+rnd()*.06;rLine(R,[a,b,z],[a-.03,b,z+h],i%3?c2:"#9ee08a",1.3);rLine(R,[a,b,z],[a+.03,b,z+h*.8],c2,1.3)}
+for(const[a,b,c]of[[.3,.35,"#ffffff"],[.7,.6,"#ffd24a"],[.45,.75,"#ff8fb1"]])rDot(R,x+a,y+b,.06,2.2,c)}
+function drDeskDual2(R,x,y,w,d,o){const fr=o.fr,tp=o.top;
+rBox(R,x+.68,y+.12,.22,.42,0,.52,"#2f3140");rLine(R,[x+.9,y+.2,.45],[x+.9,y+.46,.45],"#4fd8ff",1.6);
+for(const[a,b]of[[.08,.08],[.86,.08],[.08,.86],[.86,.86]])rBox(R,x+a,y+b,.06,.06,0,.62,fr);rBox(R,x+.08,y+.1,.84,.04,.5,.06,shd(fr,.9));
+rBox(R,x+.03,y+.03,.94,.94,.62,.07,tp);rHL(R,x+.06,y+.06,.88,.88,.691,shd(tp,1.05));
+rBox(R,x+.42,y+.16,.16,.12,.69,.02,"#3a3d4a");rBox(R,x+.47,y+.18,.06,.05,.71,.3,"#3a3d4a");rBox(R,x+.3,y+.19,.4,.04,.96,.04,"#3a3d4a");
+const mon=(p0,p1,c1,kind)=>{const L=(t,z)=>[p0[0]+(p1[0]-p0[0])*t,p0[1]+(p1[1]-p0[1])*t,z],B=(t,z)=>{const q=L(t,z);return[q[0],q[1]-.035,z]};
+rPoly(R,[B(0,.8),B(1,.8),B(1,1.2),B(0,1.2)],"#2a2c36",1.2);rPoly(R,[L(0,.8),L(1,.8),L(1,1.2),L(0,1.2)],"#23252f",1.2);
+rPoly(R,[L(.06,.84),L(.94,.84),L(.94,1.16),L(.06,1.16)],c1,0);
+if(kind==="code"){for(let k=0;k<6;k++){const a=.12+(k%3)*.06,b=a+.25+(k*7%5)*.05;rLine(R,L(a,1.11-k*.045),L(b,1.11-k*.045),["#ff8fb1","#7cff9a","#ffd24a","#9cd8ff"][k%4],1)}}
+else{rPoly(R,[L(.12,.9),L(.88,.9),L(.88,1.1),L(.12,1.1)],"#ffffff",0);rPoly(R,[L(.12,1.06),L(.88,1.06),L(.88,1.1),L(.12,1.1)],"#4f7cff",0);rPoly(R,[L(.18,.93),L(.45,.93),L(.45,1.02),L(.18,1.02)],"#ffd9a0",0)}};
+mon([x+.06,y+.44],[x+.49,y+.31],"#1e2a3a","code");mon([x+.51,y+.31],[x+.94,y+.44],"#cfe8ff","win");
+rBox(R,x+.27,y+.6,.46,.16,.69,.025,"#e8ecf1");for(let r=0;r<3;r++)rLine(R,[x+.31,y+.64+r*.04,.718],[x+.69,y+.64+r*.04,.718],"#b8c0cc",.8);
+rBox(R,x+.78,y+.64,.08,.11,.69,.03,"#ffffff");rCyl(R,x+.13,y+.72,.06,.06,.69,.13,"#ff8fb1")}
+
+FT.rug1={w:1,d:1,walk:1,cat:"rug",dr:drGrassRug};
+{const F_=id=>FDEF.find(f=>f.id===id),add=(base,list)=>{const b=F_(base);if(!b)return;for(const[id,n,o]of list)FDEF.push({id,t:b.t,n,p:b.p,o:{...b.o,...o}})};
+FDEF.push({id:"rg6",t:"rug1",n:"잔디밭 러그 (1칸)",p:10,o:{}});
+{const b=F_("rg5");if(b)b.o={bear:1,c1:"#d9a878",c2:"#f0d2a8"}}
+add("ld4p",[["l4a","분홍 4인용 긴 책상",{fr:"#e89ab4",top:"#ffe0ea"}],["l4b","하늘 4인용 긴 책상",{fr:"#7fa8d8",top:"#e0efff"}],["l4c","민트 4인용 긴 책상",{fr:"#7fc8b0",top:"#d4f4e6"}],["l4d","검은 4인용 긴 책상",{fr:"#3f4048",top:"#5a5c66"}]]);
+add("ld6",[["l6a","흰색 6인용 긴 책상",{fr:"#c9d1da",top:"#ffffff"}],["l6b","분홍 6인용 긴 책상",{fr:"#e89ab4",top:"#ffe0ea"}],["l6c","하늘 6인용 긴 책상",{fr:"#7fa8d8",top:"#e0efff"}],["l6d","민트 6인용 긴 책상",{fr:"#7fc8b0",top:"#d4f4e6"}],["l6e","검은 6인용 긴 책상",{fr:"#3f4048",top:"#5a5c66"}]]);
+add("bq1",[["bqa","민트 2인용 침대",{bl:"#8fd4c0"}],["bqb","노랑 2인용 침대",{bl:"#ffd24a"}],["bqc","보라 2인용 침대",{bl:"#c4a8f0"}],["bqd","회색 2인용 침대",{fr:"#8a8f9a",bl:"#a8b0bc"}]]);
+add("bn1",[["bna","하늘 2인용 의자",{seat:"#9cc8f0",back:"#7fb0e0"}],["bnb","민트 2인용 의자",{seat:"#9fdcc4",back:"#7fc8b0"}],["bnc","노랑 2인용 의자",{seat:"#ffd24a",back:"#f0c040"}],["bnd","회색 2인용 의자",{fr:"#6a7a8a",seat:"#c9d1da",back:"#a8b0bc"}]]);
+add("rl1",[["r1a","파랑 복도 긴 러그 (3칸)",{c1:"#5b8fe0",c2:"#e6f0ff",fr:"#e6f0ff"}],["r1b","초록 복도 긴 러그 (3칸)",{c1:"#6cc47a",c2:"#eaf8e0",fr:"#eaf8e0"}],["r1c","보라 복도 긴 러그 (3칸)",{c1:"#9a7ae0",c2:"#f0eaff",fr:"#f0eaff"}],["r1d","회색 복도 긴 러그 (3칸)",{c1:"#7a828e",c2:"#eef0f3",fr:"#eef0f3"}]]);
+add("rl2",[["r2a","분홍 체크 긴 러그 (3×2)",{c1:"#f6a8c0",c2:"#fff0f5"}],["r2b","노랑 체크 긴 러그 (3×2)",{c1:"#ffd24a",c2:"#fff7d6"}],["r2c","민트 체크 긴 러그 (3×2)",{c1:"#8fd4c0",c2:"#e8faf4"}],["r2d","회색 체크 긴 러그 (3×2)",{c1:"#a8b0bc",c2:"#f2f4f7"}]]);
+add("rl3",[["r3a","파랑 거실 큰 러그 (4×2)",{c1:"#a8c4e8",c2:"#3a5a9a",c3:"#eef4ff",fr:"#eef4ff"}],["r3b","초록 거실 큰 러그 (4×2)",{c1:"#b8dca0",c2:"#4a7a3a",c3:"#f2fae8",fr:"#f2fae8"}],["r3c","분홍 거실 큰 러그 (4×2)",{c1:"#f4c4d4",c2:"#b04a6a",c3:"#fff2f6",fr:"#fff2f6"}],["r3d","회색 거실 큰 러그 (4×2)",{c1:"#c4c8d0",c2:"#4a5060",c3:"#f4f5f7",fr:"#f4f5f7"}]]);
+add("rl4",[["r4a","분홍 줄무늬 러그 (3×2)",{c1:"#f6a8c0",c2:"#fff0f5"}],["r4b","하늘 줄무늬 러그 (3×2)",{c1:"#9cc8f0",c2:"#eef6ff"}],["r4c","노랑 줄무늬 러그 (3×2)",{c1:"#ffd24a",c2:"#fffbe6"}],["r4d","보라 줄무늬 러그 (3×2)",{c1:"#c4a8f0",c2:"#f6f0ff"}]]);
+const P=(ids,v,g)=>ids.forEach(id=>{const f=F_(id);if(f){f.fp=v;if(g)f.g=g}});
+P(["ld4p","ld4w","l4a","l4b","l4c","l4d"],400,"ld4");P(["ld6","l6a","l6b","l6c","l6d","l6e"],580);P(["ld8"],690);
+P(["bq1","bq2","bq3","bqa","bqb","bqc","bqd"],550,"bq");P(["bn1","bn2","bna","bnb","bnc","bnd"],240,"bn");
+P(["hg1","hg2"],120);P(["dw1","dw2","dw3"],105,"dw");P(["tt1","tt2"],220);P(["rg5"],190);P(["rg6"],50);
+P(["rl1","r1a","r1b","r1c","r1d"],140);P(["rl2","r2a","r2b","r2c","r2d"],210);P(["rl3","r3a","r3b","r3c","r3d"],250);P(["rl4","r4a","r4b","r4c","r4d"],210);
+for(const f of FDEF)if((f.t==="lamp"||/화병/.test(f.n))&&!/^ba_/.test(f.id))f.half=1}
 FT.tvw={w:2,d:1,cat:"tv",dr:drTvWide};FTN.tvw=FTN.tvw||"TV";
 {const F_=id=>FDEF.find(f=>f.id===id),add=(base,list)=>{const b=F_(base);if(!b)return;for(const[id,n,o]of list)FDEF.push({id,t:b.t,n,p:b.p,o:{...b.o,...o}})};
 const tv4=F_("tv4");if(tv4)tv4.t="tvw";
@@ -1163,10 +1216,10 @@ P(["bd1","bd2","bd4","bd5"],300,"bedS");P(["bd3"],450);P(["sh1","sh2","sh5","sh6
 P(["wd1","wo1","wo2","wo3","wo4","wo5","wo6"],305);P(["wd2","wm1","wm2","wm3","wm4","wm5"],410);P(["tv4"],450);P(["tv5"],500);P(["dk5"],450);P(["dk6"],400);P(["dk7"],550);
 P(["ld1","lg3","l2a","l2b","l2c","l2d"],400);P(["ld3","lg4","lca","lcb","lcc","lcd"],420);P(["ld2","l3a","l3b","l3c","l3d","l3e"],420);P(["lg1","lg5"],450);
 for(const f of FDEF){if(f.t==="win")f.fp=170;else if(FT[f.t]&&FT[f.t].cat==="win")f.fp=250;else if(f.t==="pic")f.fp=158;else if(FT[f.t]&&FT[f.t].cat==="pic")f.fp=260}}
-FDEF.forEach(f=>{if(["sh4","tb1","ba_plant"].includes(f.id))f.hide=1;if(f.t==="sofa"&&/^sf\d/.test(f.id))f.fp=420;if(f.t==="lsofa")f.fp=472});
+FDEF.forEach(f=>{if(["sh4","tb1","ba_plant"].includes(f.id))f.hide=1;if(f.t==="sofa"&&/^sf\d/.test(f.id))f.fp=420;if(f.t==="lsofa")f.fp=370});
 {const v=FTN.etc;delete FTN.etc;FTN.etc=v}const FD={};FDEF.forEach(f=>{FD[f.id]=f});
 const WD={},FLD={};WDEF.forEach(w=>{WD[w.id]=w});FLDEF.forEach(w=>{FLD[w.id]=w});
-{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g);if(i.t!=="tool"&&i.p>0)i.p=Math.max(1,Math.round(i.p*.35))}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7));if(f.fp)f.p=f.fp})}
+{const hv=v=>v>0?Math.max(1,Math.round(v/2)):v;for(const i of ITEMS){i.p=hv(i.p);if(i.g)i.g=hv(i.g);if(i.t!=="tool"&&i.p>0)i.p=Math.max(1,Math.round(i.p*.35))}[...FDEF,...WDEF,...FLDEF].forEach(f=>{f.p=hv(f.p);if(f.p>0)f.p=Math.max(1,Math.round(f.p*.7));if(f.fp)f.p=f.fp;if(f.half)f.p=Math.max(1,Math.round(f.p*.5))})}
 // ===== 색상 바꾼 모자·장비 (원래 그림의 색을 다른 색으로 돌려서 만들어요) =====
 function VBASE(id){return String(id||"").split("_")[0]}function EARLESS(h){return["h14","h15"].includes(VBASE(h))}function NOHAND(t){return["t11","t16"].includes(VBASE(t))}
 const VCOL=[["re","빨강",0],["or","주황",28],["ye","노랑",50],["gr","초록",125],["sk","하늘",195],["bl","파랑",222],["pu","보라",270],["pk","분홍",330]];
@@ -1886,7 +1939,7 @@ if(Object.keys(seen).length!==free.length)return null;
 isl.forEach(([x,y])=>put(x,y,"counter"));hol.forEach(([x,y])=>put(x,y,"hole"));
 const cx=W/2-.5,cy=H/2-.5,fs=free.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy)).slice(0,4);if(fs.length<4)return null;
 return{sp,spw:fs.map(([x,y])=>[x+.5,y+.5]),W,H,L}}
-const APPV=210;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
+const APPV=211;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
 function kLayEnc(){const out=[];for(const s of K.st){const edge=s.x===0||s.y===0||s.x===K.W-1||s.y===K.H-1;if(s.t==="counter"&&edge)continue;let cd=s.t==="crate"?"c"+s.id:s.t==="pan"?(s.ov?"o":s.dp?"f":"p"):LAYC[s.t];if(!cd)continue;out.push(s.x+"."+s.y+"."+cd)}return{W:K.W,H:K.H,L:K.L,sp:K.sp.map(p=>[+p[0].toFixed(2),+p[1].toFixed(2)]),s:out.join(";")}}
 function kLayDec(lay){const W=Math.floor(cNum(lay.W,4,30)),H=Math.floor(cNum(lay.H,4,30)),IC={};for(const k in LAYC)IC[LAYC[k]]=k;const sp={};
 for(const e of String(lay.s||"").split(";")){const m=/^(\d+)\.(\d+)\.(c[a-z0-9_]+|[a-z])$/.exec(e);if(!m)continue;const x=+m[1],y=+m[2],cd=m[3];if(x>=W||y>=H)continue;let t,o={};if(cd[0]==="c"&&cd.length>1){if(!ING[cd.slice(1)])continue;t="crate";o={id:cd.slice(1)}}else if(cd==="p")t="pan";else if(cd==="o"){t="pan";o={ov:1}}else if(cd==="f"){t="pan";o={dp:1}}else{t=IC[cd];if(!t)continue}sp[x+","+y]=[t,o]}
