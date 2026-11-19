@@ -1955,7 +1955,7 @@ if(Object.keys(seen).length!==free.length)return null;
 isl.forEach(([x,y])=>put(x,y,"counter"));hol.forEach(([x,y])=>put(x,y,"hole"));
 const cx=W/2-.5,cy=H/2-.5,fs=free.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy)).slice(0,4);if(fs.length<4)return null;
 return{sp,spw:fs.map(([x,y])=>[x+.5,y+.5]),W,H,L}}
-const APPV=230;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
+const APPV=231;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
 function kLayEnc(){const out=[];for(const s of K.st){const edge=s.x===0||s.y===0||s.x===K.W-1||s.y===K.H-1;if(s.t==="counter"&&edge)continue;let cd=s.t==="crate"?"c"+s.id:s.t==="pan"?(s.ov?"o":s.dp?"f":"p"):LAYC[s.t];if(!cd)continue;out.push(s.x+"."+s.y+"."+cd)}return{W:K.W,H:K.H,L:K.L,sp:K.sp.map(p=>[+p[0].toFixed(2),+p[1].toFixed(2)]),s:out.join(";")}}
 function kLayDec(lay){const W=Math.floor(cNum(lay.W,4,30)),H=Math.floor(cNum(lay.H,4,30)),IC={};for(const k in LAYC)IC[LAYC[k]]=k;const sp={};
 for(const e of String(lay.s||"").split(";")){const m=/^(\d+)\.(\d+)\.(c[a-z0-9_]+|[a-z])$/.exec(e);if(!m)continue;const x=+m[1],y=+m[2],cd=m[3];if(x>=W||y>=H)continue;let t,o={};if(cd[0]==="c"&&cd.length>1){if(!ING[cd.slice(1)])continue;t="crate";o={id:cd.slice(1)}}else if(cd==="p")t="pan";else if(cd==="o"){t="pan";o={ov:1}}else if(cd==="f"){t="pan";o={dp:1}}else{t=IC[cd];if(!t)continue}sp[x+","+y]=[t,o]}
@@ -1998,7 +1998,7 @@ function kSurface(s){const h=K.hold,it=s.item;
 if(!h&&it){K.hold=it;s.item=null;if(s.t==="board")s.cp=0;return}
 if(h&&!it){if(s.t==="board"&&!(h.k==="ing"&&ING[h.id].ch&&h.st==="raw"))return kmsg("썰 수 있는 생재료만 올려요");s.item=h;K.hold=null;if(s.t==="board")s.cp=0;return}
 if(h&&it){if(h.k==="plate"&&it.k==="ing"){if(addPlate(h,[tokOf(it)])){s.item=null;if(s.t==="board")s.cp=0}else kmsg("접시에 올릴 수 없어요")}else if(s.t!=="board"&&h.k==="ing"&&it.k==="plate"){if(addPlate(it,[tokOf(h)])){K.hold=it;s.item=null}else kmsg("접시에 올릴 수 없어요")}}}
-function kAct(){if(!K||K.over)return;if(isCoop()&&!K.ext&&(K.lq||K.pz))return;if(!isCoop()&&(K.pause||K.pz))return;if(K.co==="guest"&&!K.ext)return coAct();const bh=K.hold,bs=K.served,bsc=K.score,mt0=K.mt,tg=kTarget(),bi=tg&&tg.item,bp=tg&&tg.items?tg.items.length:0,br=K.rack,bd=K.dirty,bk=K.sinkd;kAct0();if(!tg)return;
+function kAct(){if(!K||K.over)return;if(isCoop()&&!K.ext&&(K.lq||K.pz))return;if(!isCoop()&&(K.pause||K.pz))return;if(K.co==="guest"&&!K.ext&&!K.pred){coAct();K.pred=1;try{kAct()}finally{K.pred=0}return}const bh=K.hold,bs=K.served,bsc=K.score,mt0=K.mt,tg=kTarget(),bi=tg&&tg.item,bp=tg&&tg.items?tg.items.length:0,br=K.rack,bd=K.dirty,bk=K.sinkd;kAct0();if(!tg)return;
 const cx=tg.x*KT+KT/2,cy=tg.y*KT+KT/2,ch=bh!==K.hold||K.served!==bs||bi!==tg.item||(tg.items?tg.items.length:0)!==bp||K.rack!==br||K.dirty!==bd||K.sinkd!==bk;
 if(!ch){if(K.mt>mt0){K.shk=.3;sfx.err();kTxt(K.x,K.y-34,"✖","#e5484d")}return}
 tg.bump=.22;if(K.served>bs)sfx.serve();else if(bh&&!K.hold&&tg.t==="trash")sfx.trash();else if(!bh&&K.hold)sfx.pick();else if(bh&&!K.hold)sfx.drop();else sfx.plate();
@@ -2010,7 +2010,7 @@ if(tg.t==="pan"&&!bi&&tg.item)kDots(cx,cy,6,["#fff","#ffd9a0"],35);
 if(tg.t==="sink"&&bh&&bh.k==="plate")kDots(cx,cy,5,["#cfe9ff","#fff"],30)}
 function kPeople(){const o=[];if(K.ext&&K.xsv){const v=K.xsv;o.push({x:v.x,y:v.y,get h(){return v.hold},set h(z){v.hold=z},pop(){v.hpop=.3}})}
 if(K.pl)for(const p of K.pl){if(p.left||p.on===false||p===K.xp)continue;if(typeof p.x!=="number")continue;o.push({x:p.x,y:p.y,get h(){return p.hold},set h(z){p.hold=z},pop(){p.hpop=.3}})}return o}
-function kThrow(){if(!K||K.over)return;if(isCoop()&&!K.ext&&(K.lq||K.pz))return;if(!isCoop()&&(K.pause||K.pz))return;if(K.co==="guest"&&!K.ext)return coThrow();
+function kThrow(){if(!K||K.over)return;if(isCoop()&&!K.ext&&(K.lq||K.pz))return;if(!isCoop()&&(K.pause||K.pz))return;if(K.co==="guest"&&!K.ext&&!K.pred){coThrow();K.pred=1;try{kThrow()}finally{K.pred=0}return}
 const h=K.hold;if(!h)return kmsg("던질 물건을 먼저 들어요");if(h.k==="plate")return kmsg("접시는 던질 수 없어요");const hz=Math.abs(K.fx)>=Math.abs(K.fy),dx=hz?Math.sign(K.fx):0,dy=hz?0:Math.sign(K.fy);if(!dx&&!dy)return;
 const sx=Math.floor(K.x/KT),sy=Math.floor(K.y/KT),ppl=kPeople(),x0=K.x,y0=K.y-10;
 for(let i=1;i<=5;i++){const tx=sx+dx*i,ty=sy+dy*i,cx=tx*KT+KT/2,cy=ty*KT+KT/2;
@@ -2020,9 +2020,9 @@ if(tx<0||ty<0||tx>=K.W||ty>=K.H)break;const st=K.grid[tx+","+ty];if(!st||st.t===
 if((st.t==="counter"||st.t==="board")&&!st.item){if(st.t==="board"&&!(h.k==="ing"&&ING[h.id].ch&&h.st==="raw"))return kmsg("도마엔 썰 수 있는 생재료만 던져요");st.item=h;K.hold=null;if(st.t==="board")st.cp=0;st.bump=.22;if(!K.ext){kFly(emOf(h),x0,y0,cx,cy);sfx.drop()}return}
 return kmsg("그쪽으로는 던질 수 없어요")}
 kmsg("5칸 안에 받을 친구나 빈 조리대가 없어요")}
-function coThrow(){const g=CO&&CO.g;if(!g)return;g.emit("th",{x:Math.round(K.x),y:Math.round(K.y),fx:+K.fx.toFixed(2),fy:+K.fy.toFixed(2)}).catch(()=>{});K.act=.12}
+function coThrow(){const g=CO&&CO.g;if(!g)return;K.aseq=(K.aseq||0)+1;K.apt=performance.now();g.emit("th",{n:K.aseq,x:Math.round(K.x),y:Math.round(K.y),fx:+K.fx.toFixed(2),fy:+K.fy.toFixed(2)}).catch(()=>{});K.act=.12}
 function coOnThrow(m){if(!K||K.co!=="host"||K.over)return;const p=K.pl.find(x=>x.peer===m.peer);if(!p||p.left)return;const d=m.data||{};
-if(typeof d.x==="number"){p.x=cNum(d.x,0,K.W*KT);p.y=cNum(d.y,0,K.H*KT);p.fx=cNum(d.fx,-1,1);p.fy=cNum(d.fy,-1,1)}p.on=true;p.seen=performance.now();const h0=p.hold;kAs(p,()=>kThrow());if(h0&&!p.hold)kFly(emOf(h0),p.x,p.y-10,p.x+Math.sign(p.fx)*KT*2,p.y+Math.sign(p.fy)*KT*2-10)}
+if(typeof d.x==="number"){p.x=cNum(d.x,0,K.W*KT);p.y=cNum(d.y,0,K.H*KT);p.fx=cNum(d.fx,-1,1);p.fy=cNum(d.fy,-1,1)}p.on=true;p.seen=performance.now();if(typeof d.n==="number")p.ak=d.n;const h0=p.hold;kAs(p,()=>kThrow());if(h0&&!p.hold)kFly(emOf(h0),p.x,p.y-10,p.x+Math.sign(p.fx)*KT*2,p.y+Math.sign(p.fy)*KT*2-10)}
 function kAct0(){if(!K||K.over)return;const s=kTarget();if(!s)return;const h=K.hold,t=s.t;
 if(t==="crate"){if(!h){if(K.stock[s.id]>0){K.stock[s.id]--;K.hold={k:"ing",id:s.id,st:"raw"}}else kmsg("재료가 다 떨어졌어요!")}else if(h.k==="ing"&&h.id===s.id&&h.st==="raw"){K.stock[s.id]++;K.hold=null}else if(h.k==="plate"&&!h.dirty){if(K.stock[s.id]<=0)kmsg("재료가 다 떨어졌어요!");else if(addPlate(h,[s.id+":raw"]))K.stock[s.id]--;else kmsg(ING[s.id].mc?"머신에서 뽑아서 올려요":"이 재료는 바로 올릴 수 없어요")}}
 else if(t==="counter"||t==="board")kSurface(s);
@@ -2605,14 +2605,14 @@ for(const p of K.pl){if(p.left)continue;const q=ps.find(x=>x.peer===p.peer),v=q&
 else if(p.on&&now-(p.seen||0)>15000){p.on=false}}}
 function coPos(dt){const g=CO&&CO.g;if(!g)return;K.pst=(K.pst||0)-dt;if(K.pst>0)return;K.pst=.05;const v={x:Math.round(K.x),y:Math.round(K.y),fx:+K.fx.toFixed(2),fy:+K.fy.toFixed(2),ch:K.chop&&!K.moving?1:0,mv:K.moving?1:0};if(K.co==="host"&&CO.ini)v.ini=CO.ini;const js=JSON.stringify(v);if(js===K.lpos)return;K.lpos=js;g.presence(v).catch(()=>{})}
 function coOnAct(m){if(!K||K.co!=="host"||K.over)return;const p=K.pl.find(x=>x.peer===m.peer);if(!p||p.left)return;const d=m.data||{};
-if(typeof d.x==="number"){p.x=cNum(d.x,0,K.W*KT);p.y=cNum(d.y,0,K.H*KT);p.fx=cNum(d.fx,-1,1);p.fy=cNum(d.fy,-1,1)}p.on=true;p.seen=performance.now();kAs(p,()=>kAct())}
-function coAct(){const g=CO&&CO.g;if(!g)return;g.emit("ac",{x:Math.round(K.x),y:Math.round(K.y),fx:+K.fx.toFixed(2),fy:+K.fy.toFixed(2)}).catch(()=>{});K.act=.12}
+if(typeof d.x==="number"){p.x=cNum(d.x,0,K.W*KT);p.y=cNum(d.y,0,K.H*KT);p.fx=cNum(d.fx,-1,1);p.fy=cNum(d.fy,-1,1)}p.on=true;p.seen=performance.now();if(typeof d.n==="number")p.ak=d.n;kAs(p,()=>kAct())}
+function coAct(){const g=CO&&CO.g;if(!g)return;K.aseq=(K.aseq||0)+1;K.apt=performance.now();g.emit("ac",{n:K.aseq,x:Math.round(K.x),y:Math.round(K.y),fx:+K.fx.toFixed(2),fy:+K.fy.toFixed(2)}).catch(()=>{});K.act=.12}
 const itE=it=>!it?0:it.k==="plate"?"p"+(it.dirty?1:0)+(it.tk.length?":"+it.tk.join(","):""):"i"+it.id+":"+it.st;
 const okTok=t=>{const[a,b]=String(t).split(":");return !!ING[a]&&["raw","chopped","fried","boiled","baked","deep","burnt","soft"].includes(b)};
 function itD(s){if(!s||typeof s!=="string")return null;if(s[0]==="p"){const tk=s.length>3?s.slice(3).split(",").filter(okTok):[];return{k:"plate",tk,dirty:s[1]==="1"}}const t=s.slice(1);if(!okTok(t))return null;const[id,st]=t.split(":");return{k:"ing",id,st}}
 function coSend(){const g=CO&&CO.g;if(!g)return;K.lsd=performance.now();const ss=[];K.st.forEach((s,i)=>{const t=s.t;if(t==="counter"){if(s.item)ss.push([i,itE(s.item)])}else if(t==="board"){if(s.item)ss.push([i,itE(s.item),+s.cp.toFixed(2),K.t-(s.chopT==null?-9:s.chopT)<.2?1:0])}else if(t==="pan"||t==="icm"){if(s.item)ss.push([i,itE(s.item),+s.tt.toFixed(1)])}else if(t==="pot"){if(s.tt!=null||s.items.length)ss.push([i,s.items.join(","),s.tt==null?-1:+s.tt.toFixed(1),(s.done?1:0)|(s.burnt?2:0),s.kind||0])}});
-const hd={},ms={};hd[myPeer(CO.lob)||"h"]=itE(K.hold);for(const p of K.pl){if(p.left)continue;hd[p.peer]=itE(p.hold);if(p.mid&&p.mid!==p.mids){p.mids=p.mid;ms[p.peer]=[p.mid,String(p.msg||"").slice(0,60)]}}
-const d={t:+K.t.toFixed(2),tm:+K.time.toFixed(2),sc:K.score,sv:K.served,sp:K.spawned,rk:K.rack,dr:K.dirty,sd:K.sinkd,wp:+K.wp.toFixed(2),o:K.orders.map(o=>[o.id,o.dish,+o.age.toFixed(1)]),qz:K.qz?1:0,qa:K.qid?[K.qid,{q:K.q.q,ans:K.q.ans,opts:K.q.opts||null,im:K.q.im||null}]:null,sk:K.ids.map(id=>K.stock[id]),s:ss,hd,ms,q:K.sq.splice(0),f:K.fxq.splice(0)};
+const hd={},ms={},ak={};hd[myPeer(CO.lob)||"h"]=itE(K.hold);for(const p of K.pl){if(p.left)continue;hd[p.peer]=itE(p.hold);if(p.ak)ak[p.peer]=p.ak;if(p.mid&&p.mid!==p.mids){p.mids=p.mid;ms[p.peer]=[p.mid,String(p.msg||"").slice(0,60)]}}
+const d={t:+K.t.toFixed(2),tm:+K.time.toFixed(2),sc:K.score,sv:K.served,sp:K.spawned,rk:K.rack,dr:K.dirty,sd:K.sinkd,wp:+K.wp.toFixed(2),o:K.orders.map(o=>[o.id,o.dish,+o.age.toFixed(1)]),qz:K.qz?1:0,qa:K.qid?[K.qid,{q:K.q.q,ans:K.q.ans,opts:K.q.opts||null,im:K.q.im||null}]:null,sk:K.ids.map(id=>K.stock[id]),s:ss,hd,ms,ak,q:K.sq.splice(0),f:K.fxq.splice(0)};
 const te=new TextEncoder();if(te.encode(JSON.stringify(d)).length>3800){d.f=[];if(te.encode(JSON.stringify(d)).length>3800)d.q=[]}g.emit("st",d).catch(()=>{})}
 function coHostTick(dt){coSync();coPos(dt);K.sst=(K.sst||0)-dt;if(K.sst<=0){K.sst=.05;coSend()}}
 function coReward(si,stars,del){const cat=(K&&K.plan&&K.plan.cat)||curCat(),m=S.me,pts=stars*5,gm=stars>=1?(si+1)*2:0;m.points+=pts;m.gems=(m.gems||0)+gm;if(pts>0){m.cp=(m.cp||0)+pts;db.doc("students/"+m.cls+"_"+m.sid).update({cp:m.cp}).catch(()=>{})}if(del&&stars>=1&&m.plans)delete m.plans[cat+si];let un=false;if(stars>=1)un=unlockCat(cat,si);return{pts,gm,un}}
@@ -2640,15 +2640,18 @@ c.uSt=g.on("st",m=>coOnSt(m));c.uEd=g.on("ed",m=>coOnEd(m));c.uRt=g.on("rt",m=>c
 function coQe(){const g=CO&&CO.g;if(g&&K&&K.lqid)Promise.resolve(g.emit("qe",{id:K.lqid})).catch(()=>{})}
 function coOnSt(m){const c=CO;if(!K||K.co!=="guest"||!c||m.peer!==c.hostG)return;const d=m.data;if(!d||typeof d!=="object")return;K.lastSt=performance.now();
 K.t=cNum(d.t,0,1e5);K.time=cNum(d.tm,-1,1e4);{const pz=K.qz;K.qz=d.qz?1:0;if(Array.isArray(d.qa)&&typeof d.qa[0]==="number"&&d.qa[0]!==K.lqid&&d.qz){const qq=d.qa[1]||{};if(typeof qq.q==="string"&&qq.ans!=null){K.lqid=d.qa[0];if(K.lq){const el=document.getElementById("kq");if(el){el.style.display="none";el.innerHTML=""}K.lq=false}kAsk({im:typeof qq.im==="string"&&QIMRE.test(qq.im)?qq.im:undefined,q:String(qq.q).slice(0,200),ans:typeof qq.ans==="number"?qq.ans:String(qq.ans).slice(0,60),opts:Array.isArray(qq.opts)?qq.opts.slice(0,6).map(v=>typeof v==="number"?v:String(v).slice(0,60)):undefined})}}
-if(pz&&!K.qz&&K.lq){const e=document.getElementById("kqst");if(e){e.textContent="⏱ 친구가 먼저 답해서 시간이 다시 흐르고 있어요!";e.style.color="#ffb4b4"}}}K.score=cNum(d.sc,0,1e7);K.served=cNum(d.sv,0,99);K.spawned=cNum(d.sp,0,99);K.rack=cNum(d.rk,0,99);K.dirty=cNum(d.dr,0,99);K.sinkd=cNum(d.sd,0,99);K.wp=cNum(d.wp,0,1);
+if(pz&&!K.qz&&K.lq){const e=document.getElementById("kqst");if(e){e.textContent="⏱ 친구가 먼저 답해서 시간이 다시 흐르고 있어요!";e.style.color="#ffb4b4"}}}
+const SQ=["chop","pick","drop","plate","serve","fail","trash","wash","dash","err","order","done","burn"];for(let nm of(Array.isArray(d.q)?d.q:[]).slice(0,20)){if(Array.isArray(nm)){if(nm[1]===c.me)continue;nm=nm[0]}if(SQ.includes(nm))sfx[nm]()}
+for(const e of(Array.isArray(d.f)?d.f:[]).slice(0,40)){if(!Array.isArray(e)||!KFX0[e[0]]||!Array.isArray(e[1])||(e[2]&&e[2]===c.me))continue;try{KFX0[e[0]](...e[1].slice(0,6))}catch(x){}}
+const mm=d.ms&&d.ms[c.me];if(Array.isArray(mm)&&mm[0]!==K.lmid){K.lmid=mm[0];if(!(K.aseq&&performance.now()-(K.apt||0)<1500)){K.msg=String(mm[1]||"").slice(0,60);K.mt=2.2}}
+{const ak=d.ak&&typeof d.ak==="object"?d.ak[c.me]:undefined;if(K.aseq&&(typeof ak!=="number"||ak<K.aseq)&&performance.now()-(K.apt||0)<1500)return}
+K.score=cNum(d.sc,0,1e7);K.served=cNum(d.sv,0,99);K.spawned=cNum(d.sp,0,99);K.rack=cNum(d.rk,0,99);K.dirty=cNum(d.dr,0,99);K.sinkd=cNum(d.sd,0,99);K.wp=cNum(d.wp,0,1);
 const old={};for(const o of K.orders)old[o.id]=o;K.orders=(Array.isArray(d.o)?d.o:[]).filter(o=>Array.isArray(o)&&DISH[o[1]]).slice(0,12).map(([id,dish,age])=>({id,dish,age:cNum(age,0,OLIFE),shown:old[id]?old[id].shown:false}));
 if(Array.isArray(d.sk))K.ids.forEach((id,i)=>K.stock[id]=cNum(d.sk[i],0,9999));
 for(const s of K.st){if(s.t==="counter")s.item=null;else if(s.t==="board"){s.item=null;s.cp=0}else if(s.t==="pan"||s.t==="icm"){s.item=null;s.tt=0}else if(s.t==="pot")Object.assign(s,{items:[],tt:null,done:false,burnt:false,kind:null})}
 for(const e of Array.isArray(d.s)?d.s:[]){const s=Array.isArray(e)&&K.st[e[0]];if(!s)continue;if(s.t==="counter")s.item=itD(e[1]);else if(s.t==="board"){s.item=itD(e[1]);s.cp=cNum(e[2],0,1);if(e[3])s.chopT=K.t}else if(s.t==="pan"||s.t==="icm"){s.item=itD(e[1]);if(s.item&&s.item.k!=="ing")s.item=null;s.tt=cNum(e[2],0,99)}else if(s.t==="pot"){s.items=typeof e[1]==="string"&&e[1]?e[1].split(",").filter(okTok).slice(0,4):[];s.tt=e[2]<0?null:cNum(e[2],0,99);s.done=!!(e[3]&1);s.burnt=!!(e[3]&2);s.kind=typeof e[4]==="string"?e[4]:null}}
 const hd=d.hd&&typeof d.hd==="object"?d.hd:{},nh=itD(hd[c.me]);if(!!nh!==!!K.hold)K.hpop=.3;K.hold=nh;for(const p of K.pl)p.hold=itD(hd[p.peer]);
-const mm=d.ms&&d.ms[c.me];if(Array.isArray(mm)&&mm[0]!==K.lmid){K.lmid=mm[0];K.msg=String(mm[1]||"").slice(0,60);K.mt=2.2}
-const SQ=["chop","pick","drop","plate","serve","fail","trash","wash","dash","err","order","done","burn"];for(const nm of(Array.isArray(d.q)?d.q:[]).slice(0,20))if(SQ.includes(nm))sfx[nm]();
-for(const e of(Array.isArray(d.f)?d.f:[]).slice(0,40)){if(!Array.isArray(e)||!KFX0[e[0]]||!Array.isArray(e[1]))continue;try{KFX0[e[0]](...e[1].slice(0,6))}catch(x){}}}
+}
 function coGTick(dt){coSync();coPos(dt);const gap=performance.now()-(K.lastSt||0);if(gap>45000)return coGLost();if(gap>4000&&(K.mt||0)<.3){K.msg="📶 방장과 연결이 잠깐 끊겼어요. 기다리는 중…";K.mt=1.2}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&K&&K.co==="guest")K.lastSt=performance.now()});
 setInterval(()=>{try{if(K&&K.co==="host"&&!K.over&&CO&&CO.g&&(document.hidden||performance.now()-(K.lsd||0)>900)){coSync();coSend()}}catch(e){}},1000);
@@ -2670,8 +2673,8 @@ if(p.hold){const hx=x+p.fx*20,hy=y+p.fy*14-6-bob;p.hold.k==="plate"?kPlate(c,p.h
 const nm=String(p.n||"친구").slice(0,8);c.font="bold 10px sans-serif";c.textAlign="center";c.textBaseline="middle";const w=c.measureText(nm).width+12;c.fillStyle=p.col;rr(c,x-w/2,y-50,w,14,7);c.fill();c.fillStyle="#fff";c.fillText(nm,x,y-43)}}
 // 효과·소리 기록 (방장 화면의 효과를 친구 화면에도 재생)
 const KFX0={kFly,kTxt,kDots,kRing,kBurst};let KFXD=0;
-for(const nm in KFX0){const f=KFX0[nm];window[nm]=function(...a){KFXD++;try{return f.apply(null,a)}finally{KFXD--;if(!KFXD&&K&&K.co==="host"&&K.fxq&&K.fxq.length<40)K.fxq.push([nm,a.map(v=>typeof v==="number"?Math.round(v):v)])}}}
-{const NOQ=["step","tick","bub","win","lose","quiz","qok","qno"];for(const nm in sfx){const f=sfx[nm];sfx[nm]=function(){f();if(K&&K.co==="host"&&K.sq&&!NOQ.includes(nm)&&K.sq.length<20)K.sq.push(nm)}}}
+for(const nm in KFX0){const f=KFX0[nm];window[nm]=function(...a){KFXD++;try{return f.apply(null,a)}finally{KFXD--;if(!KFXD&&K&&K.co==="host"&&K.fxq&&K.fxq.length<40)K.fxq.push([nm,a.map(v=>typeof v==="number"?Math.round(v):v),K.ext&&K.xp?K.xp.peer:0])}}}
+{const NOQ=["step","tick","bub","win","lose","quiz","qok","qno"];for(const nm in sfx){const f=sfx[nm];sfx[nm]=function(){f();if(K&&K.co==="host"&&K.sq&&!NOQ.includes(nm)&&K.sq.length<20)K.sq.push(K.ext&&K.xp?[nm,K.xp.peer]:nm)}}}
 let B=null,BCNT=0,BOSSI=0;
 const QOPS=["+","−","×","÷"],QOPN=["더하기","빼기","곱하기","나누기"],QNUM=[["int","자연수"],["frac","분수"],["dec","소수"]];
 const gcd=(a,b)=>b?gcd(b,a%b):a,rnI=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pk=a=>a[Math.floor(Math.random()*a.length)],shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
