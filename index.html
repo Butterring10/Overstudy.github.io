@@ -496,7 +496,7 @@ async function delS(sid){const k="s_"+sid;if(S.arm!==k){S.arm=k;return teacher()
 try{await db.doc("students/"+S.tsel+"_"+sid).delete();await loadT();qMsg("spm",`${x?x.name:sid} 학생 계정을 삭제했어요.`)}catch(e){await loadT();qMsg("spm","삭제하지 못했어요. 잠시 후 다시 해 보세요.",1)}}
 async function delC(c){if(S.arm!=="c_"+c){S.arm="c_"+c;return teacher()}S.arm=null;
 try{const q=await db.collection("students").where("cls","==",c).get();for(const d of q.docs){const x=d.data();await db.doc("students/"+c+"_"+x.sid).delete()}await db.doc("classes/"+c).delete();if(S.tsel===c)S.tsel=null}catch(e){S.err="삭제 중 문제가 생겼어요."}loadT()}
-const RSI=[["points","⭐ 점수"],["coins","🪙 코인"],["gems","💎 보석"],["hunt","⚔️ 토벌 기록"],["cook","🍳 요리 기록"],["raid","🎟 레이드 참여권"]],RSF={points:["points"],coins:["coins"],gems:["gems"],hunt:["bw","bp","rw"],cook:["cp","cw"],raid:["rt","mc"]};
+const RSI=[["points","⭐ 점수"],["coins","🪙 코인"],["gems","💎 보석"],["hunt","⚔️ 토벌 기록"],["cook","🍳 요리 기록"],["raid","🎟 레이드 참여권"],["lv","🏅 식당 레벨·셰프 증표"]],RSF={points:["points"],coins:["coins"],gems:["gems"],hunt:["bw","bp","rw"],cook:["cp","cw"],raid:["rt","mc"],lv:["cookCats","cookStage"]};
 function rsSel(){if(!S.rsSel)S.rsSel={points:1,coins:1,gems:1,hunt:1,cook:1,raid:0};return S.rsSel}
 async function resetC(c){const on=RSI.filter(([k])=>rsSel()[k]);if(!on.length)return;if(S.arm!=="rs_"+c){S.arm="rs_"+c;S.rsMsg="";teacher();return}S.arm=null;const L=(S.tstu||[]).filter(x=>x.sid!=="teacher");let ok=0,fail=0;S.rsMsg="초기화하는 중…";teacher();
 const up={};on.forEach(([k])=>RSF[k].forEach(f=>up[f]=0));
@@ -2147,7 +2147,7 @@ if(Object.keys(seen).length!==free.length)return null;
 isl.forEach(([x,y])=>put(x,y,"counter"));hol.forEach(([x,y])=>put(x,y,"hole"));
 const cx=W/2-.5,cy=H/2-.5,fs=free.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy)).slice(0,4);if(fs.length<4)return null;
 return{sp,spw:fs.map(([x,y])=>[x+.5,y+.5]),W,H,L}}
-const APPV=251;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
+const APPV=252;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
 function kLayEnc(){const out=[];for(const s of K.st){const edge=s.x===0||s.y===0||s.x===K.W-1||s.y===K.H-1;if(s.t==="counter"&&edge)continue;let cd=s.t==="crate"?"c"+s.id:s.t==="pan"?(s.ov?"o":s.dp?"f":"p"):LAYC[s.t];if(!cd)continue;out.push(s.x+"."+s.y+"."+cd)}return{W:K.W,H:K.H,L:K.L,sp:K.sp.map(p=>[+p[0].toFixed(2),+p[1].toFixed(2)]),s:out.join(";")}}
 function kLayDec(lay){const W=Math.floor(cNum(lay.W,4,30)),H=Math.floor(cNum(lay.H,4,30)),IC={};for(const k in LAYC)IC[LAYC[k]]=k;const sp={};
 for(const e of String(lay.s||"").split(";")){const m=/^(\d+)\.(\d+)\.(c[a-z0-9_]+|[a-z])$/.exec(e);if(!m)continue;const x=+m[1],y=+m[2],cd=m[3];if(x>=W||y>=H)continue;let t,o={};if(cd[0]==="c"&&cd.length>1){if(!ING[cd.slice(1)])continue;t="crate";o={id:cd.slice(1)}}else if(cd==="p")t="pan";else if(cd==="o"){t="pan";o={ov:1}}else if(cd==="f"){t="pan";o={dp:1}}else{t=IC[cd];if(!t)continue}sp[x+","+y]=[t,o]}
@@ -3014,7 +3014,7 @@ function rdCreate(){if(!RAID||RAID.g)return;rdJoin(("rd"+visNm(S.me.cls)+"-"+Mat
 async function rdJoin(id,host){const r=RAID;if(!r||r.g||r.joining||rdTk()<=0)return;r.joining=true;rdLobDraw();let g;try{g=await ROOM.join(id)}catch(e){r.joining=false;r.msg="레이드방에 들어가지 못했어요.";return rdLobDraw()}r.joining=false;if(RAID!==r){g.leave().catch(()=>{});return}
 Object.assign(r,{id,g,host:!!host,me:myPeer(g),an:null,a:null,rr:0,H:host?{st:"lobby",mem:[],nm:{},r:0}:null,x:480,y:400,fx:0,hp:RD_HP,pt:[],br:0,ammo:0,ps:[],fs:0,dh:0,ofs:{},msg:"",pops:[],fxm:{},bfl:0,sig:""});
 r.ung=g.onPeers(()=>rdChange());rdPres(1);rdLobPres();rdChange();clearInterval(r.iv);r.iv=setInterval(()=>{if(RAID===r){if(r.host)rdHost();rdChange();rdPres()}},200)}
-function rdQuit(){const r=RAID;if(!r)return;RAID=null;clearInterval(r.iv);cancelAnimationFrame(r.raf);removeEventListener("keydown",rdKey);removeEventListener("keyup",rdKey);try{r.unl&&r.unl()}catch(e){}try{r.ung&&r.ung()}catch(e){}if(r.g)r.g.leave().catch(()=>{});if(r.lob)r.lob.leave().catch(()=>{});bgmOff(['mon'])}
+function rdQuit(){const r=RAID;if(!r)return;RAID=null;clearInterval(r.iv);cancelAnimationFrame(r.raf);removeEventListener("keydown",rdKey);removeEventListener("keyup",rdKey);try{r.unl&&r.unl()}catch(e){}try{r.ung&&r.ung()}catch(e){}gLeaveLater(r.g,r.H&&r.H.st==="end");if(r.lob)r.lob.leave().catch(()=>{});bgmOff(['mon'])}
 function rdExit(){const r=RAID;if(r&&r.H&&r.H.st==="play"&&!confirm("레이드에서 나갈까요? 참여권은 돌아오지 않아요."))return;huntMenu()}
 function rdPres(force){const r=RAID;if(!r||!r.g)return;const o={n:String(S.me.name||"").slice(0,20),ch:chKey(),tk:rdTk()>0||r.paidTk?1:0,r:r.rr,an:r.an,a:r.a,hp:r.hp,br:r.br,x:Math.round(r.x),y:Math.round(r.y),pt:r.pt,sh:r.bar&&r.bar.sh?1:0,dh:r.dh||0,fs:r.fs||0};if(r.host)o.H=r.H;const js=JSON.stringify(o);if(!force&&js===r.lps)return;r.lps=js;Promise.resolve(r.g.presence(o)).catch(()=>{})}
 function rdAll(){const r=RAID,L=rdPeers().filter(p=>!p.sameTab).map(p=>({peer:p.peer,...p.presence}));L.push({peer:r.me,n:S.me.name,ch:chKey(),tk:1,r:r.rr,an:r.an,a:r.a,hp:r.hp,br:r.br,x:r.x,y:r.y,pt:r.pt,dh:r.dh||0});return L}
@@ -3036,7 +3036,7 @@ if(bhp>0&&H.act==="atk"){const c=H.mem.filter(p=>hp[p]>0&&!dodged[p]);if(c.lengt
 H.ev=ev;H.hp=hp;H.bhp=bhp;H.ph="res";H.t0=Date.now();H.rd=700+ev.length*850;rdPres(1);rdChange()}
 function rdEnd(win){const r=RAID,H=r.H;H.st="end";H.ph="end";H.win=win?1:0;rdPres(1);rdChange()}
 // ---- 모두 ----
-function rdChange(){const r=RAID;if(!r||!r.g)return;if(!r.me)r.me=myPeer(r.g);if(!r.host){const hp=rdPeers().find(p=>p.presence.H);if(!hp){if(r.H&&r.H.st!=="end"){r.H={...r.H,st:"end",ph:"end",gone:1}}else if(!r.H){r.wt=(r.wt||0)+1;if(r.wt>40)r.H={st:"end",ph:"end",gone:1,mem:[],nm:{}}}}else r.H=hp.presence.H}
+function rdChange(){const r=RAID;if(!r||!r.g)return;if(!r.me)r.me=myPeer(r.g);if(!r.host){const hp=rdPeers().find(p=>p.presence.H);if(!hp){if(r.H&&r.H.st!=="end"){const H0=r.H,won=H0.st==="play"&&H0.bhp!=null&&H0.bhp<=0,lost=H0.st==="play"&&!won&&(H0.mem||[]).length&&(H0.mem||[]).every(p=>!((H0.hp||{})[p]>0));r.H=won||lost?{...H0,st:"end",ph:"end",win:won?1:0}:{...H0,st:"end",ph:"end",gone:1}}else if(!r.H){r.wt=(r.wt||0)+1;if(r.wt>40)r.H={st:"end",ph:"end",gone:1,mem:[],nm:{}}}}else r.H=hp.presence.H}
 const H=r.H;if(!H)return rdDraw();
 if(H.st==="lobby"&&(H.full||[]).includes(r.me)){r.msg="";const l=RAID;rdLeaveRoom("방이 가득 찼어요 (4명).");return}
 if(H.st==="play"){const mine=H.mem.includes(r.me);if(!r.started){r.started=1;{const ix=H.mem.indexOf(r.me),n=H.mem.length;if(ix>=0){r.x=480+(ix-(n-1)/2)*110;r.y=410}}if(mine&&!S.isT){r.paidTk=1;S.me.rt=Math.max(0,(S.me.rt||0)-1);db.doc("students/"+S.me.cls+"_"+S.me.sid).update({rt:S.me.rt}).catch(()=>{})}rdMount()}
@@ -3047,7 +3047,7 @@ if(H.ph==="bar"&&r.barR!==H.r){r.barR=H.r;r.hp=H.hp[r.me]||0;r.bar=rdBuild(H);r.
 if(H.ph!=="bar"&&r.bar&&r.bar.t>=r.bar.dur)r.bar=null;if(H.ph!=="bar"&&H.ph!=="res")r.hp=H.hp[r.me]||0}
 if(H.st==="end"&&!r.fin){r.fin=1;r.bar=null;r.endAt=performance.now();rdFinish()}
 rdDraw()}
-function rdLeaveRoom(msg){const r=RAID;if(!r)return;clearInterval(r.iv);cancelAnimationFrame(r.raf);try{r.ung&&r.ung()}catch(e){}if(r.g)r.g.leave().catch(()=>{});removeEventListener("keydown",rdKey);removeEventListener("keyup",rdKey);Object.assign(r,{g:null,H:null,host:false,started:0,fin:0,mounted:0,msg:msg||""});rdLobPres();rdLobDraw()}
+function rdLeaveRoom(msg){const r=RAID;if(!r)return;clearInterval(r.iv);cancelAnimationFrame(r.raf);try{r.ung&&r.ung()}catch(e){}gLeaveLater(r.g,r.H&&r.H.st==="end");removeEventListener("keydown",rdKey);removeEventListener("keyup",rdKey);Object.assign(r,{g:null,H:null,host:false,started:0,fin:0,mounted:0,msg:msg||""});rdLobPres();rdLobDraw()}
 function rdAnsI(i){const r=RAID;if(!r||r.an||!r.H||r.H.ph!=="q")return;rdAnsV(r.H.q.opts[i])}
 function rdAnsT(){const e=document.getElementById("rda"),v=e&&e.value.trim();if(v)rdAnsV(v)}
 function rdAnsV(v){const r=RAID;if(!r||r.an||!r.H||r.H.ph!=="q"||!(r.H.hp[r.me]>0))return;r.an={ok:same(v,r.H.q.ans)?1:0,t:Date.now()-(r.qt0||Date.now())};try{r.an.ok?sfx.qok():sfx.qno()}catch(e){}rdPres(1);if(r.host)rdHost();rdDraw()}
