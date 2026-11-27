@@ -2309,7 +2309,7 @@ if(Object.keys(seen).length!==free.length)return null;
 isl.forEach(([x,y])=>put(x,y,"counter"));hol.forEach(([x,y])=>put(x,y,"hole"));
 const cx=W/2-.5,cy=H/2-.5,fs=free.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy)).slice(0,4);if(fs.length<4)return null;
 return{sp,spw:fs.map(([x,y])=>[x+.5,y+.5]),W,H,L}}
-const APPV=272;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
+const APPV=273;try{addEventListener("DOMContentLoaded",()=>{});setTimeout(()=>{if(document.getElementById("appv"))return;const d=document.createElement("div");d.id="appv";d.textContent="v"+APPV;d.style.cssText="position:fixed;right:6px;bottom:4px;font-size:11px;opacity:.45;pointer-events:none;z-index:50;color:#567";document.body.appendChild(d)},0)}catch(e){}const LAYC={serve:"s",dirty:"d",sink:"k",rack:"r",trash:"t",pot:"q",board:"b",icm:"m",counter:"n",hole:"h"};
 function kLayEnc(){const out=[];for(const s of K.st){const edge=s.x===0||s.y===0||s.x===K.W-1||s.y===K.H-1,st=s.t0||s.t;if(st==="counter"&&edge)continue;let cd=st==="crate"?"c"+s.id:st==="pan"?(s.ov?"o":s.dp?"f":"p"):LAYC[st];if(!cd)continue;out.push(s.x+"."+s.y+"."+cd)}return{W:K.W,H:K.H,L:K.L,sp:K.sp.map(p=>[+p[0].toFixed(2),+p[1].toFixed(2)]),s:out.join(";")}}
 function kLayDec(lay){const W=Math.floor(cNum(lay.W,4,30)),H=Math.floor(cNum(lay.H,4,30)),IC={};for(const k in LAYC)IC[LAYC[k]]=k;const sp={};
 for(const e of String(lay.s||"").split(";")){const m=/^(\d+)\.(\d+)\.(c[a-z0-9_]+|[a-z])$/.exec(e);if(!m)continue;const x=+m[1],y=+m[2],cd=m[3];if(x>=W||y>=H)continue;let t,o={};if(cd[0]==="c"&&cd.length>1){if(!ING[cd.slice(1)])continue;t="crate";o={id:cd.slice(1)}}else if(cd==="p")t="pan";else if(cd==="o"){t="pan";o={ov:1}}else if(cd==="f"){t="pan";o={dp:1}}else{t=IC[cd];if(!t)continue}sp[x+","+y]=[t,o]}
@@ -2748,6 +2748,7 @@ kPl(c,K.x+sh,K.y+14-bob-wk,K.dash>0?.75:1,mv?Math.sin(ph)*.07:0,1+bre,1-bre-(mv?
 if(K.bm>1){c.strokeStyle="rgba(255,190,30,.85)";c.lineWidth=2;c.beginPath();c.ellipse(K.x,K.y+13,19+Math.sin(K.t*10)*2,7,0,0,7);c.stroke();kEm(c,"⚡",K.x+15,K.y-30+Math.sin(K.t*8)*2,14)}else if(K.bm<1)kEm(c,"🐌",K.x+15,K.y-30+Math.sin(K.t*3)*2,14);
 
 if(K.hold){const hx=K.x+K.fx*20,hy=K.y+K.fy*14-6-bob-wk,pp=1+K.hpop*1.6;kItemD(c,K.hold,hx,hy,22*pp)}
+if(K.chop&&!K.moving&&!K.spw&&K.sinkd>0){const ft=kFace(K.x,K.y,K.fx,K.fy);if(ft&&ft.t==="sink")kSponge(c,ft.x*KT+KT/2-Math.sign(K.fx)*KT*.12*(Math.abs(K.fx)>=Math.abs(K.fy)),ft.y*KT+KT/2-2,17,K.t)}
 kFxDraw(c);kAmbD(c,now,adt);
 c.setTransform(1,0,0,1,0,0);c.drawImage(K.vg,0,0);c.setTransform(2,0,0,2,0,0);kMini(c);kHudC(c);
 const el=document.getElementById("kmsg");if(el){if(K.msg){el.style.display="block";el.textContent=K.msg}else el.style.display="none"}}
@@ -3076,10 +3077,18 @@ function coGQuit(silent){const c=CO;if(!K||!c)return;K.over=true;if(c.g)c.g.emit
 function coOnRt(m){const c=CO;if(!c||m.peer!==c.hostG||!m.data||m.data.to!==c.me||!c.quitW)return;clearTimeout(c.quitW);coRtDone(m.data,c.quitS)}
 function coRtDone(d,silent){const c=CO;if(c){c.quitW=null;try{c.uSt&&c.uSt();c.uEd&&c.uEd();c.uRt&&c.uRt()}catch(e){}if(c.g)c.g.leave().catch(()=>{});c.g=null;c.inGame=false;c.role=null}
 if(d){coApply(d.con||{},d.ret||{});ckSave()}if(silent||!c||CO!==c)return;c.msg=d?"요리에서 나왔어요. 쓴 재료는 사라지고 남은 재료는 넣은 만큼 돌려받았어요.":"방장 응답이 없어서 내 재료는 그대로예요.";coPres();if(CK&&CK.view==="lobby")ckDraw()}
+function kSponge(c,x,y,s,t){const ox=Math.cos(t*12)*s*.22,oy=Math.sin(t*12)*s*.14;c.save();c.translate(x+ox,y+oy);c.rotate(-.22+Math.sin(t*12)*.18);
+for(let i=0;i<5;i++){const a=t*3+i*1.26,r=s*(.5+.12*Math.sin(t*7+i)),ph=(t*1.8+i*.2)%1;c.fillStyle="rgba(255,255,255,"+(.85-ph*.5).toFixed(2)+")";c.beginPath();c.arc(Math.cos(a)*r,Math.sin(a)*r*.6+s*.18,s*(.08+.05*ph),0,7);c.fill()}
+const w=s,h=s*.62;c.fillStyle="rgba(0,0,0,.18)";rr(c,-w/2+1,-h/2+2,w,h,s*.14);c.fill();
+c.fillStyle="#ffd451";rr(c,-w/2,-h/2,w,h,s*.14);c.fill();c.fillStyle="#3fa857";rr(c,-w/2,-h/2,w,h*.34,s*.12);c.fill();c.fillRect(-w/2,-h/2+h*.2,w,h*.14);
+c.fillStyle="rgba(190,140,20,.55)";for(const[px,py]of[[-.3,.12],[-.05,.25],[.22,.1],[.33,.3],[-.2,.33],[.08,.02]]){c.beginPath();c.arc(px*w,py*h,s*.045,0,7);c.fill()}
+c.strokeStyle="#6b5320";c.lineWidth=1;rr(c,-w/2,-h/2,w,h,s*.14);c.stroke();c.fillStyle="rgba(255,255,255,.55)";rr(c,-w/2+2,-h/2+1.5,w*.45,h*.12,2);c.fill();
+for(let i=0;i<3;i++){const a=-t*4+i*2.1;c.fillStyle="rgba(255,255,255,.9)";c.beginPath();c.arc(Math.cos(a)*w*.42,-h*.5+Math.sin(a)*2,s*.1,0,7);c.fill()}c.restore()}
+function kFace(x,y,fx,fy){const h=Math.abs(fx)>=Math.abs(fy),dx=h?Math.sign(fx):0,dy=h?0:Math.sign(fy);if(!dx&&!dy)return null;return K.grid[Math.floor((x+dx*KT*.675)/KT)+","+Math.floor((y+dy*KT*.675)/KT)]||null}
 function kOthers(c){if(!K.pl)return;for(const p of K.pl){if(!p.on||p.left)continue;p.rx+=(p.x-p.rx)*.3;p.ry+=(p.y-p.ry)*.3;const x=p.rx,y=p.ry,bob=p.moving?Math.abs(Math.sin(K.t*16+p.x*.1))*4:0;
 c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+14,13,5,0,0,7);c.fill();c.strokeStyle=p.col;c.lineWidth=2.5;c.beginPath();c.ellipse(x,y+14,16,6.5,0,0,7);c.stroke();
 kPl(c,x,y+14-bob,1,p.moving?Math.sin(K.t*16)*.07:0,1,1,p.img,p.fx);
-if(p.chop&&!p.moving){c.save();c.translate(x+(p.fx<-.3?-12:12),y-2);c.rotate(Math.sin(K.t*13)*.3);kEm(c,"🔪",0,0,14);c.restore()}
+if(p.chop&&!p.moving){const ft=kFace(p.x,p.y,p.fx,p.fy);if(ft&&ft.t==="sink")kSponge(c,ft.x*KT+KT/2-Math.sign(p.fx)*KT*.12*(Math.abs(p.fx)>=Math.abs(p.fy)),ft.y*KT+KT/2-2,17,K.t+p.x*.01);else{c.save();c.translate(x+(p.fx<-.3?-12:12),y-2);c.rotate(Math.sin(K.t*13)*.3);kEm(c,"🔪",0,0,14);c.restore()}}
 if(p.hold){const hx=x+p.fx*20,hy=y+p.fy*14-6-bob;kItemD(c,p.hold,hx,hy,22)}
 const nm=String(p.n||"친구").slice(0,8);c.font="bold 10px sans-serif";c.textAlign="center";c.textBaseline="middle";const w=c.measureText(nm).width+12;c.fillStyle=p.col;rr(c,x-w/2,y-50,w,14,7);c.fill();c.fillStyle="#fff";c.fillText(nm,x,y-43)}}
 // 효과·소리 기록 (방장 화면의 효과를 친구 화면에도 재생)
